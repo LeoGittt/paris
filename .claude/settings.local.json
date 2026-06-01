@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__plugin_engram_engram__mem_search",
+      "WebFetch(domain:www.chevroletparis.com.ar)",
+      "WebFetch(domain:www.chevrolet.com.ar)",
+      "WebFetch(domain:www.chevrolet.com)",
+      "WebFetch(domain:brandguidelines.gm.com)",
+      "Bash(Get-ChildItem -Recurse \"D:\\\\Descargas\\\\chevrolet-prode-page\\\\public\\\\LEONEL ARCHIVOS\")",
+      "Bash(Select-Object FullName, Extension, Length)",
+      "WebFetch(domain:grupolorenzo.leadit.ar)",
+      "Bash(node -e ' *)",
+      "Bash(npm run *)",
+      "Bash(git init *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git remote *)",
+      "Bash(git branch *)"
+    ]
+  }
+}

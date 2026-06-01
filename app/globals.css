@@ -1,0 +1,255 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+/* ─── ChevySans custom font ─────────────────────────── */
+@font-face {
+  font-family: 'ChevySans';
+  src: url('/fonts/ChevySans-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'ChevySans';
+  src: url('/fonts/ChevySans-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'ChevySans';
+  src: url('/fonts/ChevySans-Demi.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'ChevySans';
+  src: url('/fonts/ChevySans-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'ChevySans';
+  src: url('/fonts/ChevySans-Black.otf') format('opentype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'ChevySansCondensed';
+  src: url('/fonts/ChevySans-CondensedRegular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'ChevySansNarrow';
+  src: url('/fonts/ChevySans-NarrowBlackItalic.otf') format('opentype');
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* ─── Chevrolet brand color palette ─────────────────── */
+/* #06192c  Navy (dark bg)                               */
+/* #054a9d  Chevrolet Blue (primary)                     */
+/* #c3871e  Chevrolet Gold (bowtie / premium accent)     */
+/* #b18633  Gold secondary                               */
+/* #1e1e1e  Near-black                                   */
+/* #363636  Dark gray                                    */
+/* #01220f  Deep green (accent)                          */
+
+:root {
+  --background:          #06192c;
+  --background-rgb:      6, 25, 44;
+  --foreground:          #f0f4f8;
+  --card:                #0b2440;
+  --card-foreground:     #f0f4f8;
+  --popover:             #0b2440;
+  --popover-foreground:  #f0f4f8;
+
+  /* Chevrolet Blue as primary interactive */
+  --primary:             #054a9d;
+  --primary-foreground:  #ffffff;
+
+  --secondary:           #0d2d50;
+  --secondary-foreground:#f0f4f8;
+  --muted:               #0f3060;
+  --muted-foreground:    #7a9bb8;
+
+  /* Gold as accent */
+  --accent:              #c3871e;
+  --accent-foreground:   #ffffff;
+
+  --destructive:         #cc3333;
+  --destructive-foreground: #ffffff;
+  --border:              #1a3a5c;
+  --input:               #0d2d50;
+  --ring:                #054a9d;
+  --radius:              0.5rem;
+
+  /* Extra brand tokens */
+  --gold:                #c3871e;
+  --gold-light:          #e8a832;
+  --gold-dark:           #9a6815;
+  --navy:                #06192c;
+  --navy-light:          #0b2440;
+  --blue-brand:          #054a9d;
+  --blue-brand-light:    #1a65c0;
+
+  /* Charts */
+  --chart-1: #054a9d;
+  --chart-2: #c3871e;
+  --chart-3: #739f3a;
+  --chart-4: #b18633;
+  --chart-5: #01220f;
+
+  /* Sidebar */
+  --sidebar:                    #040f1c;
+  --sidebar-foreground:         #f0f4f8;
+  --sidebar-primary:            #054a9d;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent:             #0d2d50;
+  --sidebar-accent-foreground:  #f0f4f8;
+  --sidebar-border:             #1a3a5c;
+  --sidebar-ring:               #054a9d;
+}
+
+@theme inline {
+  --font-sans:    'ChevySans', 'Inter', sans-serif;
+  --font-display: 'ChevySans', sans-serif;
+  --font-narrow:  'ChevySansNarrow', sans-serif;
+  --font-condensed: 'ChevySansCondensed', sans-serif;
+  --font-mono:    'Geist Mono', monospace;
+
+  --color-background:         var(--background);
+  --color-foreground:         var(--foreground);
+  --color-card:               var(--card);
+  --color-card-foreground:    var(--card-foreground);
+  --color-popover:            var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary:            var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary:          var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted:              var(--muted);
+  --color-muted-foreground:   var(--muted-foreground);
+  --color-accent:             var(--accent);
+  --color-accent-foreground:  var(--accent-foreground);
+  --color-destructive:        var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border:             var(--border);
+  --color-input:              var(--input);
+  --color-ring:               var(--ring);
+  --color-chart-1:            var(--chart-1);
+  --color-chart-2:            var(--chart-2);
+  --color-chart-3:            var(--chart-3);
+  --color-chart-4:            var(--chart-4);
+  --color-chart-5:            var(--chart-5);
+  --radius-sm:   calc(var(--radius) - 2px);
+  --radius-md:   var(--radius);
+  --radius-lg:   calc(var(--radius) + 4px);
+  --radius-xl:   calc(var(--radius) + 8px);
+  --color-sidebar:                    var(--sidebar);
+  --color-sidebar-foreground:         var(--sidebar-foreground);
+  --color-sidebar-primary:            var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent:             var(--sidebar-accent);
+  --color-sidebar-accent-foreground:  var(--sidebar-accent-foreground);
+  --color-sidebar-border:             var(--sidebar-border);
+  --color-sidebar-ring:               var(--sidebar-ring);
+}
+
+@layer base {
+  * { @apply border-border outline-ring/50; }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'ChevySans', 'Inter', sans-serif;
+  }
+}
+
+/* ─── Animations ─────────────────────────────────────── */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-12px); }
+}
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.3; }
+  50%       { opacity: 0.7; }
+}
+@keyframes shine {
+  0%   { transform: translateX(-100%) skewX(-15deg); }
+  100% { transform: translateX(300%) skewX(-15deg); }
+}
+@keyframes scan-line {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(400%); }
+}
+
+.animate-float       { animation: float 4s ease-in-out infinite; }
+.animate-glow-pulse  { animation: glow-pulse 2.5s ease-in-out infinite; }
+
+/* ─── Gold gradient text ─────────────────────────────── */
+.gradient-text {
+  background: linear-gradient(135deg, #e8a832 0%, #c3871e 50%, #9a6815 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Blue gradient text (titles) */
+.gradient-text-blue {
+  background: linear-gradient(135deg, #ffffff 0%, #a8c8f0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Glass card ─────────────────────────────────────── */
+.glass {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+/* ─── Gold border ────────────────────────────────────── */
+.gold-border {
+  border: 1px solid rgba(195, 135, 30, 0.3);
+  transition: border-color 0.2s;
+}
+.gold-border:hover { border-color: rgba(195, 135, 30, 0.6); }
+
+/* ─── Diagonal stripe (brand decoration) ────────────── */
+.stripe-bg {
+  background-image: repeating-linear-gradient(
+    -55deg,
+    transparent,
+    transparent 8px,
+    rgba(5, 74, 157, 0.06) 8px,
+    rgba(5, 74, 157, 0.06) 16px
+  );
+}
+
+/* ─── Button shine ───────────────────────────────────── */
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+}
+.btn-shine::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.15) 50%,
+    transparent 65%
+  );
+  transform: translateX(-100%) skewX(-15deg);
+  animation: shine 4s ease-in-out infinite;
+  pointer-events: none;
+}

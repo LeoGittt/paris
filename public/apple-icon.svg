@@ -1,0 +1,7 @@
+<svg width='180' height='180' viewBox='0 0 180 180' fill='none' xmlns='http://www.w3.org/2000/svg'>
+  <rect width='180' height='180' rx='36' fill='#06192c'/>
+  <path d='M22 76 L50 76 L50 62 L90 62 L90 76 L130 76 L130 62 L158 62 L158 118 L130 118 L130 104 L90 104 L90 118 L50 118 L50 104 L22 104 Z' fill='#c3871e'/>
+  <rect x='50' y='76' width='80' height='28' fill='#06192c'/>
+  <rect x='74' y='62' width='32' height='56' fill='#c3871e'/>
+  <rect x='82' y='70' width='16' height='40' fill='#e8a832'/>
+</svg>
