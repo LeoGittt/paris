@@ -53,8 +53,8 @@ export function Countdown() {
               <div className="absolute top-0 left-2 right-2 h-px bg-linear-to-r from-transparent via-[#c3871e]/60 to-transparent" />
 
               <span
-                className="font-black gradient-text tabular-nums leading-none
-                           text-[1.9rem] md:text-[2.8rem]"
+                className="font-black tabular-nums leading-none text-[1.9rem] md:text-[2.8rem]"
+                style={{ background: "linear-gradient(135deg, #e8a832 0%, #c3871e 50%, #9a6815 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}
                 style={{ fontFamily: "'ChevySans', sans-serif" }}
               >
                 {display(unit.value)}

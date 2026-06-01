@@ -221,7 +221,7 @@ export default function ProdePage() {
                            text-[3.2rem] md:text-[6rem]"
                 style={{ fontFamily: "'ChevySans', sans-serif" }}>
               PRODE<br />
-              <span className="gradient-text">MUNDIAL</span>
+              <span style={{ background: "linear-gradient(135deg, #e8a832 0%, #c3871e 50%, #9a6815 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>MUNDIAL</span>
               <span className="md:hidden"> 2026</span>
               <span className="hidden md:block">
                 <br />2026
@@ -515,7 +515,7 @@ export default function ProdePage() {
             style={{ fontSize: "clamp(2.8rem, 8vw, 6rem)" }}
           >
             ¿LISTO PARA<br />
-            <span className="gradient-text">JUGAR?</span>
+            <span style={{ background: "linear-gradient(135deg, #e8a832 0%, #c3871e 50%, #9a6815 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>JUGAR?</span>
           </h2>
           <p className="text-white/60 text-base md:text-xl mb-10 max-w-lg mx-auto leading-relaxed font-medium">
             Registrate ahora y sé parte de la mejor experiencia del
