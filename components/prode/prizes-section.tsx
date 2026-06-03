@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import type { LandingPrize } from "@/app/page"
 
 interface Props { prizes?: LandingPrize[] }
@@ -23,13 +24,21 @@ export function PrizesSection({ prizes }: Props) {
       {/* Premio principal */}
       <div className="lg:col-span-2 group relative rounded-2xl overflow-hidden bg-[#0b2440] border border-[#c3871e]/25 hover:border-[#c3871e]/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-[#c3871e]/10">
         <div className="absolute top-0 inset-x-0 h-0.5 bg-linear-to-r from-transparent via-[#c3871e] to-transparent" />
-        <div className="p-7 md:p-10 flex flex-col md:flex-row gap-8 items-start md:items-center">
-          <div className="shrink-0">
-            <span className="block font-black leading-none text-[#c3871e]/15 group-hover:text-[#c3871e]/25 transition-colors"
-              style={{ fontSize: "clamp(5rem, 12vw, 9rem)", fontFamily: "'ChevySans', sans-serif" }}>
-              01
-            </span>
+        {main.image_url && (
+          <div className="relative w-full" style={{ height: 220 }}>
+            <Image src={main.image_url} alt={main.title} fill className="object-cover" />
+            <div className="absolute inset-0 bg-linear-to-t from-[#0b2440] via-[#0b2440]/40 to-transparent" />
           </div>
+        )}
+        <div className="p-7 md:p-10 flex flex-col md:flex-row gap-8 items-start md:items-center">
+          {!main.image_url && (
+            <div className="shrink-0">
+              <span className="block font-black leading-none text-[#c3871e]/15 group-hover:text-[#c3871e]/25 transition-colors"
+                style={{ fontSize: "clamp(5rem, 12vw, 9rem)", fontFamily: "'ChevySans', sans-serif" }}>
+                01
+              </span>
+            </div>
+          )}
           <div className="flex-1">
             <span className="text-[#c3871e] text-[11px] font-black uppercase tracking-[0.3em] block mb-3"
               style={{ fontFamily: "'ChevySans', sans-serif" }}>
@@ -58,6 +67,12 @@ export function PrizesSection({ prizes }: Props) {
           <div key={prize.id}
             className="group relative rounded-xl bg-[#0b2440] border border-white/6 hover:border-white/14 transition-all duration-300 hover:-translate-y-0.5 overflow-hidden">
             <div className="absolute top-0 inset-x-0 h-px bg-linear-to-r from-transparent via-[#054a9d]/50 to-transparent" />
+            {prize.image_url && (
+              <div className="relative w-full" style={{ height: 100 }}>
+                <Image src={prize.image_url} alt={prize.title} fill className="object-cover" />
+                <div className="absolute inset-0 bg-linear-to-t from-[#0b2440] via-[#0b2440]/30 to-transparent" />
+              </div>
+            )}
             <div className="p-5 flex items-center gap-4">
               <span className="shrink-0 font-black text-4xl text-[#054a9d]/20 group-hover:text-[#054a9d]/40 transition-colors leading-none w-10 text-right tabular-nums"
                 style={{ fontFamily: "'ChevySans', sans-serif" }}>

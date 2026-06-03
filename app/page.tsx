@@ -17,6 +17,7 @@ export interface LandingPrize {
   stage: string
   prize_type: string
   status: "available" | "pending" | "delivered"
+  image_url: string | null
 }
 
 export interface LandingMatch {
@@ -50,7 +51,7 @@ export default async function ProdePage() {
 
     supabase
       .from("prizes")
-      .select("id, title, description, stage, prize_type, status")
+      .select("id, title, description, stage, prize_type, status, image_url")
       .order("created_at", { ascending: true }) as unknown as Promise<{ data: LandingPrize[] | null }>,
 
     supabase

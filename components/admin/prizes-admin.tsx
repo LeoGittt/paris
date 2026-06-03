@@ -1,13 +1,16 @@
 "use client"
 
-import { useState, useTransition } from "react"
-import { Plus, Trophy, CheckCircle2, Clock, Gift, Trash2, User } from "lucide-react"
+import { useState, useTransition, useRef } from "react"
+import { Plus, Trophy, CheckCircle2, Clock, Gift, Trash2, User, ImageIcon, X } from "lucide-react"
+import Image from "next/image"
 import { createPrize, assignWinner, markPrizeDelivered, deletePrize } from "@/lib/actions/admin/prizes"
+import { createClient } from "@/lib/supabase/client"
 
 interface Prize {
   id: string; title: string; description: string | null; stage: string
   prize_type: string; status: "available" | "pending" | "delivered"
   winner_id: string | null; delivered_at: string | null; created_at: string
+  image_url: string | null
 }
 interface Participant { id: string; first_name: string; last_name: string; total_points: number; ranking_position: number | null }
 
@@ -21,16 +24,55 @@ const inputCls = "w-full px-3 py-2.5 bg-[#06192c] border border-white/10 rounded
 const labelCls = "block text-white/40 text-[11px] font-bold uppercase tracking-[0.2em] mb-1.5"
 
 function CreateModal({ onClose }: { onClose: () => void }) {
-  const [form, setForm] = useState({ title: "", description: "", stage: "Fase de Grupos", prize_type: "weekly" })
-  const [loading, setLoading] = useState(false)
-  const [error,   setError]   = useState("")
+  const [form, setForm]         = useState({ title: "", description: "", stage: "Fase de Grupos", prize_type: "weekly" })
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [loading, setLoading]   = useState(false)
+  const [error,   setError]     = useState("")
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }))
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 5 * 1024 * 1024) { setError("La imagen no puede superar 5 MB."); return }
+    setImageFile(file)
+    setImagePreview(URL.createObjectURL(file))
+    setError("")
+  }
+
+  const removeImage = () => {
+    setImageFile(null)
+    setImagePreview(null)
+    if (fileInputRef.current) fileInputRef.current.value = ""
+  }
 
   const handleSave = async () => {
     if (!form.title.trim()) return
     setLoading(true)
     setError("")
-    const res = await createPrize(form)
+
+    let image_url: string | undefined
+
+    if (imageFile) {
+      try {
+        const supabase  = createClient()
+        const ext       = imageFile.name.split(".").pop() ?? "jpg"
+        const fileName  = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+        const { error: uploadError } = await supabase.storage
+          .from("prize-images")
+          .upload(fileName, imageFile, { contentType: imageFile.type, upsert: false })
+        if (uploadError) throw uploadError
+        const { data: { publicUrl } } = supabase.storage.from("prize-images").getPublicUrl(fileName)
+        image_url = publicUrl
+      } catch (e) {
+        setError(`Error al subir la imagen: ${String(e)}`)
+        setLoading(false)
+        return
+      }
+    }
+
+    const res = await createPrize({ ...form, image_url })
     if (!res.ok) {
       setError(res.error ?? "Error al crear el premio")
       setLoading(false)
@@ -71,12 +113,46 @@ function CreateModal({ onClose }: { onClose: () => void }) {
               </select>
             </div>
           </div>
+
+          {/* Imagen del premio */}
+          <div>
+            <label className={labelCls}>Foto del premio (opcional)</label>
+            {imagePreview ? (
+              <div className="relative rounded-xl overflow-hidden border border-white/10" style={{ height: 160 }}>
+                <Image src={imagePreview} alt="preview" fill className="object-cover" />
+                <button
+                  type="button"
+                  onClick={removeImage}
+                  className="absolute top-2 right-2 w-7 h-7 rounded-lg bg-black/60 hover:bg-black/80 flex items-center justify-center transition-colors"
+                >
+                  <X className="w-3.5 h-3.5 text-white" />
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full h-24 border-2 border-dashed border-white/15 hover:border-white/30 rounded-xl flex flex-col items-center justify-center gap-2 transition-colors cursor-pointer"
+              >
+                <ImageIcon className="w-6 h-6 text-white/20" />
+                <span className="text-white/30 text-xs font-medium">Subir imagen (JPG, PNG — máx 5 MB)</span>
+              </button>
+            )}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={handleImageChange}
+              className="hidden"
+            />
+          </div>
         </div>
+
         {error && <p className="text-red-400 text-xs font-medium mt-3">{error}</p>}
         <div className="grid grid-cols-2 gap-3 mt-5">
           <button onClick={onClose} className="h-11 bg-white/6 hover:bg-white/10 border border-white/10 text-white/60 font-bold uppercase text-sm rounded-xl transition-all">Cancelar</button>
           <button onClick={handleSave} disabled={loading || !form.title.trim()} className="h-11 bg-[#c3871e] hover:bg-[#d9961f] disabled:opacity-50 text-white font-black uppercase text-sm rounded-xl transition-all">
-            {loading ? "Creando..." : "Crear"}
+            {loading ? (imageFile ? "Subiendo..." : "Creando...") : "Crear"}
           </button>
         </div>
       </div>
@@ -178,6 +254,12 @@ export function PrizesAdmin({ prizes, participants }: { prizes: Prize[]; partici
             const winner  = prize.winner_id ? participantsById[prize.winner_id] : null
             return (
               <div key={prize.id} className="bg-[#0b2440] border border-white/8 rounded-2xl overflow-hidden">
+                {prize.image_url && (
+                  <div className="relative w-full" style={{ height: 140 }}>
+                    <Image src={prize.image_url} alt={prize.title} fill className="object-cover" />
+                    <div className="absolute inset-0 bg-linear-to-t from-[#0b2440] via-transparent to-transparent" />
+                  </div>
+                )}
                 <div className="px-5 py-4 border-b border-white/5 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <cfg.icon className="w-3.5 h-3.5" style={{ color: cfg.color }} />
