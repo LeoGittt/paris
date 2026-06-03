@@ -22,13 +22,15 @@ export async function savePrediction(
   // Verificar que el partido no esté bloqueado
   const { data: match } = await supabase
     .from("matches")
-    .select("predictions_locked, is_finished")
+    .select("predictions_locked, is_finished, match_date")
     .eq("id", matchId)
-    .single() as { data: { predictions_locked: boolean; is_finished: boolean } | null }
+    .single() as { data: { predictions_locked: boolean; is_finished: boolean; match_date: string } | null }
 
   if (!match) return { ok: false, error: "Partido no encontrado." }
-  if (match.predictions_locked) return { ok: false, error: "El partido ya comenzó. No podés modificar tu pronóstico." }
   if (match.is_finished) return { ok: false, error: "El partido ya finalizó." }
+  if (match.predictions_locked) return { ok: false, error: "El partido ya comenzó. No podés modificar tu pronóstico." }
+  // Defensa independiente del cron: bloquear si la fecha del partido ya pasó
+  if (new Date(match.match_date) <= new Date()) return { ok: false, error: "El partido ya comenzó. No podés modificar tu pronóstico." }
 
   const { error } = await supabase
     .from("predictions")
