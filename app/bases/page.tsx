@@ -3,7 +3,9 @@ import Image from "next/image"
 import { ArrowLeft } from "lucide-react"
 
 export const metadata = {
-  title: "Bases y Condiciones — Prode Chevrolet Grupo Paris 2026",
+  title: "Bases y Condiciones",
+  description: "Leé las bases y condiciones del Prode oficial del Mundial 2026 organizado por Chevrolet Grupo Paris.",
+  alternates: { canonical: '/bases' },
 }
 
 export default function BasesPage() {

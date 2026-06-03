@@ -97,7 +97,7 @@ function LoginContent() {
     // Redirigir según rol
     if (signInData.user) {
       // Registro de acceso para métricas (fire-and-forget)
-      logAccess(signInData.user.id)
+      logAccess(signInData.user.id).catch(() => {})
 
       const { data: roleData } = await supabase
         .from("user_roles")
@@ -116,7 +116,6 @@ function LoginContent() {
     } else {
       router.push(redirectTo)
     }
-    router.refresh()
   }
 
   return (
@@ -132,11 +131,10 @@ function LoginContent() {
 
         {/* Logo */}
         <div className="flex flex-col items-center mb-10">
-          <div className="relative mb-4" style={{ width: 100, height: 42 }}>
-            <Image src="/bowtie.png" alt="Chevrolet" fill className="object-contain" style={{ mixBlendMode: "screen" }} />
+          <div className="relative mb-5" style={{ width: 300, height: Math.round(300 * 292 / 855) }}>
+            <Image src="/logosinfondo.png" alt="Chevrolet Grupo Paris" fill className="object-contain" priority />
           </div>
-          <p className="text-white/40 text-[11px] font-black uppercase tracking-[0.3em]">GRUPO PARIS</p>
-          <h1 className="text-white font-black uppercase text-3xl mt-1">PRODE 2026</h1>
+          <h1 className="text-white font-black uppercase text-3xl">PRODE 2026</h1>
         </div>
 
         {/* Card */}
@@ -244,7 +242,7 @@ function LoginContent() {
           </button>
           <p className="text-white/25 text-sm font-medium">
             ¿No tenés cuenta?{" "}
-            <a href="/" className="text-[#7ab0e8] hover:text-white transition-colors font-bold">
+            <a href="/?registro=1" className="text-[#7ab0e8] hover:text-white transition-colors font-bold">
               Registrate gratis
             </a>
           </p>

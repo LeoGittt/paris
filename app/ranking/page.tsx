@@ -1,7 +1,14 @@
 import { createClient } from "@/lib/supabase/server"
 import type { RankingRow } from "@/components/prode/ranking-table"
+import type { Metadata } from "next"
 
 export const revalidate = 60
+
+export const metadata: Metadata = {
+  title: 'Ranking General',
+  description: 'Seguí el ranking en tiempo real del Prode Chevrolet Grupo Paris 2026. Mirá quiénes lideran la tabla de posiciones del Mundial 2026.',
+  alternates: { canonical: '/ranking' },
+}
 
 export default async function PublicRankingPage() {
   const supabase = await createClient()

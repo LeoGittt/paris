@@ -16,14 +16,21 @@ export default async function PronosticosPage() {
   if (!participant) redirect("/")
 
   // Todos los partidos con el pronóstico del participante (si existe)
-  const { data: matches } = await supabase
+  const { data: rawMatches } = await supabase
     .from("matches")
     .select(`
       id, team1, team2, team1_flag, team2_flag,
       match_date, stage, group_name, venue,
       score1, score2, is_finished, predictions_locked
     `)
-    .order("match_date", { ascending: true }) as { data: MatchRow[] | null }
+    .order("match_date", { ascending: true }) as { data: Omit<MatchRow, "formatted_date" | "formatted_time">[] | null }
+
+  const tz = "America/Argentina/Buenos_Aires"
+  const matches: MatchRow[] = (rawMatches ?? []).map((m) => ({
+    ...m,
+    formatted_date: new Date(m.match_date).toLocaleDateString("es-AR", { weekday: "short", day: "2-digit", month: "short", timeZone: tz }),
+    formatted_time: new Date(m.match_date).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", timeZone: tz }),
+  }))
 
   // Pronósticos existentes del participante
   const { data: predictions } = await supabase
@@ -64,6 +71,8 @@ export interface MatchRow {
   score2: number | null
   is_finished: boolean
   predictions_locked: boolean
+  formatted_date: string
+  formatted_time: string
 }
 
 export interface PredictionRow {

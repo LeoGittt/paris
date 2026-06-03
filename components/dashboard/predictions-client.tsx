@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react"
 import { CheckCircle2, Clock, Lock, XCircle, ChevronDown } from "lucide-react"
 import { savePrediction } from "@/lib/actions/predictions"
+import { Flag } from "@/components/ui/flag"
 import type { MatchRow, PredictionRow } from "@/app/dashboard/pronosticos/page"
 
 interface Props {
@@ -62,9 +63,8 @@ function PredictionCard({
     })
   }
 
-  const matchDate = new Date(match.match_date)
-  const dateStr   = matchDate.toLocaleDateString("es-AR", { weekday: "short", day: "2-digit", month: "short" })
-  const timeStr   = matchDate.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })
+  const dateStr = match.formatted_date
+  const timeStr = match.formatted_time
 
   return (
     <div className={`bg-[#0b2440] border rounded-2xl overflow-hidden transition-all ${
@@ -96,7 +96,7 @@ function PredictionCard({
         <div className="flex items-center gap-3 mb-5">
           {/* Local */}
           <div className="flex-1 flex items-center gap-2.5">
-            <span className="text-2xl leading-none">{match.team1_flag}</span>
+            <Flag emoji={match.team1_flag} size={28} />
             <span className="text-white font-black text-sm uppercase tracking-wide leading-tight">{match.team1}</span>
           </div>
 
@@ -112,7 +112,7 @@ function PredictionCard({
           {/* Visitante */}
           <div className="flex-1 flex items-center justify-end gap-2.5">
             <span className="text-white font-black text-sm uppercase tracking-wide leading-tight text-right">{match.team2}</span>
-            <span className="text-2xl leading-none">{match.team2_flag}</span>
+            <Flag emoji={match.team2_flag} size={28} />
           </div>
         </div>
 

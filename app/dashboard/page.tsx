@@ -2,6 +2,7 @@ import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import Link from "next/link"
 import { Target, Trophy, Gift, ArrowRight, CheckCircle2, Clock, XCircle } from "lucide-react"
+import { Flag } from "@/components/ui/flag"
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -48,7 +49,7 @@ export default async function DashboardPage() {
   // Próximos partidos sin pronóstico
   const { data: upcomingMatches } = await supabase
     .from("matches")
-    .select("id, team1, team2, match_date, group_name, predictions_locked")
+    .select("id, team1, team2, team1_flag, team2_flag, match_date, group_name, predictions_locked")
     .eq("is_finished", false)
     .eq("predictions_locked", false)
     .order("match_date", { ascending: true })
@@ -141,8 +142,12 @@ export default async function DashboardPage() {
                   className="flex items-center justify-between px-6 py-4 hover:bg-white/3 transition-colors group"
                 >
                   <div>
-                    <p className="text-white font-bold text-sm">
-                      {match.team1} <span className="text-white/30">vs</span> {match.team2}
+                    <p className="text-white font-bold text-sm flex items-center gap-1.5">
+                      <Flag emoji={match.team1_flag} size={18} />
+                      {match.team1}
+                      <span className="text-white/30">vs</span>
+                      {match.team2}
+                      <Flag emoji={match.team2_flag} size={18} />
                     </p>
                     <p className="text-white/30 text-[11px] font-medium mt-0.5">
                       {match.group_name && `${match.group_name} · `}
@@ -265,6 +270,8 @@ interface UpcomingMatch {
   id: string
   team1: string
   team2: string
+  team1_flag: string
+  team2_flag: string
   match_date: string
   group_name: string | null
   predictions_locked: boolean

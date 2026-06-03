@@ -1,6 +1,11 @@
+import type { Metadata } from "next"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import Link from "next/link"
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+}
 import Image from "next/image"
 import { Phone, LogOut } from "lucide-react"
 

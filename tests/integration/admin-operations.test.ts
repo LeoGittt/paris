@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll } from "vitest"
+import { describe, it, expect, beforeAll, afterAll } from "vitest"
 import { createAdminClient, createTestParticipant } from "../helpers/supabase"
 
 const admin = createAdminClient()
@@ -52,6 +52,10 @@ describe("Admin: bloquear / desbloquear participante", () => {
     testParticipantId = part.participantId
   })
 
+  afterAll(async () => {
+    if (testUserId) await admin.auth.admin.deleteUser(testUserId)
+  })
+
   it("bloquear setea is_blocked = true", async () => {
     const { error } = await admin
       .from("participants")
@@ -71,8 +75,6 @@ describe("Admin: bloquear / desbloquear participante", () => {
     const { data } = await admin
       .from("participants").select("is_blocked").eq("id", testParticipantId).single()
     expect(data?.is_blocked).toBe(false)
-
-    await admin.auth.admin.deleteUser(testUserId)
   })
 })
 
@@ -98,6 +100,11 @@ describe("Admin: asignar y entregar premios", () => {
     userId        = part.userId
   })
 
+  afterAll(async () => {
+    if (prizeId) await admin.from("prizes").delete().eq("id", prizeId)
+    if (userId)  await admin.auth.admin.deleteUser(userId)
+  })
+
   it("asignar ganador cambia status a pending y setea winner_id", async () => {
     const { error } = await admin.from("prizes")
       .update({ winner_id: participantId, status: "pending" })
@@ -120,9 +127,6 @@ describe("Admin: asignar y entregar premios", () => {
     const { data } = await admin.from("prizes").select("status, delivered_at").eq("id", prizeId).single()
     expect(data?.status).toBe("delivered")
     expect(data?.delivered_at).not.toBeNull()
-
-    await admin.from("prizes").delete().eq("id", prizeId)
-    await admin.auth.admin.deleteUser(userId)
   })
 })
 
@@ -163,6 +167,10 @@ describe("DB functions: get_participant_stats y lock_started_matches", () => {
     statUserId        = part.userId
   })
 
+  afterAll(async () => {
+    if (statUserId) await admin.auth.admin.deleteUser(statUserId)
+  })
+
   it("get_participant_stats retorna estructura correcta", async () => {
     const { data, error } = await admin.rpc("get_participant_stats", {
       p_participant_id: statParticipantId,
@@ -182,7 +190,5 @@ describe("DB functions: get_participant_stats y lock_started_matches", () => {
   it("lock_started_matches no falla en ejecución", async () => {
     const { error } = await admin.rpc("lock_started_matches" as never)
     expect(error).toBeNull()
-
-    await admin.auth.admin.deleteUser(statUserId)
   })
 })

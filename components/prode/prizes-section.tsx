@@ -2,17 +2,19 @@
 
 import type { LandingPrize } from "@/app/page"
 
-const MOCK_PRIZES: LandingPrize[] = [
-  { id: "1", title: "Gran Premio",      description: "Pasajes + Hotel + Entradas a partidos",        stage: "Final",          prize_type: "final",   status: "available" },
-  { id: "2", title: "Experiencia VIP",  description: "Test drive exclusivo + Kit Chevrolet Premium", stage: "Semifinal",      prize_type: "stage",   status: "available" },
-  { id: "3", title: "Service Premium",  description: "Mantenimiento completo durante 1 año",          stage: "Cuartos",        prize_type: "stage",   status: "available" },
-  { id: "4", title: "Merchandising",    description: "Productos exclusivos Chevrolet cada semana",    stage: "Fase de Grupos", prize_type: "weekly",  status: "available" },
-]
-
 interface Props { prizes?: LandingPrize[] }
 
 export function PrizesSection({ prizes }: Props) {
-  const data = prizes && prizes.length > 0 ? prizes : MOCK_PRIZES
+  const data = (prizes ?? []).filter(p => p.status !== "delivered")
+
+  if (data.length === 0) {
+    return (
+      <div className="flex items-center justify-center bg-[#0b2440] border border-white/6 rounded-2xl p-12 text-center">
+        <p className="text-white/20 text-sm font-medium">Los premios se anunciarán pronto</p>
+      </div>
+    )
+  }
+
   const [main, ...rest] = data
 
   return (
@@ -52,14 +54,14 @@ export function PrizesSection({ prizes }: Props) {
 
       {/* Premios secundarios */}
       <div className="flex flex-col gap-4">
-        {rest.slice(0, 3).map((prize, i) => (
+        {rest.map((prize, i) => (
           <div key={prize.id}
             className="group relative rounded-xl bg-[#0b2440] border border-white/6 hover:border-white/14 transition-all duration-300 hover:-translate-y-0.5 overflow-hidden">
             <div className="absolute top-0 inset-x-0 h-px bg-linear-to-r from-transparent via-[#054a9d]/50 to-transparent" />
             <div className="p-5 flex items-center gap-4">
               <span className="shrink-0 font-black text-4xl text-[#054a9d]/20 group-hover:text-[#054a9d]/40 transition-colors leading-none w-10 text-right tabular-nums"
                 style={{ fontFamily: "'ChevySans', sans-serif" }}>
-                0{i + 2}
+                {String(i + 2).padStart(2, "0")}
               </span>
               <div className="w-px h-10 bg-white/6 shrink-0" />
               <div className="flex-1 min-w-0">
@@ -76,12 +78,6 @@ export function PrizesSection({ prizes }: Props) {
             </div>
           </div>
         ))}
-
-        {data.length === 0 && (
-          <div className="flex-1 flex items-center justify-center bg-[#0b2440] border border-white/6 rounded-xl p-6 text-center">
-            <p className="text-white/20 text-sm">Los premios se anunciarán pronto</p>
-          </div>
-        )}
       </div>
     </div>
   )

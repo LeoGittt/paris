@@ -1,6 +1,14 @@
+import { Suspense } from "react"
 import { createClient } from "@/lib/supabase/server"
 import { LandingClient } from "@/components/prode/landing-client"
 import type { RankingRow } from "@/components/prode/ranking-table"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: 'Prode Chevrolet Grupo Paris | Mundial 2026',
+  description: 'El prode oficial del Mundial 2026 de Chevrolet Grupo Paris. Registrate gratis, hacé tus pronósticos partido a partido y ganá premios en cada etapa. Solo para clientes Grupo Paris — San Juan, Argentina.',
+  alternates: { canonical: '/' },
+}
 
 export interface LandingPrize {
   id: string
@@ -22,6 +30,8 @@ export interface LandingMatch {
   stage: string
   predictions_locked: boolean
   is_finished: boolean
+  formatted_date: string
+  formatted_time: string
 }
 
 export default async function ProdePage() {
@@ -52,11 +62,20 @@ export default async function ProdePage() {
       .limit(6) as unknown as Promise<{ data: LandingMatch[] | null }>,
   ])
 
+  const tz = "America/Argentina/Buenos_Aires"
+  const upcomingMatches = (matches ?? []).map((m) => ({
+    ...m,
+    formatted_date: new Date(m.match_date).toLocaleDateString("es-AR", { day: "2-digit", month: "short", timeZone: tz }),
+    formatted_time: new Date(m.match_date).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", timeZone: tz }),
+  }))
+
   return (
-    <LandingClient
-      rankingRows={ranking ?? []}
-      prizes={prizes ?? []}
-      upcomingMatches={matches ?? []}
-    />
+    <Suspense>
+      <LandingClient
+        rankingRows={ranking ?? []}
+        prizes={prizes ?? []}
+        upcomingMatches={upcomingMatches}
+      />
+    </Suspense>
   )
 }

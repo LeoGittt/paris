@@ -9,10 +9,17 @@ export default async function AdminPartidosPage({
   const { stage = "group" } = await searchParams
   const supabase = await createClient()
 
-  const { data: matches } = await supabase
+  const { data: rawMatches } = await supabase
     .from("matches")
     .select("*")
-    .order("match_date", { ascending: true }) as { data: MatchAdminRow[] | null }
+    .order("match_date", { ascending: true }) as { data: Omit<MatchAdminRow, "formatted_date" | "formatted_time">[] | null }
+
+  const tz = "America/Argentina/Buenos_Aires"
+  const matches: MatchAdminRow[] = (rawMatches ?? []).map((m) => ({
+    ...m,
+    formatted_date: new Date(m.match_date).toLocaleDateString("es-AR", { day: "2-digit", month: "short", timeZone: tz }),
+    formatted_time: new Date(m.match_date).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", timeZone: tz }),
+  }))
 
   return (
     <div className="space-y-6">
@@ -20,7 +27,7 @@ export default async function AdminPartidosPage({
         <p className="text-white/35 text-[11px] font-black uppercase tracking-[0.3em] mb-1">Administración</p>
         <h1 className="text-white font-black uppercase text-4xl md:text-5xl leading-none">PARTIDOS</h1>
       </div>
-      <MatchesAdmin matches={matches ?? []} activeStage={stage} />
+      <MatchesAdmin matches={matches} activeStage={stage} />
     </div>
   )
 }
@@ -39,4 +46,6 @@ export interface MatchAdminRow {
   score2: number | null
   is_finished: boolean
   predictions_locked: boolean
+  formatted_date: string
+  formatted_time: string
 }

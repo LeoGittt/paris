@@ -1,14 +1,8 @@
-import { describe, it, expect, beforeAll } from "vitest"
+import { describe, it, expect, beforeAll, afterAll } from "vitest"
 import { createAdminClient } from "../helpers/supabase"
-
-// Tests de las vistas de métricas y access_logs usando service_role
-// Verifica que los cron jobs pueden leer estas vistas (bug 26)
 
 const admin = createAdminClient()
 
-// ─────────────────────────────────────────────────────────────────
-// Las vistas de métricas requieren que metrics.sql esté ejecutado en Supabase.
-// Si no existen, el test lo documenta con un mensaje claro.
 function skipIfNotFound(error: unknown, viewName: string) {
   if (error && typeof error === "object" && "code" in error && (error as { code: string }).code === "PGRST205") {
     console.warn(`⚠ Vista '${viewName}' no encontrada. Ejecutar metrics.sql en Supabase primero.`)
@@ -17,6 +11,7 @@ function skipIfNotFound(error: unknown, viewName: string) {
   return false
 }
 
+// -----------------------------------------------------------------
 describe("Bug 26: service_role puede leer vistas de métricas", () => {
   it("metrics_overview: service_role tiene acceso (o documenta que falta metrics.sql)", async () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -65,39 +60,49 @@ describe("Bug 26: service_role puede leer vistas de métricas", () => {
   })
 })
 
-// ─────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------
 describe("access_logs: service_role puede insertar", () => {
-  it("service_role puede insertar un log de acceso", async () => {
-    // Crear un usuario temporal solo para el log
+  let userId: string | undefined
+
+  beforeAll(async () => {
     const { data: authData } = await admin.auth.admin.createUser({
-      email: `__logtest${Date.now()}@test.com`,
-      password: "test-123!",
+      email:         `__logtest${Date.now()}@test.com`,
+      password:      "test-123!",
       email_confirm: true,
     })
-    const userId = authData.user?.id
-    if (!userId) return
+    userId = authData.user?.id
+  })
 
+  afterAll(async () => {
+    if (userId) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (admin as any).from("access_logs").delete().eq("user_id", userId)
+      await admin.auth.admin.deleteUser(userId)
+    }
+  })
+
+  it("service_role puede insertar un log de acceso", async () => {
+    if (!userId) return
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await (admin as any).from("access_logs").insert({ user_id: userId })
     expect(error).toBeNull()
 
-    // Verificar que el log existe
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: logs } = await (admin as any)
-      .from("access_logs")
-      .select("id")
-      .eq("user_id", userId)
+      .from("access_logs").select("id").eq("user_id", userId)
     expect((logs?.length ?? 0) >= 1).toBe(true)
-
-    // Limpiar
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (admin as any).from("access_logs").delete().eq("user_id", userId)
-    await admin.auth.admin.deleteUser(userId)
   })
 })
 
-// ─────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------
 describe("report_snapshots: service_role puede leer e insertar", () => {
+  let snapshotId: string | undefined
+
+  afterAll(async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (snapshotId) await (admin as any).from("report_snapshots").delete().eq("id", snapshotId)
+  })
+
   it("service_role puede insertar y leer snapshots", async () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data, error } = await (admin as any).from("report_snapshots").insert({
@@ -108,9 +113,6 @@ describe("report_snapshots: service_role puede leer e insertar", () => {
 
     expect(error).toBeNull()
     expect(data?.id).toBeTruthy()
-
-    // Limpiar
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if (data?.id) await (admin as any).from("report_snapshots").delete().eq("id", data.id)
+    snapshotId = data?.id
   })
 })

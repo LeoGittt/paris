@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import Image from "next/image"
 import { Countdown } from "@/components/prode/countdown"
 import { MatchCard } from "@/components/prode/match-card"
@@ -8,6 +9,7 @@ import { RankingTable, type RankingRow } from "@/components/prode/ranking-table"
 import { PrizesSection } from "@/components/prode/prizes-section"
 import { RegistrationForm } from "@/components/prode/registration-form"
 import { ChevronDown, Menu, X, ArrowRight, CheckCircle2 } from "lucide-react"
+import { Flag } from "@/components/ui/flag"
 import type { LandingPrize, LandingMatch } from "@/app/page"
 
 const navItems = [
@@ -18,16 +20,11 @@ const navItems = [
 ]
 
 function Logo({ compact = false }: { compact?: boolean }) {
+  const w = compact ? 160 : 210
+  const h = Math.round(w * 292 / 855)
   return (
-    <div className="flex items-center gap-3 select-none">
-      <div className="relative shrink-0" style={{ width: compact ? 56 : 72, height: compact ? 24 : 30 }}>
-        <Image src="/bowtie.png" alt="" fill className="object-contain" style={{ mixBlendMode: "screen" }} priority />
-      </div>
-      <div className="w-px bg-white/30 self-stretch" />
-      <div className="leading-none">
-        <p className={`font-bold text-white/70 uppercase tracking-[0.2em] ${compact ? "text-[9px]" : "text-[11px]"}`} style={{ fontFamily: "'ChevySans', sans-serif" }}>CHEVROLET</p>
-        <p className={`font-black text-white uppercase tracking-wide leading-tight ${compact ? "text-[15px]" : "text-[20px]"}`} style={{ fontFamily: "'ChevySans', sans-serif" }}>GRUPO PARIS</p>
-      </div>
+    <div className="relative select-none shrink-0" style={{ width: w, height: h }}>
+      <Image src="/logosinfondo.png" alt="Chevrolet Grupo Paris" fill className="object-contain" priority />
     </div>
   )
 }
@@ -42,9 +39,8 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 function LandingMatchCard({ match }: { match: LandingMatch }) {
-  const date = new Date(match.match_date)
-  const dateStr = date.toLocaleDateString("es-AR", { day: "2-digit", month: "short" })
-  const timeStr = date.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })
+  const dateStr = match.formatted_date
+  const timeStr = match.formatted_time
 
   return (
     <div className="group relative rounded-2xl bg-[#0b2440] border border-white/8 group-hover:border-white/16 overflow-hidden transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-black/30">
@@ -62,7 +58,7 @@ function LandingMatchCard({ match }: { match: LandingMatch }) {
       <div className="h-px mx-4 bg-white/6" />
       <div className="flex items-center gap-2 px-4 py-5">
         <div className="flex-1 flex flex-col items-center gap-2">
-          <span className="text-4xl leading-none">{match.team1_flag}</span>
+          <Flag emoji={match.team1_flag} size={44} />
           <span className="text-white font-black text-xs tracking-wide text-center leading-tight"
             style={{ fontFamily: "'ChevySans', sans-serif" }}>
             {match.team1}
@@ -70,7 +66,7 @@ function LandingMatchCard({ match }: { match: LandingMatch }) {
         </div>
         <span className="text-white/20 font-black text-lg px-2">VS</span>
         <div className="flex-1 flex flex-col items-center gap-2">
-          <span className="text-4xl leading-none">{match.team2_flag}</span>
+          <Flag emoji={match.team2_flag} size={44} />
           <span className="text-white font-black text-xs tracking-wide text-center leading-tight"
             style={{ fontFamily: "'ChevySans', sans-serif" }}>
             {match.team2}
@@ -91,6 +87,11 @@ interface Props {
 export function LandingClient({ rankingRows, prizes, upcomingMatches }: Props) {
   const [showModal, setShowModal]   = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const searchParams = useSearchParams()
+
+  useEffect(() => {
+    if (searchParams.get("registro") === "1") setShowModal(true)
+  }, [searchParams])
 
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" })
@@ -332,8 +333,8 @@ export function LandingClient({ rankingRows, prizes, upcomingMatches }: Props) {
         <div className="absolute inset-0 bg-linear-to-t from-[#040f1c] via-transparent to-[#040f1c]/60" />
         <div className="relative z-10 max-w-7xl mx-auto px-5 md:px-10 text-center">
           <div className="flex justify-center mb-8">
-            <div className="relative" style={{ width: 100, height: 42 }}>
-              <Image src="/bowtie.png" alt="Chevrolet" fill className="object-contain" style={{ mixBlendMode: "screen" }} />
+            <div className="relative" style={{ width: 280, height: Math.round(280 * 292 / 855) }}>
+              <Image src="/logosinfondo.png" alt="Chevrolet Grupo Paris" fill className="object-contain" />
             </div>
           </div>
           <h2 className="font-black text-white uppercase leading-none mb-6" style={{ fontSize: "clamp(2.8rem, 8vw, 6rem)" }}>
@@ -435,8 +436,8 @@ export function LandingClient({ rankingRows, prizes, upcomingMatches }: Props) {
               </button>
               <div className="text-center mb-7">
                 <div className="flex justify-center mb-5">
-                  <div className="relative" style={{ width: 140, height: 60 }}>
-                    <Image src="/bowtie.png" alt="Chevrolet" fill className="object-contain" style={{ mixBlendMode: "screen" }} />
+                  <div className="relative" style={{ width: 220, height: Math.round(220 * 292 / 855) }}>
+                    <Image src="/logosinfondo.png" alt="Chevrolet Grupo Paris" fill className="object-contain" />
                   </div>
                 </div>
                 <h3 className="font-black text-white uppercase text-3xl mb-1.5" style={{ fontFamily: "'ChevySans', sans-serif" }}>UNITE AL PRODE</h3>

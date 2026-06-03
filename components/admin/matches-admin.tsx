@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { CheckCircle2, Lock, Edit3, RefreshCw, AlertCircle, Plus, Trash2, Upload } from "lucide-react"
+import { Flag } from "@/components/ui/flag"
 import {
   saveMatchResult,
   recalculateAllPoints,
@@ -58,10 +59,13 @@ function ResultModal({ match, onClose }: { match: MatchAdminRow; onClose: () => 
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-[#0b2440] border border-white/10 rounded-2xl p-7 w-full max-w-sm shadow-2xl">
         <h3 className="text-white font-black uppercase text-lg mb-1">Cargar resultado</h3>
-        <p className="text-white/40 text-sm mb-6">{match.team1} vs {match.team2}</p>
+        <p className="text-white/40 text-sm mb-6 flex items-center gap-1.5">
+          <Flag emoji={match.team1_flag} size={16} /> {match.team1} vs <Flag emoji={match.team2_flag} size={16} /> {match.team2}
+        </p>
 
         <div className="flex items-center gap-4 mb-6">
           <div className="flex-1 text-center">
+            <div className="flex justify-center mb-1"><Flag emoji={match.team1_flag} size={36} /></div>
             <p className="text-white/40 text-[11px] font-bold uppercase tracking-wide mb-2">{match.team1}</p>
             <div className="flex items-center justify-center gap-2">
               <button onClick={() => setS1(v => Math.max(0, v-1))} className="w-9 h-9 rounded-xl bg-white/6 hover:bg-white/12 text-white font-black text-lg transition-colors">–</button>
@@ -71,6 +75,7 @@ function ResultModal({ match, onClose }: { match: MatchAdminRow; onClose: () => 
           </div>
           <span className="text-white/20 font-black text-2xl">–</span>
           <div className="flex-1 text-center">
+            <div className="flex justify-center mb-1"><Flag emoji={match.team2_flag} size={36} /></div>
             <p className="text-white/40 text-[11px] font-bold uppercase tracking-wide mb-2">{match.team2}</p>
             <div className="flex items-center justify-center gap-2">
               <button onClick={() => setS2(v => Math.max(0, v-1))} className="w-9 h-9 rounded-xl bg-white/6 hover:bg-white/12 text-white font-black text-lg transition-colors">–</button>
@@ -416,8 +421,8 @@ function ImportCSVModal({ onClose }: { onClose: () => void }) {
                 <p className="text-emerald-400 text-sm font-bold">{preview.length} partidos listos para importar</p>
                 <div className="mt-2 max-h-32 overflow-y-auto space-y-1">
                   {preview.map((m, i) => (
-                    <p key={i} className="text-white/40 text-[11px]">
-                      {m.team1_flag} {m.team1} vs {m.team2_flag} {m.team2} · {m.stage}{m.group_name ? ` · ${m.group_name}` : ""}
+                    <p key={i} className="text-white/40 text-[11px] flex items-center gap-1">
+                      <Flag emoji={m.team1_flag} size={14} /> {m.team1} vs <Flag emoji={m.team2_flag} size={14} /> {m.team2} · {m.stage}{m.group_name ? ` · ${m.group_name}` : ""}
                     </p>
                   ))}
                 </div>
@@ -582,9 +587,7 @@ export function MatchesAdmin({ matches, activeStage }: { matches: MatchAdminRow[
                   </span>
                 )}
                 <span className="text-white/20 text-[10px] font-medium">
-                  {new Date(match.match_date).toLocaleDateString("es-AR", { day: "2-digit", month: "short" })}
-                  {" "}
-                  {new Date(match.match_date).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}hs
+                  {match.formatted_date} {match.formatted_time}hs
                 </span>
               </div>
               <div className="flex items-center gap-1">
@@ -597,7 +600,7 @@ export function MatchesAdmin({ matches, activeStage }: { matches: MatchAdminRow[
               {/* Teams */}
               <div className="flex items-center gap-2 mb-4">
                 <div className="flex-1 flex items-center gap-2">
-                  <span className="text-xl">{match.team1_flag}</span>
+                  <Flag emoji={match.team1_flag} size={24} />
                   <span className="text-white/80 font-bold text-sm leading-tight">{match.team1}</span>
                 </div>
                 {match.is_finished ? (
@@ -609,7 +612,7 @@ export function MatchesAdmin({ matches, activeStage }: { matches: MatchAdminRow[
                 )}
                 <div className="flex-1 flex items-center justify-end gap-2">
                   <span className="text-white/80 font-bold text-sm leading-tight text-right">{match.team2}</span>
-                  <span className="text-xl">{match.team2_flag}</span>
+                  <Flag emoji={match.team2_flag} size={24} />
                 </div>
               </div>
 
