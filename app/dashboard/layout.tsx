@@ -10,11 +10,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   const { data: participant } = await supabase
     .from("participants")
-    .select("first_name, last_name, total_points, ranking_position")
+    .select("first_name, last_name, total_points, ranking_position, is_blocked")
     .eq("user_id", user.id)
-    .single() as { data: { first_name: string; last_name: string; total_points: number; ranking_position: number | null } | null }
+    .single() as { data: { first_name: string; last_name: string; total_points: number; ranking_position: number | null; is_blocked: boolean } | null }
 
   if (!participant) redirect("/")
+  if (participant.is_blocked) redirect("/?blocked=1")
 
   return (
     <div className="min-h-screen bg-[#06192c] flex flex-col md:flex-row" style={{ fontFamily: "'ChevySans', sans-serif" }}>

@@ -202,7 +202,7 @@ export interface Database {
     }
     Functions: {
       recalculate_points: {
-        Args: { match_id: string }
+        Args: { p_match_id: string }
         Returns: undefined
       }
       get_participant_stats: {

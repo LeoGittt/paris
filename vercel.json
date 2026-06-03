@@ -1,6 +1,10 @@
 {
   "crons": [
     {
+      "path": "/api/cron/lock-matches",
+      "schedule": "* * * * *"
+    },
+    {
       "path": "/api/cron/daily-report",
       "schedule": "0 6 * * *"
     },

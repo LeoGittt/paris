@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
 import type { Database } from "@/lib/supabase/types"
 
-const PUBLIC_PATHS = ["/", "/login", "/registro", "/api/", "/auth/"]
+const PUBLIC_PATHS = ["/", "/login", "/registro", "/ranking", "/terminos", "/bases", "/api/", "/auth/"]
 const ADMIN_PATHS  = ["/admin"]
 const CC_PATHS     = ["/callcenter"]
 
@@ -35,7 +35,10 @@ export async function middleware(request: NextRequest) {
   // Refresca la sesión — SIEMPRE antes de leer user
   const { data: { user } } = await supabase.auth.getUser()
 
-  const isPublic = PUBLIC_PATHS.some(p => pathname === p || pathname.startsWith(p))
+  // "/" debe ser match exacto — startsWith("/") matchearía TODO
+  const isPublic = PUBLIC_PATHS.some(p =>
+    pathname === p || (p.length > 1 && pathname.startsWith(p))
+  )
 
   // Rutas protegidas sin sesión → login
   if (!user && !isPublic) {
@@ -45,36 +48,37 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Rutas de admin/callcenter → verificar rol
-  if (user && (ADMIN_PATHS.some(p => pathname.startsWith(p)) || CC_PATHS.some(p => pathname.startsWith(p)))) {
+  const needsRole =
+    user && (
+      ADMIN_PATHS.some(p => pathname.startsWith(p)) ||
+      CC_PATHS.some(p => pathname.startsWith(p))    ||
+      pathname === "/login" ||
+      pathname === "/registro"
+    )
+
+  // Leer rol una sola vez si es necesario
+  let role: string | null = null
+  if (needsRole) {
     const { data: roleData } = await supabase
       .from("user_roles")
       .select("role")
-      .eq("user_id", user.id)
+      .eq("user_id", user!.id)
       .single() as { data: { role: string } | null }
-
-    const role = roleData?.role
-
-    if (ADMIN_PATHS.some(p => pathname.startsWith(p)) && role !== "admin") {
-      return NextResponse.redirect(new URL("/dashboard", request.url))
-    }
-
-    if (CC_PATHS.some(p => pathname.startsWith(p)) && role !== "callcenter" && role !== "admin") {
-      return NextResponse.redirect(new URL("/dashboard", request.url))
-    }
+    role = roleData?.role ?? null
   }
 
-  // Usuario autenticado en login → redirigir según rol
-  if (user && (pathname === "/login" || pathname === "/registro")) {
-    const { data: roleData } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", user.id)
-      .single() as { data: { role: string } | null }
+  // Rutas de admin/callcenter → verificar rol
+  if (user && ADMIN_PATHS.some(p => pathname.startsWith(p)) && role !== "admin") {
+    return NextResponse.redirect(new URL("/dashboard", request.url))
+  }
+  if (user && CC_PATHS.some(p => pathname.startsWith(p)) && role !== "callcenter" && role !== "admin") {
+    return NextResponse.redirect(new URL("/dashboard", request.url))
+  }
 
-    const role = roleData?.role
-    if (role === "admin") return NextResponse.redirect(new URL("/admin", request.url))
-    if (role === "callcenter") return NextResponse.redirect(new URL("/callcenter", request.url))
+  // Usuario autenticado en login/registro → redirigir según rol
+  if (user && (pathname === "/login" || pathname === "/registro")) {
+    if (role === "admin")       return NextResponse.redirect(new URL("/admin", request.url))
+    if (role === "callcenter")  return NextResponse.redirect(new URL("/callcenter", request.url))
     return NextResponse.redirect(new URL("/dashboard", request.url))
   }
 

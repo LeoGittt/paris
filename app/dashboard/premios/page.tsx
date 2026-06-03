@@ -2,6 +2,16 @@ import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { Gift, CheckCircle2, Clock, Trophy } from "lucide-react"
 
+// Solo permite URLs HTTPS absolutas — evita cargar recursos arbitrarios
+function isSafeImageUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url)
+    return parsed.protocol === "https:"
+  } catch {
+    return false
+  }
+}
+
 const STATUS_CONFIG = {
   available: { label: "Disponible",  color: "#4ade80", icon: Gift },
   pending:   { label: "Pendiente",   color: "#c3871e", icon: Clock },
@@ -85,7 +95,7 @@ export default async function PremiosPage() {
                           : "border border-white/8"
                       }`}
                     >
-                      {prize.image_url && (
+                      {prize.image_url && isSafeImageUrl(prize.image_url) && (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={prize.image_url} alt={prize.title} className="w-full h-32 object-cover" />
                       )}

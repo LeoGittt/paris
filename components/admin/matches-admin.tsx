@@ -114,15 +114,22 @@ function EditMatchModal({ match, onClose }: { match: MatchAdminRow; onClose: () 
   const [date, setDate]   = useState(toDatetimeLocal(match.match_date))
   const [group, setGroup] = useState(match.group_name ?? "")
   const [loading, setLoading] = useState(false)
+  const [error,   setError]   = useState("")
 
   const handleSave = async () => {
     setLoading(true)
-    await updateMatchDetails(match.id, {
+    setError("")
+    const res = await updateMatchDetails(match.id, {
       team1: t1.trim(), team2: t2.trim(),
       team1_flag: f1.trim(), team2_flag: f2.trim(),
       match_date: toISO(date),
       group_name: group.trim() || null,
     })
+    if (!res.ok) {
+      setError(res.error)
+      setLoading(false)
+      return
+    }
     onClose()
   }
 
@@ -172,6 +179,7 @@ function EditMatchModal({ match, onClose }: { match: MatchAdminRow; onClose: () 
           </div>
         </div>
 
+        {error && <p className="text-red-400 text-xs font-medium mt-4">{error}</p>}
         <div className="grid grid-cols-2 gap-3 mt-6">
           <button onClick={onClose} className="h-11 bg-white/6 hover:bg-white/10 border border-white/10 text-white/60 font-bold uppercase text-sm rounded-xl transition-all">
             Cancelar

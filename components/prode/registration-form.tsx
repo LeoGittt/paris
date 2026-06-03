@@ -56,7 +56,7 @@ export function RegistrationForm({ onClose }: Props) {
     form.dni.replace(/\D/g, "").length >= 7 &&
     form.phone.trim().length >= 8 &&
     form.email.includes("@") &&
-    form.password.length >= 6
+    form.password.length >= 8
 
   const step2Valid =
     form.license_plate.trim().length >= 6 &&
@@ -182,8 +182,8 @@ export function RegistrationForm({ onClose }: Props) {
               <input
                 type={showPass ? "text" : "password"}
                 required
-                placeholder="Mínimo 6 caracteres"
-                minLength={6}
+                placeholder="Mínimo 8 caracteres"
+                minLength={8}
                 value={form.password}
                 onChange={e => set("password", e.target.value)}
                 className={inputCls + " pr-11"}

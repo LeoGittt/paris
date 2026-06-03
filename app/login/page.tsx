@@ -6,6 +6,7 @@ import Image from "next/image"
 import { ArrowRight, Eye, EyeOff } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { logAccess } from "@/lib/actions/log-access"
+import { findEmailByDni } from "@/lib/actions/find-email-by-dni"
 
 const inputCls = `
   w-full px-4 py-3 rounded-xl text-white text-sm font-medium
@@ -29,7 +30,9 @@ export default function LoginPage() {
 function LoginContent() {
   const router       = useRouter()
   const searchParams = useSearchParams()
-  const redirectTo   = searchParams.get("redirectTo") ?? "/dashboard"
+  const rawRedirect  = searchParams.get("redirectTo") ?? "/dashboard"
+  // Prevenir open redirect: solo rutas internas relativas
+  const redirectTo   = rawRedirect.startsWith("/") && !rawRedirect.startsWith("//") ? rawRedirect : "/dashboard"
 
   const [mode, setMode]       = useState<LoginMode>("email")
   const [email, setEmail]     = useState("")
@@ -69,20 +72,15 @@ function LoginContent() {
 
     let loginEmail = email
 
-    // Si el modo es DNI, buscar el email asociado
+    // Si el modo es DNI, buscar el email con service_role (anon no puede leer participants)
     if (mode === "dni") {
-      const { data: participant } = await supabase
-        .from("participants")
-        .select("email")
-        .eq("dni", dni.replace(/\D/g, ""))
-        .single() as { data: { email: string } | null }
-
-      if (!participant) {
+      const found = await findEmailByDni(dni)
+      if (!found) {
         setError("No encontramos un usuario con ese DNI.")
         setLoading(false)
         return
       }
-      loginEmail = participant.email
+      loginEmail = found
     }
 
     const { data: signInData, error: authError } = await supabase.auth.signInWithPassword({

@@ -22,7 +22,7 @@ function CreateUserModal({ onClose }: { onClose: () => void }) {
   const [error,    setError]    = useState("")
 
   const handleCreate = async () => {
-    if (!email.trim() || password.length < 6) return
+    if (!email.trim() || password.length < 8) return
     setLoading(true)
     setError("")
     const res = await createSystemUser(email.trim(), password, role)
@@ -110,7 +110,7 @@ function CreateUserModal({ onClose }: { onClose: () => void }) {
           </button>
           <button
             onClick={handleCreate}
-            disabled={loading || !email.trim() || password.length < 6}
+            disabled={loading || !email.trim() || password.length < 8}
             className="h-11 bg-[#054a9d] hover:bg-[#1558b8] disabled:opacity-40 text-white font-black uppercase text-sm rounded-xl transition-all"
           >
             {loading ? "Creando..." : "Crear usuario"}
@@ -127,20 +127,23 @@ export function SystemUsersManager({ users }: { users: SystemUser[] }) {
 
   const handleToggle = (userId: string, banned: boolean) => {
     startTransition(async () => {
-      await toggleUserEnabled(userId, !banned)
+      const res = await toggleUserEnabled(userId, !banned)
+      if (!res.ok) alert(`Error: ${res.error}`)
     })
   }
 
   const handleDelete = (userId: string, email: string) => {
     if (!confirm(`¿Eliminar el usuario ${email}? Esta acción no se puede deshacer.`)) return
     startTransition(async () => {
-      await deleteSystemUser(userId)
+      const res = await deleteSystemUser(userId)
+      if (!res.ok) alert(`Error al eliminar: ${res.error}`)
     })
   }
 
   const handleRoleChange = (userId: string, role: "admin" | "callcenter") => {
     startTransition(async () => {
-      await updateUserRole(userId, role)
+      const res = await updateUserRole(userId, role)
+      if (!res.ok) alert(`Error al cambiar rol: ${res.error}`)
     })
   }
 

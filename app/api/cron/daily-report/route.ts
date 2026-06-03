@@ -4,8 +4,9 @@ import type { Database } from "@/lib/supabase/types"
 
 // Vercel Cron — todos los días a las 6:00 UTC
 export async function GET(request: Request) {
+  const secret = process.env.CRON_SECRET
   const authHeader = request.headers.get("authorization")
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (!secret || authHeader !== `Bearer ${secret}`) {
     return new NextResponse("Unauthorized", { status: 401 })
   }
 
@@ -43,6 +44,9 @@ export async function GET(request: Request) {
         pronosticos_hoy:         predictionsToday ?? 0,
       },
     })
+
+    // Limpiar logs viejos (> 90 días) — falla silenciosamente si la función no existe aún
+    await db.rpc("cleanup_old_access_logs").catch(() => null)
 
     return NextResponse.json({ ok: true, date: today })
   } catch (err) {

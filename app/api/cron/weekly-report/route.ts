@@ -5,8 +5,9 @@ import type { Database } from "@/lib/supabase/types"
 // Vercel Cron llama este endpoint cada lunes a las 8:00 UTC
 // Autenticado con CRON_SECRET para evitar llamadas externas no autorizadas
 export async function GET(request: Request) {
+  const secret = process.env.CRON_SECRET
   const authHeader = request.headers.get("authorization")
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (!secret || authHeader !== `Bearer ${secret}`) {
     return new NextResponse("Unauthorized", { status: 401 })
   }
 
@@ -37,10 +38,10 @@ export async function GET(request: Request) {
       total_participantes:  totalParticipants ?? 0,
       nuevos_esta_semana:   newThisWeek ?? 0,
       total_pronosticos:    totalPredictions ?? 0,
-      de_taller:            metricsOverview?.data?.from_taller ?? 0,
-      de_repuestos:         metricsOverview?.data?.from_repuestos ?? 0,
-      de_digital:           metricsOverview?.data?.from_digital ?? 0,
-      de_qr:                metricsOverview?.data?.from_qr ?? 0,
+      de_taller:            metricsOverview?.from_taller ?? 0,
+      de_repuestos:         metricsOverview?.from_repuestos ?? 0,
+      de_digital:           metricsOverview?.from_digital ?? 0,
+      de_qr:                metricsOverview?.from_qr ?? 0,
     }
 
     const periodStart = weekAgo.toLocaleDateString("es-AR", { day: "2-digit", month: "short" })

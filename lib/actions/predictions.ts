@@ -13,6 +13,10 @@ export async function savePrediction(
   score1: number,
   score2: number
 ): Promise<SavePredictionResult> {
+  if (!Number.isInteger(score1) || !Number.isInteger(score2)) return { ok: false, error: "Marcador inválido." }
+  if (score1 < 0 || score2 < 0)   return { ok: false, error: "El marcador no puede ser negativo." }
+  if (score1 > 30 || score2 > 30) return { ok: false, error: "Marcador fuera de rango razonable." }
+
   const supabase = await createClient()
 
   // Verificar que el partido no esté bloqueado

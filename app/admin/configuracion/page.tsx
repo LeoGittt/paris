@@ -24,21 +24,25 @@ export default async function AdminConfiguracionPage() {
     .select("user_id, role")
     .in("role", ["admin", "callcenter"]) as { data: { user_id: string; role: string }[] | null }
 
-  // Obtener datos de auth.users para cada user_id
-  const systemUsers: SystemUser[] = []
-  for (const r of roles ?? []) {
-    const { data: { user } } = await admin.auth.admin.getUserById(r.user_id)
-    if (user) {
-      systemUsers.push({
-        user_id:    user.id,
-        email:      user.email ?? "",
-        role:       r.role as "admin" | "callcenter",
-        banned:     !!user.banned_until,
-        created_at: user.created_at,
+  // Obtener datos de auth.users en paralelo (evitar N+1 secuencial)
+  const userResults = await Promise.all(
+    (roles ?? []).map(r => admin.auth.admin.getUserById(r.user_id))
+  )
+  const systemUsers: SystemUser[] = userResults
+    .map((res, i) => {
+      const user = res.data?.user
+      const r    = (roles ?? [])[i]
+      if (!user || !r) return null
+      return {
+        user_id:      user.id,
+        email:        user.email ?? "",
+        role:         r.role as "admin" | "callcenter",
+        banned:       !!user.banned_until,
+        created_at:   user.created_at,
         last_sign_in: user.last_sign_in_at ?? null,
-      })
-    }
-  }
+      }
+    })
+    .filter((u): u is SystemUser => u !== null)
 
   return (
     <div className="space-y-10">

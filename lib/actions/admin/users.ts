@@ -39,7 +39,11 @@ export async function createSystemUser(
     .from("user_roles")
     .insert({ user_id: data.user.id, role })
 
-  if (roleError) return { ok: false, error: "Usuario creado pero error al asignar rol." }
+  if (roleError) {
+    // Rollback: eliminar el usuario de Auth para no dejar cuentas huérfanas sin rol
+    await admin.auth.admin.deleteUser(data.user.id)
+    return { ok: false, error: "Error al asignar el rol. El usuario no fue creado." }
+  }
 
   revalidatePath("/admin/configuracion")
   return { ok: true }
@@ -57,7 +61,27 @@ export async function updateUserRole(userId: string, role: UserRole): Promise<Us
 }
 
 export async function deleteSystemUser(userId: string): Promise<UserActionResult> {
-  const admin = getAdminClient()
+  const admin    = getAdminClient()
+  const supabase = await createClient()
+
+  // Verificar que no sea el último admin del sistema
+  const { data: roleData } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userId)
+    .single() as { data: { role: string } | null }
+
+  if (roleData?.role === "admin") {
+    const { count } = await supabase
+      .from("user_roles")
+      .select("*", { count: "exact", head: true })
+      .eq("role", "admin") as { count: number | null }
+
+    if ((count ?? 0) <= 1) {
+      return { ok: false, error: "No podés eliminar el último administrador del sistema." }
+    }
+  }
+
   const { error } = await admin.auth.admin.deleteUser(userId)
   if (error) return { ok: false, error: error.message }
   revalidatePath("/admin/configuracion")

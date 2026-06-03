@@ -1,9 +1,18 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
+import { createClient as createAdminClient } from "@supabase/supabase-js"
 import { revalidatePath } from "next/cache"
+import type { Database } from "@/lib/supabase/types"
 
 export type ParticipantActionResult = { ok: true } | { ok: false; error: string }
+
+function getAdminClient() {
+  return createAdminClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  )
+}
 
 export async function updateParticipantProfile(
   participantId: string,
@@ -21,6 +30,18 @@ export async function updateParticipantProfile(
   }
 ): Promise<ParticipantActionResult> {
   const supabase = await createClient()
+  const admin    = getAdminClient()
+
+  const newEmail = data.email.trim()
+
+  // Obtener user_id y email actual para saber si cambió
+  const { data: current } = await supabase
+    .from("participants")
+    .select("user_id, email")
+    .eq("id", participantId)
+    .single() as { data: { user_id: string; email: string } | null }
+
+  // Actualizar perfil en la tabla participants
   const { error } = await supabase
     .from("participants")
     .update({
@@ -28,12 +49,14 @@ export async function updateParticipantProfile(
       last_name:     data.last_name.trim(),
       dni:           data.dni.replace(/\D/g, ""),
       phone:         data.phone.trim(),
-      email:         data.email.trim(),
+      email:         newEmail,
       license_plate: data.license_plate.toUpperCase().replace(/\s/g, ""),
       car_brand:     data.car_brand.trim(),
       car_model:     data.car_model.trim(),
       city:          data.city.trim(),
-      lead_source:   data.lead_source as "taller" | "repuestos" | "digital" | "qr" | "direct",
+      lead_source:   (["taller","repuestos","digital","qr","direct"].includes(data.lead_source)
+                      ? data.lead_source
+                      : "direct") as "taller" | "repuestos" | "digital" | "qr" | "direct",
     })
     .eq("id", participantId)
 
@@ -46,30 +69,53 @@ export async function updateParticipantProfile(
     return { ok: false, error: error.message }
   }
 
+  // Si el email cambió, sincronizar en Supabase Auth para que el login siga funcionando
+  if (current?.user_id && current.email !== newEmail) {
+    const { error: authError } = await admin.auth.admin.updateUserById(current.user_id, {
+      email: newEmail,
+    })
+    if (authError) {
+      // Rollback: restaurar el email original en participants para mantener consistencia
+      await supabase
+        .from("participants")
+        .update({ email: current.email })
+        .eq("id", participantId)
+      return { ok: false, error: `No se pudo actualizar el email: ${authError.message}` }
+    }
+  }
+
   revalidatePath("/admin/participantes")
   return { ok: true }
 }
 
-export async function toggleBlockParticipant(participantId: string, block: boolean) {
+export async function toggleBlockParticipant(participantId: string, block: boolean): Promise<ParticipantActionResult> {
   const supabase = await createClient()
-  await supabase
+  const { error } = await supabase
     .from("participants")
     .update({ is_blocked: block })
     .eq("id", participantId)
+  if (error) return { ok: false, error: error.message }
   revalidatePath("/admin/participantes")
+  return { ok: true }
 }
 
-export async function deleteParticipant(participantId: string) {
+export async function deleteParticipant(participantId: string): Promise<ParticipantActionResult> {
   const supabase = await createClient()
-  // Eliminar el user_id asociado también (cascade elimina el participant)
-  const { data } = await supabase
+  const admin    = getAdminClient()
+
+  // Obtener user_id con el cliente SSR (sujeto a RLS — el admin puede leer esto)
+  const { data, error: fetchError } = await supabase
     .from("participants")
     .select("user_id")
     .eq("id", participantId)
-    .single() as { data: { user_id: string } | null }
+    .single() as { data: { user_id: string } | null; error: unknown }
 
-  if (data?.user_id) {
-    await supabase.auth.admin.deleteUser(data.user_id)
-  }
+  if (fetchError || !data?.user_id) return { ok: false, error: "Participante no encontrado." }
+
+  // Eliminar en Auth con service_role — esto hace cascade sobre participants y user_roles
+  const { error: authError } = await admin.auth.admin.deleteUser(data.user_id)
+  if (authError) return { ok: false, error: authError.message }
+
   revalidatePath("/admin/participantes")
+  return { ok: true }
 }

@@ -9,7 +9,8 @@ export default async function AdminParticipantesPage({
   const { q = "", page = "1", from: dateFrom = "", to: dateTo = "" } = await searchParams
   const supabase = await createClient()
   const pageSize = 20
-  const rangeFrom = (parseInt(page) - 1) * pageSize
+  const pageNum  = Math.max(1, parseInt(page) || 1)
+  const rangeFrom = (pageNum - 1) * pageSize
   const rangeTo   = rangeFrom + pageSize - 1
 
   let query = supabase
@@ -18,9 +19,10 @@ export default async function AdminParticipantesPage({
     .order("created_at", { ascending: false })
     .range(rangeFrom, rangeTo)
 
-  if (q.trim()) {
+  const safeQ = q.replace(/[%_,.()"']/g, "").trim()
+  if (safeQ) {
     query = query.or(
-      `first_name.ilike.%${q}%,last_name.ilike.%${q}%,dni.ilike.%${q}%,email.ilike.%${q}%,phone.ilike.%${q}%,license_plate.ilike.%${q}%`
+      `first_name.ilike.%${safeQ}%,last_name.ilike.%${safeQ}%,dni.ilike.%${safeQ}%,email.ilike.%${safeQ}%,phone.ilike.%${safeQ}%,license_plate.ilike.%${safeQ}%`
     )
   }
   if (dateFrom) query = query.gte("created_at", dateFrom)
@@ -40,7 +42,7 @@ export default async function AdminParticipantesPage({
       <ParticipantsTable
         participants={participants ?? []}
         total={count ?? 0}
-        page={parseInt(page)}
+        page={pageNum}
         pageSize={pageSize}
         query={q}
         dateFrom={dateFrom}

@@ -30,14 +30,14 @@ export default async function CallCenterLayout({ children }: { children: React.R
             <span className="text-white font-black text-[13px] uppercase tracking-wide">Call Center</span>
           </div>
         </div>
-        <form action="/api/auth/signout" method="post">
-          <Link
-            href="/login"
+        <form action="/auth/signout" method="post">
+          <button
+            type="submit"
             className="flex items-center gap-2 text-white/30 hover:text-white/60 text-sm font-bold transition-colors"
           >
             <LogOut className="w-4 h-4" />
             Salir
-          </Link>
+          </button>
         </form>
       </header>
       <main className="max-w-5xl mx-auto px-5 md:px-10 py-8">

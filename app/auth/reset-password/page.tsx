@@ -25,7 +25,7 @@ export default function ResetPasswordPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (password.length < 6) { setError("La contraseña debe tener al menos 6 caracteres."); return }
+    if (password.length < 8) { setError("La contraseña debe tener al menos 8 caracteres."); return }
     if (password !== password2) { setError("Las contraseñas no coinciden."); return }
 
     setLoading(true)
@@ -74,8 +74,8 @@ export default function ResetPasswordPage() {
               <div className="relative">
                 <input
                   type={showPass ? "text" : "password"}
-                  required minLength={6}
-                  placeholder="Mínimo 6 caracteres"
+                  required minLength={8}
+                  placeholder="Mínimo 8 caracteres"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   className={inputCls + " pr-11"}

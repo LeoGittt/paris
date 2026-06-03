@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react"
 import { Save, CheckCircle2, AlertCircle, Settings } from "lucide-react"
-import { createClient } from "@/lib/supabase/client"
+import { updatePointConfig } from "@/lib/actions/admin/point-config"
 
 interface Config { id: string; correct_winner: number; correct_exact: number; correct_diff: number }
 
@@ -16,14 +16,14 @@ export function PointsConfig({ config }: { config: Config | null }) {
   const [isPending, startTransition] = useTransition()
 
   const handleSave = () => {
+    if (!config?.id) return
     startTransition(async () => {
-      const supabase = createClient()
-      const { error } = await supabase
-        .from("point_config")
-        .update({ correct_winner: winner, correct_exact: exact, correct_diff: diff })
-        .eq("id", config?.id ?? "")
-
-      setStatus(error ? "error" : "ok")
+      const res = await updatePointConfig(config.id, {
+        correct_winner: winner,
+        correct_exact:  exact,
+        correct_diff:   diff,
+      })
+      setStatus(res.ok ? "ok" : "error")
       setTimeout(() => setStatus("idle"), 3000)
     })
   }

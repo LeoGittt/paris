@@ -12,7 +12,8 @@ export function Countdown() {
 
   useEffect(() => {
     setMounted(true)
-    const target = new Date("2026-06-11T00:00:00").getTime()
+    // Primer partido: 11 Jun 2026 16:00 Ciudad de México (UTC-6) = 22:00 UTC
+    const target = new Date("2026-06-11T22:00:00Z").getTime()
     const tick = () => {
       const diff = target - Date.now()
       if (diff > 0) setTimeLeft({

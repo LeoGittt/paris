@@ -27,6 +27,18 @@ export type RegisterResult =
   | { ok: false; error: string }
 
 export async function registerParticipant(data: RegisterData, captchaToken?: string): Promise<RegisterResult> {
+  // Validaciones server-side — el cliente puede bypassear las del formulario
+  if (!data.accepts_terms)
+    return { ok: false, error: "Debés aceptar los términos y condiciones." }
+  if (data.dni.replace(/\D/g, "").length < 7)
+    return { ok: false, error: "DNI inválido." }
+  if (data.email && !data.email.includes("@"))
+    return { ok: false, error: "Email inválido." }
+  if (data.password.length < 8)
+    return { ok: false, error: "La contraseña debe tener al menos 8 caracteres." }
+  if (data.license_plate.replace(/\s/g, "").length < 6)
+    return { ok: false, error: "Patente inválida." }
+
   const supabase = await createClient()
 
   // Cliente admin (service role) — usado para inserts que ocurren en la misma
@@ -96,7 +108,14 @@ export async function registerParticipant(data: RegisterData, captchaToken?: str
 
   // 3. Asignar rol participant con service role
   const roleRow: UserRoleInsert = { user_id: authData.user.id, role: "participant" as UserRole }
-  await admin.from("user_roles").insert(roleRow)
+  const { error: roleError } = await admin.from("user_roles").insert(roleRow)
+
+  if (roleError) {
+    // Rollback completo: eliminar participant y auth user para evitar estado inconsistente
+    await admin.from("participants").delete().eq("user_id", authData.user.id)
+    await admin.auth.admin.deleteUser(authData.user.id)
+    return { ok: false, error: "Error al completar el registro. Intentá de nuevo." }
+  }
 
   return { ok: true }
 }

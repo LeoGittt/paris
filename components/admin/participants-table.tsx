@@ -193,7 +193,13 @@ export function ParticipantsTable({ participants, total, page, pageSize, query, 
   const handleExportCSV = () => {
     const rows = getExportRows()
     const headers = Object.keys(rows[0] ?? {})
-    const csv = [headers, ...rows.map(r => Object.values(r))].map(r => r.map(v => `"${v}"`).join(",")).join("\n")
+    // Escapar: 1) comillas dobles → "" (estándar CSV), 2) prevenir formula injection
+    const escapeCell = (v: unknown): string => {
+      const s = String(v ?? "")
+      const safe = /^[=+\-@\t\r]/.test(s) ? `'${s}` : s  // prefix fórmulas con '
+      return `"${safe.replace(/"/g, '""')}"` // escapar " internos
+    }
+    const csv = [headers.map(h => `"${h}"`), ...rows.map(r => Object.values(r).map(escapeCell))].map(r => r.join(",")).join("\n")
     const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" })
     const url  = URL.createObjectURL(blob)
     const a    = document.createElement("a")
@@ -294,14 +300,16 @@ export function ParticipantsTable({ participants, total, page, pageSize, query, 
 
   const handleToggleBlock = (id: string, blocked: boolean) => {
     startTransition(async () => {
-      await toggleBlockParticipant(id, !blocked)
+      const res = await toggleBlockParticipant(id, !blocked)
+      if (!res.ok) alert(`Error al ${blocked ? "desbloquear" : "bloquear"}: ${res.error}`)
     })
   }
 
   const handleDelete = (id: string, name: string) => {
     if (!confirm(`¿Eliminar a ${name}? Esta acción no se puede deshacer.`)) return
     startTransition(async () => {
-      await deleteParticipant(id)
+      const res = await deleteParticipant(id)
+      if (!res.ok) alert(`Error al eliminar: ${res.error}`)
     })
   }
 

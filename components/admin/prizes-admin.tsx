@@ -23,12 +23,19 @@ const labelCls = "block text-white/40 text-[11px] font-bold uppercase tracking-[
 function CreateModal({ onClose }: { onClose: () => void }) {
   const [form, setForm] = useState({ title: "", description: "", stage: "Fase de Grupos", prize_type: "weekly" })
   const [loading, setLoading] = useState(false)
+  const [error,   setError]   = useState("")
   const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }))
 
   const handleSave = async () => {
     if (!form.title.trim()) return
     setLoading(true)
-    await createPrize(form)
+    setError("")
+    const res = await createPrize(form)
+    if (!res.ok) {
+      setError(res.error ?? "Error al crear el premio")
+      setLoading(false)
+      return
+    }
     onClose()
   }
 
@@ -65,6 +72,7 @@ function CreateModal({ onClose }: { onClose: () => void }) {
             </div>
           </div>
         </div>
+        {error && <p className="text-red-400 text-xs font-medium mt-3">{error}</p>}
         <div className="grid grid-cols-2 gap-3 mt-5">
           <button onClick={onClose} className="h-11 bg-white/6 hover:bg-white/10 border border-white/10 text-white/60 font-bold uppercase text-sm rounded-xl transition-all">Cancelar</button>
           <button onClick={handleSave} disabled={loading || !form.title.trim()} className="h-11 bg-[#c3871e] hover:bg-[#d9961f] disabled:opacity-50 text-white font-black uppercase text-sm rounded-xl transition-all">

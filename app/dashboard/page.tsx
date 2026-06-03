@@ -11,9 +11,9 @@ export default async function DashboardPage() {
   // Datos del participante
   const { data: participant } = await supabase
     .from("participants")
-    .select("*")
+    .select("id, first_name, total_points, ranking_position")
     .eq("user_id", user.id)
-    .single() as { data: Record<string, unknown> | null }
+    .single() as { data: { id: string; first_name: string; total_points: number; ranking_position: number | null } | null }
 
   if (!participant) redirect("/")
 

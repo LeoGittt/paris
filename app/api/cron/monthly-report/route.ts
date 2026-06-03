@@ -4,8 +4,9 @@ import type { Database } from "@/lib/supabase/types"
 
 // Vercel Cron llama este endpoint el día 1 de cada mes a las 8:00 UTC
 export async function GET(request: Request) {
+  const secret = process.env.CRON_SECRET
   const authHeader = request.headers.get("authorization")
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (!secret || authHeader !== `Bearer ${secret}`) {
     return new NextResponse("Unauthorized", { status: 401 })
   }
 
@@ -29,8 +30,12 @@ export async function GET(request: Request) {
       { data: top3 },
     ] = await Promise.all([
       admin.from("participants").select("*", { count: "exact", head: true }),
-      admin.from("participants").select("*", { count: "exact", head: true }).gte("created_at", monthAgo.toISOString()),
-      admin.from("predictions").select("participant_id", { count: "exact", head: true }),
+      admin.from("participants").select("*", { count: "exact", head: true })
+        .gte("created_at", monthAgo.toISOString())
+        .lte("created_at", monthEnd.toISOString()),
+      admin.from("predictions").select("participant_id", { count: "exact", head: true })
+        .gte("submitted_at", monthAgo.toISOString())
+        .lte("submitted_at", monthEnd.toISOString()),
       db.from("metrics_overview").select("*").single(),
       admin.from("ranking_view")
         .select("first_name, last_name, total_points, ranking_position")
@@ -42,10 +47,10 @@ export async function GET(request: Request) {
       total_participantes:  totalParticipants ?? 0,
       nuevos_este_mes:      newThisMonth ?? 0,
       con_pronosticos:      activePredictors ?? 0,
-      de_taller:            metricsOverview?.data?.from_taller ?? 0,
-      de_repuestos:         metricsOverview?.data?.from_repuestos ?? 0,
-      de_digital:           metricsOverview?.data?.from_digital ?? 0,
-      de_qr:                metricsOverview?.data?.from_qr ?? 0,
+      de_taller:            metricsOverview?.from_taller ?? 0,
+      de_repuestos:         metricsOverview?.from_repuestos ?? 0,
+      de_digital:           metricsOverview?.from_digital ?? 0,
+      de_qr:                metricsOverview?.from_qr ?? 0,
     }
 
     // Top 3 del mes

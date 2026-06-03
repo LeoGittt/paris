@@ -13,7 +13,10 @@ export default async function CallCenterPage({
   let prizesMap:     Record<string, PrizeCC[]>  = {}
   let lastActivityMap: Record<string, string | null> = {}
 
-  if (q.trim().length >= 2) {
+  // Sanitizar: eliminar caracteres especiales de la sintaxis PostgREST
+  const safeQ = q.replace(/[%_,.()"']/g, "").trim()
+
+  if (safeQ.length >= 2) {
     const { data } = await supabase
       .from("participants")
       .select(`
@@ -22,7 +25,7 @@ export default async function CallCenterPage({
         total_points, ranking_position, is_blocked, created_at,
         lead_source
       `)
-      .or(`first_name.ilike.%${q}%,last_name.ilike.%${q}%,dni.ilike.%${q}%,email.ilike.%${q}%,phone.ilike.%${q}%,license_plate.ilike.%${q}%`)
+      .or(`first_name.ilike.%${safeQ}%,last_name.ilike.%${safeQ}%,dni.ilike.%${safeQ}%,email.ilike.%${safeQ}%,phone.ilike.%${safeQ}%,license_plate.ilike.%${safeQ}%`)
       .limit(10) as { data: ParticipantCC[] | null }
 
     participants = data ?? []
