@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { createClient as createAdminClient } from "@supabase/supabase-js"
 import type { Database, LeadSource, UserRole } from "@/lib/supabase/types"
+import { checkRateLimit } from "@/lib/rate-limit"
 
 type ParticipantInsert = Database["public"]["Tables"]["participants"]["Insert"]
 type UserRoleInsert    = Database["public"]["Tables"]["user_roles"]["Insert"]
@@ -27,6 +28,15 @@ export type RegisterResult =
   | { ok: false; error: string }
 
 export async function registerParticipant(data: RegisterData, captchaToken?: string): Promise<RegisterResult> {
+  // Rate limit: máx 3 registros por IP por hora
+  // Evita creación masiva de cuentas desde un mismo origen
+  const { allowed, retryAfter } = await checkRateLimit("register", {
+    maxRequests:   3,
+    windowMinutes: 60,
+  })
+  if (!allowed)
+    return { ok: false, error: `Demasiados intentos de registro. Intentá de nuevo en ${retryAfter} minutos.` }
+
   // Validaciones server-side — el cliente puede bypassear las del formulario
   if (!data.accepts_terms)
     return { ok: false, error: "Debés aceptar los términos y condiciones." }

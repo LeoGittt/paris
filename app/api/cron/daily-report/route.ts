@@ -47,6 +47,8 @@ export async function GET(request: Request) {
 
     // Limpiar logs viejos (> 90 días) — falla silenciosamente si la función no existe aún
     await db.rpc("cleanup_old_access_logs").catch(() => null)
+    // Limpiar rate limit counters viejos (> 24h)
+    await db.rpc("cleanup_old_rate_limits").catch(() => null)
 
     return NextResponse.json({ ok: true, date: today })
   } catch (err) {
