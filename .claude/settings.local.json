@@ -16,7 +16,13 @@
       "Bash(git commit *)",
       "Bash(git remote *)",
       "Bash(git branch *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "mcp__plugin_engram_engram__mem_context",
+      "mcp__plugin_engram_engram__mem_save",
+      "Bash(npm install *)",
+      "Bash(node -e \"const {createClient} = require\\('@supabase/supabase-js'\\); console.log\\('ok'\\)\")",
+      "mcp__plugin_engram_engram__mem_judge",
+      "Bash(node -e \"console.log\\('URL:', process.env.NEXT_PUBLIC_SUPABASE_URL ? 'OK' : 'FALTA'\\); console.log\\('ANON:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'OK' : 'FALTA'\\); console.log\\('SERVICE:', process.env.SUPABASE_SERVICE_ROLE_KEY ? 'OK' : 'FALTA'\\)\")"
     ]
   }
 }

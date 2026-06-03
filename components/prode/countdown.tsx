@@ -54,8 +54,7 @@ export function Countdown() {
 
               <span
                 className="font-black tabular-nums leading-none text-[1.9rem] md:text-[2.8rem]"
-                style={{ background: "linear-gradient(135deg, #e8a832 0%, #c3871e 50%, #9a6815 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}
-                style={{ fontFamily: "'ChevySans', sans-serif" }}
+                style={{ background: "linear-gradient(135deg, #e8a832 0%, #c3871e 50%, #9a6815 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", fontFamily: "'ChevySans', sans-serif" }}
               >
                 {display(unit.value)}
               </span>
