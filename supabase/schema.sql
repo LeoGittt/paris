@@ -345,6 +345,11 @@ create policy "participant: ver propio perfil"
   on participants for select
   using (user_id = auth.uid());
 
+-- Los participantes pueden insertar su propio perfil al registrarse
+create policy "participant: registrarse"
+  on participants for insert
+  with check (user_id = auth.uid());
+
 -- Los participantes pueden actualizar su propio perfil
 create policy "participant: actualizar propio perfil"
   on participants for update

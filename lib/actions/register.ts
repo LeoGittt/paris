@@ -29,6 +29,13 @@ export type RegisterResult =
 export async function registerParticipant(data: RegisterData, captchaToken?: string): Promise<RegisterResult> {
   const supabase = await createClient()
 
+  // Cliente admin (service role) — usado para inserts que ocurren en la misma
+  // request que el signUp, antes de que la cookie de sesión esté disponible
+  const admin = createAdminClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+
   // 1. Crear usuario en Supabase Auth
   const { data: authData, error: authError } = await supabase.auth.signUp({
     email: data.email,
@@ -53,7 +60,8 @@ export async function registerParticipant(data: RegisterData, captchaToken?: str
     return { ok: false, error: "Error al crear el usuario. Intentá de nuevo." }
   }
 
-  // 2. Crear perfil del participante
+  // 2. Insertar perfil del participante con service role
+  // (la cookie de sesión aún no está disponible dentro de la misma server action)
   const participantRow: ParticipantInsert = {
     user_id:           authData.user.id,
     first_name:        data.first_name,
@@ -69,35 +77,26 @@ export async function registerParticipant(data: RegisterData, captchaToken?: str
     accepts_marketing: data.accepts_marketing,
     lead_source:       "direct" as LeadSource,
   }
-  const { error: profileError } = await supabase
+
+  const { error: profileError } = await admin
     .from("participants")
     .insert(participantRow)
 
   if (profileError) {
-    // El usuario de auth ya fue creado — eliminarlo para evitar cuentas huérfanas
-    const adminClient = createAdminClient<Database>(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    )
-    await adminClient.auth.admin.deleteUser(authData.user.id)
+    // Limpiar el usuario de auth para evitar cuentas huérfanas
+    await admin.auth.admin.deleteUser(authData.user.id)
 
     if (profileError.code === "23505") {
-      if (profileError.message.includes("dni")) {
-        return { ok: false, error: "Este DNI ya está registrado." }
-      }
-      if (profileError.message.includes("email")) {
-        return { ok: false, error: "Este email ya está registrado." }
-      }
-      if (profileError.message.includes("license_plate")) {
-        return { ok: false, error: "Esta patente ya está registrada." }
-      }
+      if (profileError.message.includes("dni"))           return { ok: false, error: "Este DNI ya está registrado." }
+      if (profileError.message.includes("email"))         return { ok: false, error: "Este email ya está registrado." }
+      if (profileError.message.includes("license_plate")) return { ok: false, error: "Esta patente ya está registrada." }
     }
     return { ok: false, error: "Error al guardar tus datos. Intentá de nuevo." }
   }
 
-  // 3. Asignar rol participant
+  // 3. Asignar rol participant con service role
   const roleRow: UserRoleInsert = { user_id: authData.user.id, role: "participant" as UserRole }
-  await supabase.from("user_roles").insert(roleRow)
+  await admin.from("user_roles").insert(roleRow)
 
   return { ok: true }
 }

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef } from "react"
+import { useRouter } from "next/navigation"
 import { ArrowRight, Eye, EyeOff } from "lucide-react"
 import HCaptcha from "@hcaptcha/react-hcaptcha"
 import { registerParticipant } from "@/lib/actions/register"
@@ -22,6 +23,7 @@ const labelCls = "block text-white/50 text-[11px] font-bold uppercase tracking-[
 type Step = 1 | 2
 
 export function RegistrationForm({ onClose }: Props) {
+  const router = useRouter()
   const [step, setStep]           = useState<Step>(1)
   const [loading, setLoading]     = useState(false)
   const [done, setDone]           = useState(false)
@@ -102,7 +104,7 @@ export function RegistrationForm({ onClose }: Props) {
         Tu registro fue realizado correctamente. Ya podés comenzar a cargar tus pronósticos.
       </p>
       <button
-        onClick={onClose}
+        onClick={() => { onClose?.(); window.location.href = "/dashboard" }}
         className="bg-[#054a9d] hover:bg-[#1558b8] text-white font-black uppercase tracking-wide px-8 h-11 rounded-xl text-sm transition-colors"
         style={{ fontFamily: "'ChevySans', sans-serif" }}
       >

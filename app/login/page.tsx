@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { Suspense, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Image from "next/image"
 import { ArrowRight, Eye, EyeOff } from "lucide-react"
@@ -19,6 +19,14 @@ const labelCls = "block text-white/50 text-[11px] font-bold uppercase tracking-[
 type LoginMode = "email" | "dni"
 
 export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginContent />
+    </Suspense>
+  )
+}
+
+function LoginContent() {
   const router       = useRouter()
   const searchParams = useSearchParams()
   const redirectTo   = searchParams.get("redirectTo") ?? "/dashboard"
