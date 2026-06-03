@@ -6,7 +6,7 @@ const PUBLIC_PATHS = ["/", "/login", "/registro", "/ranking", "/terminos", "/bas
 const ADMIN_PATHS  = ["/admin"]
 const CC_PATHS     = ["/callcenter"]
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   let response = NextResponse.next({
