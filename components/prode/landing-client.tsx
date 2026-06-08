@@ -24,7 +24,7 @@ function Logo({ compact = false }: { compact?: boolean }) {
   const h = Math.round(w * 0.27)
   return (
     <div className="relative select-none shrink-0" style={{ width: w, height: h }}>
-      <Image src="/logo-grupo-paris.png" alt="Grupo Paris" fill className="object-contain" priority />
+      <Image src="/logo-grupo-paris-new.png" alt="Chevrolet Grupo Paris" fill className="object-contain" priority />
     </div>
   )
 }
@@ -362,7 +362,7 @@ export function LandingClient({ rankingRows, prizes, upcomingMatches }: Props) {
         <div className="relative z-10 max-w-7xl mx-auto px-5 md:px-10 text-center">
           <div className="flex justify-center mb-8">
             <div className="relative" style={{ width: 280, height: Math.round(280 * 0.27) }}>
-              <Image src="/logo-grupo-paris.png" alt="Grupo Paris" fill className="object-contain" />
+              <Image src="/logo-grupo-paris-new.png" alt="Chevrolet Grupo Paris" fill className="object-contain" />
             </div>
           </div>
           <h2 className="font-black text-white uppercase leading-none mb-6" style={{ fontSize: "clamp(2.8rem, 8vw, 6rem)" }}>
@@ -539,7 +539,7 @@ export function LandingClient({ rankingRows, prizes, upcomingMatches }: Props) {
               <div className="text-center mb-7">
                 <div className="flex justify-center mb-5">
                   <div className="relative" style={{ width: 220, height: Math.round(220 * 0.27) }}>
-                    <Image src="/logo-grupo-paris.png" alt="Grupo Paris" fill className="object-contain" />
+                    <Image src="/logo-grupo-paris-new.png" alt="Chevrolet Grupo Paris" fill className="object-contain" />
                   </div>
                 </div>
                 <h3 className="font-black text-white uppercase text-3xl mb-1.5" style={{ fontFamily: "'ChevySans', sans-serif" }}>UNITE AL PRODE</h3>

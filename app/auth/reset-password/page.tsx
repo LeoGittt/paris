@@ -32,10 +32,31 @@ export default function ResetPasswordPage() {
     setError("")
 
     const supabase = createClient()
-    const { error: updateError } = await supabase.auth.updateUser({ password })
 
-    if (updateError) {
-      setError(updateError.message)
+    // Verificar que hay una sesión válida (debe venir del link de reset)
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session || !session.user) {
+      setError("Sesión expirada. Solicitá un nuevo enlace de reset.")
+      setLoading(false)
+      return
+    }
+
+    // Actualizar contraseña vía API (server-side, más confiable)
+    const response = await fetch("/api/auth/update-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password }),
+    })
+
+    const result = await response.json()
+
+    if (result.error || !response.ok) {
+      // Traducir mensajes de error de Supabase
+      const errorMap: Record<string, string> = {
+        "New password should be different from the old password.": "La nueva contraseña debe ser diferente a la contraseña anterior.",
+      }
+      const message = errorMap[result.error] ?? result.error ?? "Error al cambiar la contraseña."
+      setError(message)
       setLoading(false)
       return
     }
