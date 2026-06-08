@@ -63,18 +63,14 @@ export function AdminNav() {
       {/* Logo */}
       <div className="px-5 py-5 border-b border-white/6">
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative shrink-0" style={{ width: 40, height: 17 }}>
+          <div className="relative shrink-0" style={{ width: 120, height: 32 }}>
             <Image
-              src="/bowtie.png" alt="Chevrolet" fill
-              className="object-contain opacity-70 group-hover:opacity-100 transition-opacity"
-              style={{ mixBlendMode: "screen" }}
+              src="/logo-grupo-paris.png" alt="Grupo Paris" fill
+              className="object-contain opacity-75 group-hover:opacity-100 transition-opacity"
             />
           </div>
           <div className="w-px bg-white/15 self-stretch" />
-          <div className="leading-none">
-            <p className="text-white/35 text-[8px] font-black uppercase tracking-[0.25em]">GRUPO PARIS</p>
-            <p className="text-white/90 font-black text-[13px] uppercase tracking-wide">PRODE 2026</p>
-          </div>
+          <p className="text-white/90 font-black text-[13px] uppercase tracking-wide">PRODE 2026</p>
         </Link>
       </div>
 

@@ -41,10 +41,10 @@ export default async function EmpleadosLayout({ children }: { children: React.Re
           {/* Logo + título */}
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="relative shrink-0" style={{ width: 32, height: 14 }}>
+              <div className="relative shrink-0" style={{ width: 100, height: 27 }}>
                 <Image
-                  src="/bowtie.png"
-                  alt="Chevrolet"
+                  src="/logo-grupo-paris.png"
+                  alt="Grupo Paris"
                   fill
                   className="object-contain opacity-80 group-hover:opacity-100 transition-opacity"
                   style={{ mixBlendMode: "screen" }}
@@ -73,11 +73,18 @@ export default async function EmpleadosLayout({ children }: { children: React.Re
             </div>
           </div>
 
-          {/* Derecha: nombre + volver */}
-          <div className="flex items-center gap-4">
+          {/* Derecha: nombre + botones */}
+          <div className="flex items-center gap-3">
             <span className="hidden sm:block text-white/30 text-[11px] font-medium">
               {participant.first_name} {participant.last_name}
             </span>
+            <Link
+              href="/empleados/perfil"
+              className="inline-flex items-center gap-1.5 text-white/25 hover:text-white/70 text-[11px] font-black uppercase tracking-widest transition-colors"
+            >
+              Mi perfil
+            </Link>
+            <div className="w-px h-4 bg-white/10" />
             <Link
               href="/dashboard"
               className="inline-flex items-center gap-1.5 text-white/25 hover:text-white/70 text-[11px] font-black uppercase tracking-widest transition-colors group"

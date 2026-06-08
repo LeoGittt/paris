@@ -52,6 +52,7 @@ export default async function DashboardPage() {
     .select("id, team1, team2, team1_flag, team2_flag, match_date, group_name, predictions_locked")
     .eq("is_finished", false)
     .eq("predictions_locked", false)
+    .or("team1.ilike.%argentina%,team2.ilike.%argentina%")
     .order("match_date", { ascending: true })
     .limit(3) as { data: UpcomingMatch[] | null }
 

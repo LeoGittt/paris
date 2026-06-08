@@ -8,7 +8,7 @@ export const revalidate = 30
 
 export const metadata: Metadata = {
   title: 'Prode Chevrolet Grupo Paris | Mundial 2026',
-  description: 'El prode oficial del Mundial 2026 de Chevrolet Grupo Paris. Registrate gratis, hacé tus pronósticos partido a partido y ganá premios en cada etapa. Solo para clientes Grupo Paris — San Juan, Argentina.',
+  description: 'El prode oficial del Mundial 2026 de Chevrolet Grupo Paris. Registrate gratis, predecí los partidos de Argentina y ganá premios en cada etapa. Solo para clientes Grupo Paris.',
   alternates: { canonical: '/' },
 }
 
@@ -62,6 +62,7 @@ export default async function ProdePage() {
       .select("id, team1, team2, team1_flag, team2_flag, match_date, group_name, stage, predictions_locked, is_finished")
       .eq("is_finished", false)
       .eq("predictions_locked", false)
+      .or("team1.ilike.%argentina%,team2.ilike.%argentina%")
       .order("match_date", { ascending: true })
       .limit(6) as unknown as Promise<{ data: LandingMatch[] | null }>,
 

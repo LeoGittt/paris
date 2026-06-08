@@ -8,6 +8,11 @@ import { checkRateLimit } from "@/lib/rate-limit"
 type ParticipantInsert = Database["public"]["Tables"]["participants"]["Insert"]
 type UserRoleInsert    = Database["public"]["Tables"]["user_roles"]["Insert"]
 
+const admin = createAdminClient<Database>(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
+
 export interface RegisterData {
   first_name: string
   last_name: string
@@ -29,16 +34,8 @@ export type RegisterResult =
   | { ok: false; error: string }
 
 export async function registerParticipant(data: RegisterData, captchaToken?: string): Promise<RegisterResult> {
-  // Rate limit: máx 3 registros por IP por hora
-  // Evita creación masiva de cuentas desde un mismo origen
-  const { allowed, retryAfter } = await checkRateLimit("register", {
-    maxRequests:   3,
-    windowMinutes: 60,
-  })
-  if (!allowed)
-    return { ok: false, error: `Demasiados intentos de registro. Intentá de nuevo en ${retryAfter} minutos.` }
 
-  // Validaciones server-side — el cliente puede bypassear las del formulario
+  // Validaciones síncronas primero
   if (!data.accepts_terms)
     return { ok: false, error: "Debés aceptar los términos y condiciones." }
   if (data.dni.replace(/\D/g, "").length < 7)
@@ -50,44 +47,36 @@ export async function registerParticipant(data: RegisterData, captchaToken?: str
   if (data.license_plate.replace(/\s/g, "").length < 6)
     return { ok: false, error: "Patente inválida." }
 
+  // Rate limit antes del signUp
+  const { allowed, retryAfter } = await checkRateLimit("register", {
+    maxRequests:   3,
+    windowMinutes: 60,
+  })
+  if (!allowed)
+    return { ok: false, error: `Demasiados intentos de registro. Intentá de nuevo en ${retryAfter} minutos.` }
+
+  // Crear usuario en Supabase Auth
   const supabase = await createClient()
-
-  // Cliente admin (service role) — usado para inserts que ocurren en la misma
-  // request que el signUp, antes de que la cookie de sesión esté disponible
-  const admin = createAdminClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
-
-  // 1. Crear usuario en Supabase Auth
   const { data: authData, error: authError } = await supabase.auth.signUp({
-    email: data.email,
+    email:    data.email,
     password: data.password,
-    options: {
+    options:  {
       captchaToken,
-      data: {
-        first_name: data.first_name,
-        last_name: data.last_name,
-      },
+      data: { first_name: data.first_name, last_name: data.last_name },
     },
   })
 
   if (authError) {
-    if (authError.message.includes("already registered")) {
+    if (authError.message.includes("already registered"))
       return { ok: false, error: "Este email ya está registrado." }
-    }
     return { ok: false, error: authError.message }
   }
 
-  if (!authData.user) {
+  if (!authData?.user)
     return { ok: false, error: "Error al crear el usuario. Intentá de nuevo." }
-  }
 
-  // 2. Insertar perfil del participante con service role
-  // (la cookie de sesión aún no está disponible dentro de la misma server action)
-  const isEmployee = /^empleadoparis@\d{7,8}\.com$/i.test(data.email)
-
-  const participantRow: ParticipantInsert & { is_employee?: boolean } = {
+  // Insert solo con columnas que SIEMPRE existen en el schema base
+  const participantRow: ParticipantInsert = {
     user_id:           authData.user.id,
     first_name:        data.first_name,
     last_name:         data.last_name,
@@ -100,19 +89,15 @@ export async function registerParticipant(data: RegisterData, captchaToken?: str
     city:              data.city,
     accepts_terms:     data.accepts_terms,
     accepts_marketing: data.accepts_marketing,
-    lead_source:       (["taller","repuestos","digital","qr"].includes(data.lead_source ?? "") ? data.lead_source : "direct") as LeadSource,
-    is_employee:       isEmployee,
+    lead_source:       (["taller","repuestos","digital","qr"].includes(data.lead_source ?? "")
+                         ? data.lead_source : "direct") as LeadSource,
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error: profileError } = await (admin as any)
-    .from("participants")
-    .insert(participantRow)
+  const { error: profileError } = await (admin as any).from("participants").insert(participantRow)
 
   if (profileError) {
-    // Limpiar el usuario de auth para evitar cuentas huérfanas
     await admin.auth.admin.deleteUser(authData.user.id)
-
     if (profileError.code === "23505") {
       if (profileError.message.includes("dni"))           return { ok: false, error: "Este DNI ya está registrado." }
       if (profileError.message.includes("email"))         return { ok: false, error: "Este email ya está registrado." }
@@ -121,15 +106,27 @@ export async function registerParticipant(data: RegisterData, captchaToken?: str
     return { ok: false, error: "Error al guardar tus datos. Intentá de nuevo." }
   }
 
-  // 3. Asignar rol participant con service role
+  // Asignar rol participant
   const roleRow: UserRoleInsert = { user_id: authData.user.id, role: "participant" as UserRole }
   const { error: roleError } = await admin.from("user_roles").insert(roleRow)
 
   if (roleError) {
-    // Rollback completo: eliminar participant y auth user para evitar estado inconsistente
-    await admin.from("participants").delete().eq("user_id", authData.user.id)
-    await admin.auth.admin.deleteUser(authData.user.id)
+    await Promise.all([
+      admin.from("participants").delete().eq("user_id", authData.user.id),
+      admin.auth.admin.deleteUser(authData.user.id),
+    ])
     return { ok: false, error: "Error al completar el registro. Intentá de nuevo." }
+  }
+
+  // Marcar como empleado si corresponde — no bloquea el registro si la columna no existe todavía
+  const isEmployee = /^empleadoparis@\d{7,8}\.com$/i.test(data.email)
+  if (isEmployee) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (admin as any)
+      .from("participants")
+      .update({ is_employee: true })
+      .eq("user_id", authData.user.id)
+      .then(() => {}) // silently ignore if column doesn't exist
   }
 
   return { ok: true }

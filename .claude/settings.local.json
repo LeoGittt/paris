@@ -23,7 +23,8 @@
       "Bash(node -e \"const {createClient} = require\\('@supabase/supabase-js'\\); console.log\\('ok'\\)\")",
       "mcp__plugin_engram_engram__mem_judge",
       "Bash(node -e \"console.log\\('URL:', process.env.NEXT_PUBLIC_SUPABASE_URL ? 'OK' : 'FALTA'\\); console.log\\('ANON:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'OK' : 'FALTA'\\); console.log\\('SERVICE:', process.env.SUPABASE_SERVICE_ROLE_KEY ? 'OK' : 'FALTA'\\)\")",
-      "WebFetch(domain:www.thesportsdb.com)"
+      "WebFetch(domain:www.thesportsdb.com)",
+      "Bash(Copy-Item \"d:\\\\Descargas\\\\chevrolet-prode-page\\\\public\\\\ChatGPT_Image_7_jun_2026__23_41_29-removebg-preview.png\" \"d:\\\\Descargas\\\\chevrolet-prode-page\\\\public\\\\logo-grupo-paris-new.png\")"
     ]
   }
 }
