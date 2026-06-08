@@ -6,6 +6,12 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get("code")
   const type = searchParams.get("type")
 
+  // DEBUG
+  console.log("🔐 CALLBACK URL:", request.url)
+  console.log("🔐 code:", code)
+  console.log("🔐 type:", type)
+  console.log("🔐 searchParams:", Array.from(searchParams.entries()))
+
   if (code) {
     const supabase = await createClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)

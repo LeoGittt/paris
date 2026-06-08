@@ -67,7 +67,7 @@ export function AvatarUpload({ currentUrl, initials, size = 80, ringColor }: Pro
           style={{ border: `2px solid ${ring}` }}
         >
           {url ? (
-            <Image src={url} alt={initials} fill className="object-cover" sizes={`${size}px`} />
+            <Image src={url} alt={initials} fill className="object-cover" sizes={`${size}px`} unoptimized />
           ) : (
             <div
               className="w-full h-full flex items-center justify-center"

@@ -9,6 +9,11 @@ const nextConfig = {
         hostname: 'flagcdn.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'zswhbfvyrjxsrnqkylqq.supabase.co',
+        pathname: '/**',
+      },
     ],
   },
 

@@ -118,15 +118,20 @@ export async function registerParticipant(data: RegisterData, captchaToken?: str
     return { ok: false, error: "Error al completar el registro. Intentá de nuevo." }
   }
 
-  // Marcar como empleado si corresponde — no bloquea el registro si la columna no existe todavía
+  // Marcar como empleado si corresponde
   const isEmployee = /^empleadoparis@\d{7,8}\.com$/i.test(data.email)
   if (isEmployee) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (admin as any)
+    const { error: employeeError } = await (admin as any)
       .from("participants")
       .update({ is_employee: true })
       .eq("user_id", authData.user.id)
-      .then(() => {}) // silently ignore if column doesn't exist
+
+    if (employeeError) {
+      console.error("❌ Error marking as employee:", employeeError)
+    } else {
+      console.log("✅ Marked as employee:", data.email)
+    }
   }
 
   return { ok: true }
