@@ -5,6 +5,7 @@ import type { Database } from "@/lib/supabase/types"
 const PUBLIC_PATHS = ["/", "/login", "/registro", "/ranking", "/terminos", "/bases", "/api/", "/auth/"]
 const ADMIN_PATHS  = ["/admin"]
 const CC_PATHS     = ["/callcenter"]
+const EMP_PATHS    = ["/empleados"]
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -55,6 +56,14 @@ export async function proxy(request: NextRequest) {
       pathname === "/login" ||
       pathname === "/registro"
     )
+
+  // /empleados solo requiere auth (el layout verifica is_employee)
+  if (!user && EMP_PATHS.some(p => pathname.startsWith(p))) {
+    const url = request.nextUrl.clone()
+    url.pathname = "/login"
+    url.searchParams.set("redirectTo", pathname)
+    return NextResponse.redirect(url)
+  }
 
   // Leer rol una sola vez si es necesario
   let role: string | null = null

@@ -2,7 +2,8 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Search, Phone, Mail, Car, MapPin, Trophy, Calendar, Download, Shield, CheckCircle2, Gift, Clock } from "lucide-react"
+import { Search, Phone, Mail, Car, MapPin, Trophy, Download, Shield, CheckCircle2, Gift, Clock, FileSpreadsheet } from "lucide-react"
+import * as XLSX from "xlsx"
 import type { ParticipantCC, PrizeCC } from "@/app/callcenter/page"
 
 const LEAD_LABELS: Record<string, string> = {
@@ -202,6 +203,33 @@ export function CallCenterSearch({ participants, query, prizesMap, lastActivityM
   const router  = useRouter()
   const [search, setSearch] = useState(query)
 
+  const handleExportAll = () => {
+    const rows = participants.map(p => ({
+      Nombre:             p.first_name,
+      Apellido:           p.last_name,
+      DNI:                p.dni,
+      Celular:            p.phone,
+      Email:              p.email,
+      Localidad:          p.city,
+      Patente:            p.license_plate,
+      Marca:              p.car_brand,
+      Modelo:             p.car_model,
+      Origen:             LEAD_LABELS[p.lead_source] ?? p.lead_source,
+      Puntos:             p.total_points,
+      Ranking:            p.ranking_position ?? "-",
+      "Última actividad": lastActivityMap[p.id]
+        ? new Date(lastActivityMap[p.id]!).toLocaleDateString("es-AR")
+        : "Sin actividad",
+      "Premios ganados":  (prizesMap[p.id] ?? []).map(pr => pr.title).join(", ") || "-",
+      Estado:             p.is_blocked ? "Bloqueado" : "Activo",
+      Registro:           new Date(p.created_at).toLocaleDateString("es-AR"),
+    }))
+    const ws = XLSX.utils.json_to_sheet(rows)
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, "Resultados")
+    XLSX.writeFile(wb, `callcenter-busqueda-${new Date().toISOString().slice(0, 10)}.xlsx`)
+  }
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (search.trim().length < 2) return
@@ -252,9 +280,18 @@ export function CallCenterSearch({ participants, query, prizesMap, lastActivityM
       {/* Resultados */}
       {participants.length > 0 && (
         <div className="space-y-4">
-          <p className="text-white/30 text-[11px] font-medium">
-            {participants.length} resultado{participants.length > 1 ? "s" : ""} para "{query}"
-          </p>
+          <div className="flex items-center justify-between">
+            <p className="text-white/30 text-[11px] font-medium">
+              {participants.length} resultado{participants.length > 1 ? "s" : ""} para "{query}"
+            </p>
+            <button
+              onClick={handleExportAll}
+              className="flex items-center gap-1.5 px-3 h-8 bg-white/4 hover:bg-white/8 border border-white/8 text-white/40 hover:text-white font-black text-[10px] uppercase tracking-wide rounded-xl transition-all"
+            >
+              <FileSpreadsheet className="w-3.5 h-3.5" />
+              Exportar Excel
+            </button>
+          </div>
           {participants.map(p => (
             <ParticipantCard
               key={p.id}

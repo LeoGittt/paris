@@ -15,7 +15,7 @@ export default async function PronosticosPage() {
 
   if (!participant) redirect("/")
 
-  // Todos los partidos con el pronóstico del participante (si existe)
+  // Solo partidos de Argentina por el momento
   const { data: rawMatches } = await supabase
     .from("matches")
     .select(`
@@ -23,6 +23,7 @@ export default async function PronosticosPage() {
       match_date, stage, group_name, venue,
       score1, score2, is_finished, predictions_locked
     `)
+    .or("team1.ilike.%argentina%,team2.ilike.%argentina%")
     .order("match_date", { ascending: true }) as { data: Omit<MatchRow, "formatted_date" | "formatted_time">[] | null }
 
   const tz = "America/Argentina/Buenos_Aires"

@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import type { RankingRow } from "@/components/prode/ranking-table"
 import type { Metadata } from "next"
 
-export const revalidate = 60
+export const revalidate = 30
 
 export const metadata: Metadata = {
   title: 'Ranking General',
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default async function PublicRankingPage() {
   const supabase = await createClient()
 
-  const [{ data: ranking }, { data: lastUpdated }] = await Promise.all([
+  const [{ data: ranking }, { data: lastUpdated }, { data: nzMatches }] = await Promise.all([
     supabase
       .from("ranking_view")
       .select("participant_id, first_name, last_name, total_points, correct_exact, ranking_position")
@@ -25,9 +25,31 @@ export default async function PublicRankingPage() {
       .select("updated_at")
       .order("updated_at", { ascending: false })
       .limit(1) as unknown as Promise<{ data: { updated_at: string }[] | null }>,
+
+    supabase
+      .from("matches")
+      .select("id, team1, team2")
+      .or("team1.ilike.%Nueva Zelanda%,team1.ilike.%New Zealand%,team2.ilike.%Nueva Zelanda%,team2.ilike.%New Zealand%") as unknown as Promise<{ data: { id: string; team1: string; team2: string }[] | null }>,
   ])
 
-  const rows = ranking ?? []
+  const painManiaFanIds = new Set<string>()
+  if (nzMatches?.length) {
+    const { data: nzPreds } = await supabase
+      .from("predictions")
+      .select("participant_id, predicted_score1, predicted_score2, match_id")
+      .in("match_id", nzMatches.map(m => m.id))
+    for (const pred of nzPreds ?? []) {
+      const match = nzMatches.find(m => m.id === pred.match_id)
+      if (!match) continue
+      const nzIsTeam1 = /new zealand|nueva zelanda/i.test(match.team1)
+      const nzWins = nzIsTeam1
+        ? pred.predicted_score1 > pred.predicted_score2
+        : pred.predicted_score2 > pred.predicted_score1
+      if (nzWins) painManiaFanIds.add(pred.participant_id)
+    }
+  }
+
+  const rows = (ranking ?? []).map(r => ({ ...r, is_pain_mania_fan: painManiaFanIds.has(r.participant_id) }))
   const updatedAt = lastUpdated?.[0]?.updated_at ?? null
 
   return (
@@ -99,6 +121,9 @@ export default async function PublicRankingPage() {
                       <span className="text-white/70 text-sm font-bold truncate">
                         {p.first_name} {p.last_name}
                       </span>
+                      {p.is_pain_mania_fan && (
+                        <span title="Seguidor de Tim Payne desde antes que fuera famoso" className="text-sm select-none shrink-0">🇳🇿</span>
+                      )}
                     </div>
                     <div className="col-span-2 text-center">
                       <span className="font-black text-base tabular-nums" style={{ color: medalColor ?? "rgba(255,255,255,0.7)" }}>

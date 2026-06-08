@@ -4,7 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname, useRouter } from "next/navigation"
-import { LayoutDashboard, Target, Trophy, Gift, LogOut, Menu, X } from "lucide-react"
+import { LayoutDashboard, Target, Trophy, Gift, LogOut, Menu, X, Users } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 
 const navItems = [
@@ -21,9 +21,10 @@ interface Props {
     total_points: number
     ranking_position: number | null
   }
+  isEmployee?: boolean
 }
 
-export function DashboardNav({ participant }: Props) {
+export function DashboardNav({ participant, isEmployee = false }: Props) {
   const pathname  = usePathname()
   const router    = useRouter()
   const [open, setOpen] = useState(false)
@@ -94,6 +95,20 @@ export function DashboardNav({ participant }: Props) {
           )
         })}
       </nav>
+
+      {/* Panel empleados (solo empleados Paris) */}
+      {isEmployee && (
+        <div className="px-3 pb-2">
+          <Link
+            href="/empleados/ranking"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all bg-[#c3871e]/10 border border-[#c3871e]/20 text-[#c3871e] hover:bg-[#c3871e]/20"
+          >
+            <Users className="w-4 h-4 shrink-0" />
+            Panel Empleados
+          </Link>
+        </div>
+      )}
 
       {/* Logout */}
       <div className="px-3 py-4 border-t border-white/6">

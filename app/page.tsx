@@ -4,6 +4,8 @@ import { LandingClient } from "@/components/prode/landing-client"
 import type { RankingRow } from "@/components/prode/ranking-table"
 import type { Metadata } from "next"
 
+export const revalidate = 30
+
 export const metadata: Metadata = {
   title: 'Prode Chevrolet Grupo Paris | Mundial 2026',
   description: 'El prode oficial del Mundial 2026 de Chevrolet Grupo Paris. Registrate gratis, hacé tus pronósticos partido a partido y ganá premios en cada etapa. Solo para clientes Grupo Paris — San Juan, Argentina.',
@@ -42,6 +44,7 @@ export default async function ProdePage() {
     { data: ranking },
     { data: prizes },
     { data: matches },
+    { data: nzMatches },
   ] = await Promise.all([
     supabase
       .from("ranking_view")
@@ -61,7 +64,34 @@ export default async function ProdePage() {
       .eq("predictions_locked", false)
       .order("match_date", { ascending: true })
       .limit(6) as unknown as Promise<{ data: LandingMatch[] | null }>,
+
+    supabase
+      .from("matches")
+      .select("id, team1, team2")
+      .or("team1.ilike.%Nueva Zelanda%,team1.ilike.%New Zealand%,team2.ilike.%Nueva Zelanda%,team2.ilike.%New Zealand%") as unknown as Promise<{ data: { id: string; team1: string; team2: string }[] | null }>,
   ])
+
+  const painManiaFanIds = new Set<string>()
+  if (nzMatches?.length) {
+    const { data: nzPreds } = await supabase
+      .from("predictions")
+      .select("participant_id, predicted_score1, predicted_score2, match_id")
+      .in("match_id", nzMatches.map(m => m.id))
+    for (const pred of nzPreds ?? []) {
+      const match = nzMatches.find(m => m.id === pred.match_id)
+      if (!match) continue
+      const nzIsTeam1 = /new zealand|nueva zelanda/i.test(match.team1)
+      const nzWins = nzIsTeam1
+        ? pred.predicted_score1 > pred.predicted_score2
+        : pred.predicted_score2 > pred.predicted_score1
+      if (nzWins) painManiaFanIds.add(pred.participant_id)
+    }
+  }
+
+  const rankingRows = (ranking ?? []).map(r => ({
+    ...r,
+    is_pain_mania_fan: painManiaFanIds.has(r.participant_id),
+  }))
 
   const tz = "America/Argentina/Buenos_Aires"
   const upcomingMatches = (matches ?? []).map((m) => ({
@@ -73,7 +103,7 @@ export default async function ProdePage() {
   return (
     <Suspense>
       <LandingClient
-        rankingRows={ranking ?? []}
+        rankingRows={rankingRows}
         prizes={prizes ?? []}
         upcomingMatches={upcomingMatches}
       />

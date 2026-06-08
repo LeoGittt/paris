@@ -8,7 +8,7 @@ import { registerParticipant } from "@/lib/actions/register"
 
 const HCAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY ?? ""
 
-interface Props { onClose?: () => void }
+interface Props { onClose?: () => void; leadSource?: string }
 
 const inputCls = `
   w-full px-4 py-3 rounded-xl text-white text-sm font-medium
@@ -22,7 +22,7 @@ const labelCls = "block text-white/50 text-[11px] font-bold uppercase tracking-[
 
 type Step = 1 | 2
 
-export function RegistrationForm({ onClose }: Props) {
+export function RegistrationForm({ onClose, leadSource }: Props) {
   const router = useRouter()
   const [step, setStep]           = useState<Step>(1)
   const [loading, setLoading]     = useState(false)
@@ -79,7 +79,7 @@ export function RegistrationForm({ onClose }: Props) {
     }
     setLoading(true)
     setError("")
-    const result = await registerParticipant(form, captchaToken ?? undefined)
+    const result = await registerParticipant({ ...form, lead_source: leadSource }, captchaToken ?? undefined)
     if (result.ok) {
       setDone(true)
     } else {

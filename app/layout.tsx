@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://prodesanjuan.com.ar'
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://prodegrupoparis.com'
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -10,10 +10,10 @@ export const metadata: Metadata = {
     default: 'Prode Chevrolet Grupo Paris | Mundial 2026',
     template: '%s | Prode Chevrolet Grupo Paris',
   },
-  description: 'Participá gratis del Prode oficial del Mundial 2026 de Chevrolet Grupo Paris. Hacé tus pronósticos, sumá puntos y ganá premios en cada etapa del torneo. Solo para clientes Grupo Paris — San Juan, Argentina.',
+  description: 'Participá gratis del Prode oficial del Mundial 2026 de Chevrolet Grupo Paris. Hacé tus pronósticos, sumá puntos y ganá premios en cada etapa del torneo. Solo para clientes Grupo Paris.',
   keywords: [
     'prode mundial 2026', 'chevrolet grupo paris', 'pronosticos futbol',
-    'mundial 2026 argentina', 'grupo paris san juan', 'concesionaria chevrolet san juan',
+    'mundial 2026 argentina', 'grupo paris', 'chevrolet grupo paris',
     'prode futbol gratis', 'premios mundial 2026',
   ],
   authors: [{ name: 'Chevrolet Grupo Paris' }],

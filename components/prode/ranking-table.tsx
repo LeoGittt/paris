@@ -7,6 +7,7 @@ export interface RankingRow {
   total_points: number
   correct_exact: number
   ranking_position: number
+  is_pain_mania_fan?: boolean
 }
 
 interface Props {
@@ -38,6 +39,9 @@ function PodiumCard({ player, MAX_PTS }: { player: RankingRow; MAX_PTS: number }
         {initials(player.first_name, player.last_name)}
         {player.ranking_position === 1 && (
           <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-lg select-none">👑</span>
+        )}
+        {player.is_pain_mania_fan && (
+          <span title="Seguidor de Tim Payne desde antes que fuera famoso" className="absolute -bottom-1 -right-1 text-xs select-none leading-none">🇳🇿</span>
         )}
       </div>
       <p className="text-white font-black text-sm text-center leading-tight max-w-22.5" style={{ fontFamily: "'ChevySans', sans-serif" }}>
@@ -132,6 +136,9 @@ export function RankingTable({ rows }: Props) {
                     <span className="text-white/55 group-hover:text-white/80 text-sm font-bold truncate transition-colors" style={{ fontFamily: "'ChevySans', sans-serif" }}>
                       {p.first_name} {p.last_name}
                     </span>
+                    {p.is_pain_mania_fan && (
+                      <span title="Seguidor de Tim Payne desde antes que fuera famoso" className="text-sm select-none shrink-0">🇳🇿</span>
+                    )}
                   </div>
                   <div className="col-span-3 flex flex-col items-center gap-1.5">
                     <span className="text-white/70 font-black text-base tabular-nums" style={{ fontFamily: "'ChevySans', sans-serif" }}>{p.total_points}</span>

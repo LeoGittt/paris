@@ -21,6 +21,7 @@ export interface RegisterData {
   city: string
   accepts_terms: boolean
   accepts_marketing: boolean
+  lead_source?: string
 }
 
 export type RegisterResult =
@@ -84,7 +85,9 @@ export async function registerParticipant(data: RegisterData, captchaToken?: str
 
   // 2. Insertar perfil del participante con service role
   // (la cookie de sesión aún no está disponible dentro de la misma server action)
-  const participantRow: ParticipantInsert = {
+  const isEmployee = /^empleadoparis@\d{7,8}\.com$/i.test(data.email)
+
+  const participantRow: ParticipantInsert & { is_employee?: boolean } = {
     user_id:           authData.user.id,
     first_name:        data.first_name,
     last_name:         data.last_name,
@@ -97,10 +100,12 @@ export async function registerParticipant(data: RegisterData, captchaToken?: str
     city:              data.city,
     accepts_terms:     data.accepts_terms,
     accepts_marketing: data.accepts_marketing,
-    lead_source:       "direct" as LeadSource,
+    lead_source:       (["taller","repuestos","digital","qr"].includes(data.lead_source ?? "") ? data.lead_source : "direct") as LeadSource,
+    is_employee:       isEmployee,
   }
 
-  const { error: profileError } = await admin
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error: profileError } = await (admin as any)
     .from("participants")
     .insert(participantRow)
 
