@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import { useSearchParams } from "next/navigation"
 import Image from "next/image"
+import Link from "next/link"
 import { Countdown } from "@/components/prode/countdown"
 import { MatchCard } from "@/components/prode/match-card"
 import { RankingTable, type RankingRow } from "@/components/prode/ranking-table"
@@ -23,9 +24,9 @@ function Logo({ compact = false }: { compact?: boolean }) {
   const w = compact ? 160 : 210
   const h = Math.round(w * 0.27)
   return (
-    <div className="relative select-none shrink-0" style={{ width: w, height: h }}>
+    <Link href="/" className="relative select-none shrink-0 block" style={{ width: w, height: h }}>
       <Image src="/ChatGPT_Image_7_jun_2026__23_41_29-removebg-preview.png" alt="Chevrolet Grupo Paris" fill className="object-contain" priority />
-    </div>
+    </Link>
   )
 }
 
@@ -226,9 +227,15 @@ export function LandingClient({ rankingRows, prizes, upcomingMatches }: Props) {
               Participar
             </button>
           </nav>
-          <button className="md:hidden p-2 text-white/60 hover:text-white hover:bg-white/8 rounded-lg transition-all" onClick={() => setMobileOpen(!mobileOpen)}>
-            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+          <div className="md:hidden flex items-center gap-2">
+            <a href="/login"
+              className="px-3 py-1.5 text-[12px] font-black uppercase tracking-wide text-white/70 hover:text-white border border-white/20 hover:border-white/40 rounded-lg transition-all">
+              Iniciar sesión
+            </a>
+            <button className="p-2 text-white/60 hover:text-white hover:bg-white/8 rounded-lg transition-all" onClick={() => setMobileOpen(!mobileOpen)}>
+              {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
         {mobileOpen && (
           <div className="md:hidden border-t border-white/8 bg-[#06192c] px-5 py-3 flex flex-col gap-1 animate-in slide-in-from-top-2 duration-200">
