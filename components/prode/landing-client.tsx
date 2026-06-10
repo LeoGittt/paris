@@ -49,6 +49,84 @@ function PainManiaCounter() {
   return <>{n.toLocaleString("es-AR")}</>
 }
 
+function PainManiaVote() {
+  const [vote, setVote] = useState<"si" | "no" | null>(null)
+  const [counts, setCounts] = useState({ si: 8241, no: 1423 })
+  const [animating, setAnimating] = useState(false)
+
+  useEffect(() => {
+    const saved = localStorage.getItem("pain-mania-vote")
+    if (saved === "si" || saved === "no") setVote(saved)
+    const savedSi = localStorage.getItem("pain-mania-si")
+    const savedNo = localStorage.getItem("pain-mania-no")
+    if (savedSi && savedNo) setCounts({ si: parseInt(savedSi), no: parseInt(savedNo) })
+  }, [])
+
+  const handleVote = (v: "si" | "no") => {
+    if (vote) return
+    const newCounts = { ...counts, [v]: counts[v] + 1 }
+    setCounts(newCounts)
+    setVote(v)
+    setAnimating(true)
+    localStorage.setItem("pain-mania-vote", v)
+    localStorage.setItem("pain-mania-si", String(newCounts.si))
+    localStorage.setItem("pain-mania-no", String(newCounts.no))
+    setTimeout(() => setAnimating(false), 600)
+  }
+
+  const total = counts.si + counts.no
+  const pctSi = Math.round((counts.si / total) * 100)
+  const pctNo = 100 - pctSi
+
+  return (
+    <div className="bg-[#06192c] border border-white/8 rounded-xl p-4">
+      <p className="text-white/50 text-[10px] uppercase tracking-[0.25em] font-bold mb-3 text-center">
+        ⚽ ¿Anotará Tim Payne en el Mundial?
+      </p>
+      {!vote ? (
+        <div className="flex gap-2">
+          <button
+            onClick={() => handleVote("si")}
+            className="flex-1 h-10 rounded-xl font-black uppercase text-[13px] text-white bg-emerald-600/80 hover:bg-emerald-500 transition-all hover:scale-105 active:scale-95"
+          >
+            ⚽ Sí, anota
+          </button>
+          <button
+            onClick={() => handleVote("no")}
+            className="flex-1 h-10 rounded-xl font-black uppercase text-[13px] text-white bg-red-700/70 hover:bg-red-600 transition-all hover:scale-105 active:scale-95"
+          >
+            ❌ Ni en pedo
+          </button>
+        </div>
+      ) : (
+        <div className={`space-y-2 transition-all duration-500 ${animating ? "opacity-0 scale-95" : "opacity-100 scale-100"}`}>
+          <div>
+            <div className="flex justify-between text-[11px] font-bold mb-1">
+              <span className="text-emerald-400">⚽ Sí, anota</span>
+              <span className="text-emerald-400">{pctSi}%</span>
+            </div>
+            <div className="h-2.5 bg-white/8 rounded-full overflow-hidden">
+              <div className="h-full bg-emerald-500 rounded-full transition-all duration-700" style={{ width: `${pctSi}%` }} />
+            </div>
+          </div>
+          <div>
+            <div className="flex justify-between text-[11px] font-bold mb-1">
+              <span className="text-red-400">❌ Ni en pedo</span>
+              <span className="text-red-400">{pctNo}%</span>
+            </div>
+            <div className="h-2.5 bg-white/8 rounded-full overflow-hidden">
+              <div className="h-full bg-red-500 rounded-full transition-all duration-700" style={{ width: `${pctNo}%` }} />
+            </div>
+          </div>
+          <p className="text-white/20 text-[10px] text-center pt-1">
+            {total.toLocaleString("es-AR")} votos · vos votaste <span className={vote === "si" ? "text-emerald-400" : "text-red-400"}>{vote === "si" ? "sí" : "no"}</span>
+          </p>
+        </div>
+      )}
+    </div>
+  )
+}
+
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex items-center gap-3 mb-4">
@@ -472,54 +550,74 @@ export function LandingClient({ rankingRows, prizes, upcomingMatches }: Props) {
       {showPainMania && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-[#020b15]/92 backdrop-blur-xl" onClick={() => setShowPainMania(false)} />
-          <div className="relative w-full max-w-sm animate-in zoom-in-95 fade-in duration-200">
-            <div className="bg-[#0b2440] border border-white/10 rounded-2xl p-7 shadow-2xl text-center relative">
+          <div className="relative w-full max-w-sm animate-in zoom-in-95 fade-in duration-200 max-h-[90vh] overflow-y-auto rounded-2xl">
+            <div className="bg-[#0b2440] border border-white/10 rounded-2xl shadow-2xl relative">
               <button onClick={() => setShowPainMania(false)}
-                className="absolute top-4 right-4 text-white/30 hover:text-white/80 p-1.5 hover:bg-white/8 rounded-lg transition-all">
+                className="absolute top-4 right-4 z-10 text-white/30 hover:text-white/80 p-1.5 hover:bg-white/8 rounded-lg transition-all">
                 <X className="w-4 h-4" />
               </button>
 
-              <div className="text-5xl mb-3 select-none">🇳🇿</div>
-
-              <h3 className="font-black text-white uppercase text-3xl leading-none mb-1" style={{ fontFamily: "'ChevySans', sans-serif" }}>
-                PAIN MANÍA
-              </h3>
-              <p className="text-[#c3871e] text-[10px] font-black uppercase tracking-[0.3em] mb-6">
-                El fenómeno del Mundial
-              </p>
-
-              <div className="bg-[#06192c] border border-white/8 rounded-xl px-5 py-4 mb-5">
-                <p className="text-white/25 text-[9px] uppercase tracking-[0.3em] font-bold mb-2">Seguidores en Instagram</p>
-                <p className="font-black text-4xl text-white tabular-nums" style={{ fontFamily: "'ChevySans', sans-serif" }}>
-                  <PainManiaCounter />
-                </p>
-                <p className="text-white/20 text-[10px] font-medium mt-1">de 4.000 a 5.000.000+ en 15 días</p>
+              {/* Foto */}
+              <div className="relative w-full h-52 rounded-t-2xl overflow-hidden bg-[#06192c]">
+                <img
+                  src="https://media.mdzol.com/p/ac6912eacbf4a9b3a812c3654d83ef5c/adjuntos/373/imagenes/001/939/0001939166/760x0/631x493:651x513/tim-payne.jpg"
+                  alt="Tim Payne"
+                  className="w-full h-full object-cover object-top"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = "none"
+                  }}
+                />
+                <div className="absolute inset-0 bg-linear-to-t from-[#0b2440] via-transparent to-transparent" />
+                <div className="absolute bottom-3 left-0 right-0 flex flex-col items-center">
+                  <span className="text-4xl select-none">🇳🇿</span>
+                </div>
               </div>
 
-              <p className="text-white/45 text-[13px] leading-relaxed mb-5 text-left">
-                Tim Payne, defensor de Nueva Zelanda, pasó de{" "}
-                <span className="text-white font-bold">4.000 seguidores</span> a más de{" "}
-                <span className="text-[#c3871e] font-bold">5.000.000</span> gracias a la campaña viral de{" "}
-                <span className="text-white font-bold">@elscarso</span>. El objetivo: encontrar al jugador
-                con menos seguidores del Mundial y convertirlo en el protagonista. Lo lograron. Hasta lo invitaron a Miami.
-              </p>
+              <div className="p-6 text-center">
+                <h3 className="font-black text-white uppercase text-3xl leading-none mb-1" style={{ fontFamily: "'ChevySans', sans-serif" }}>
+                  PAIN MANÍA
+                </h3>
+                <p className="text-[#c3871e] text-[10px] font-black uppercase tracking-[0.3em] mb-5">
+                  El fenómeno del Mundial
+                </p>
 
-              <a
-                href="https://www.instagram.com/timpayne__/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 w-full h-11 rounded-xl font-black uppercase text-sm text-white transition-opacity hover:opacity-90 mb-3"
-                style={{ background: "linear-gradient(135deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%)" }}
-              >
-                <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                </svg>
-                Seguir a Tim Payne
-              </a>
+                <div className="bg-[#06192c] border border-white/8 rounded-xl px-5 py-4 mb-4">
+                  <p className="text-white/25 text-[9px] uppercase tracking-[0.3em] font-bold mb-2">Seguidores en Instagram</p>
+                  <p className="font-black text-4xl text-white tabular-nums" style={{ fontFamily: "'ChevySans', sans-serif" }}>
+                    <PainManiaCounter />
+                  </p>
+                  <p className="text-white/20 text-[10px] font-medium mt-1">de 4.000 a 5.000.000+ en 15 días</p>
+                </div>
 
-              <p className="text-white/15 text-[10px] font-medium">
-                iniciativa de @elscarso · Argentina 🇦🇷
-              </p>
+                <p className="text-white/45 text-[13px] leading-relaxed mb-4 text-left">
+                  Tim Payne, defensor de Nueva Zelanda, pasó de{" "}
+                  <span className="text-white font-bold">4.000 seguidores</span> a más de{" "}
+                  <span className="text-[#c3871e] font-bold">5.000.000</span> gracias a la campaña viral de{" "}
+                  <span className="text-white font-bold">@elscarso</span>. El objetivo: encontrar al jugador
+                  con menos seguidores del Mundial y convertirlo en el protagonista. Lo lograron. Hasta lo invitaron a Miami.
+                </p>
+
+                <div className="mb-4">
+                  <PainManiaVote />
+                </div>
+
+                <a
+                  href="https://www.instagram.com/timpayne__/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 w-full h-11 rounded-xl font-black uppercase text-sm text-white transition-opacity hover:opacity-90 mb-3"
+                  style={{ background: "linear-gradient(135deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%)" }}
+                >
+                  <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                  </svg>
+                  Seguir a Tim Payne
+                </a>
+
+                <p className="text-white/15 text-[10px] font-medium">
+                  iniciativa de @elscarso · Argentina 🇦🇷
+                </p>
+              </div>
             </div>
           </div>
         </div>
