@@ -185,6 +185,20 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["user_roles"]["Insert"]>
         Relationships: []
       }
+      pain_mania_votes: {
+        Row: {
+          id: string
+          vote: "si" | "no"
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          vote: "si" | "no"
+          created_at?: string
+        }
+        Update: Partial<Database["public"]["Tables"]["pain_mania_votes"]["Insert"]>
+        Relationships: []
+      }
     }
     Views: {
       ranking_view: {
