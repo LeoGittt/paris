@@ -65,7 +65,7 @@ export function AdminNav() {
         <Link href="/" className="flex items-center gap-3 group">
           <div className="relative shrink-0" style={{ width: 120, height: 32 }}>
             <Image
-              src="/ChatGPT_Image_7_jun_2026__23_41_29-removebg-preview.png" alt="Grupo Paris" fill
+              src="/logo-paris.png" alt="Grupo Paris" fill
               className="object-contain opacity-75 group-hover:opacity-100 transition-opacity"
             />
           </div>
