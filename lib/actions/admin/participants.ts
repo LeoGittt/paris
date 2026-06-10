@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server"
 import { createClient as createAdminClient } from "@supabase/supabase-js"
 import { revalidatePath } from "next/cache"
 import type { Database } from "@/lib/supabase/types"
+import { requireAdmin } from "./guard"
 
 export type ParticipantActionResult = { ok: true } | { ok: false; error: string }
 
@@ -29,6 +30,9 @@ export async function updateParticipantProfile(
     lead_source: string
   }
 ): Promise<ParticipantActionResult> {
+  const guard = await requireAdmin()
+  if (!guard.ok) return guard
+
   const supabase = await createClient()
   const admin    = getAdminClient()
 
@@ -89,6 +93,9 @@ export async function updateParticipantProfile(
 }
 
 export async function toggleBlockParticipant(participantId: string, block: boolean): Promise<ParticipantActionResult> {
+  const guard = await requireAdmin()
+  if (!guard.ok) return guard
+
   const supabase = await createClient()
   const { error } = await supabase
     .from("participants")
@@ -100,6 +107,9 @@ export async function toggleBlockParticipant(participantId: string, block: boole
 }
 
 export async function deleteParticipant(participantId: string): Promise<ParticipantActionResult> {
+  const guard = await requireAdmin()
+  if (!guard.ok) return guard
+
   const supabase = await createClient()
   const admin    = getAdminClient()
 

@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 import type { MatchStage } from "@/lib/supabase/types"
+import { requireAdmin } from "./guard"
 
 const VALID_STAGES: MatchStage[] = [
   "group", "round_of_32", "round_of_16", "quarterfinal", "semifinal", "third_place", "final"
@@ -27,6 +28,9 @@ export async function saveMatchResult(
   score1: number,
   score2: number
 ): Promise<MatchResult> {
+  const guard = await requireAdmin()
+  if (!guard.ok) return guard
+
   if (!Number.isInteger(score1) || !Number.isInteger(score2))
     return { ok: false, error: "Los marcadores deben ser números enteros." }
   if (score1 < 0 || score2 < 0)
@@ -55,6 +59,9 @@ export async function saveMatchResult(
 }
 
 export async function updateMatchDate(matchId: string, matchDate: string): Promise<MatchResult> {
+  const guard = await requireAdmin()
+  if (!guard.ok) return guard
+
   if (!isValidISODate(matchDate))
     return { ok: false, error: "Formato de fecha inválido. Usar ISO 8601 (ej: 2026-06-15T18:00:00Z)." }
 
@@ -89,6 +96,9 @@ export async function updateMatchTeams(
 }
 
 export async function lockMatch(matchId: string): Promise<MatchResult> {
+  const guard = await requireAdmin()
+  if (!guard.ok) return guard
+
   const supabase = await createClient()
   const { error } = await supabase
     .from("matches")
@@ -137,6 +147,9 @@ export async function createMatch(data: {
 }
 
 export async function deleteMatch(matchId: string): Promise<MatchResult> {
+  const guard = await requireAdmin()
+  if (!guard.ok) return guard
+
   const supabase = await createClient()
 
   // Verificar si el partido tiene resultado cargado
@@ -237,6 +250,9 @@ export async function bulkCreateMatches(matches: {
 }
 
 export async function recalculateAllPoints(): Promise<MatchResult> {
+  const guard = await requireAdmin()
+  if (!guard.ok) return guard
+
   const supabase = await createClient()
 
   const { data: finishedMatches } = await supabase

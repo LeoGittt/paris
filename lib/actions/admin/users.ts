@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server"
 import { createClient as createAdminClient } from "@supabase/supabase-js"
 import { revalidatePath } from "next/cache"
 import type { Database, UserRole } from "@/lib/supabase/types"
+import { requireAdmin } from "./guard"
 
 // Cliente con service_role para operaciones de admin en auth.users
 function getAdminClient() {
@@ -20,6 +21,9 @@ export async function createSystemUser(
   password: string,
   role: UserRole
 ): Promise<UserActionResult> {
+  const guard = await requireAdmin()
+  if (!guard.ok) return guard
+
   const admin = getAdminClient()
 
   // Crear usuario en auth
@@ -50,6 +54,9 @@ export async function createSystemUser(
 }
 
 export async function updateUserRole(userId: string, role: UserRole): Promise<UserActionResult> {
+  const guard = await requireAdmin()
+  if (!guard.ok) return guard
+
   const supabase = await createClient()
   const { error } = await supabase
     .from("user_roles")
@@ -61,6 +68,9 @@ export async function updateUserRole(userId: string, role: UserRole): Promise<Us
 }
 
 export async function deleteSystemUser(userId: string): Promise<UserActionResult> {
+  const guard = await requireAdmin()
+  if (!guard.ok) return guard
+
   const admin    = getAdminClient()
   const supabase = await createClient()
 
@@ -89,6 +99,9 @@ export async function deleteSystemUser(userId: string): Promise<UserActionResult
 }
 
 export async function toggleUserEnabled(userId: string, banned: boolean): Promise<UserActionResult> {
+  const guard = await requireAdmin()
+  if (!guard.ok) return guard
+
   const admin = getAdminClient()
   const { error } = await admin.auth.admin.updateUserById(userId, {
     ban_duration: banned ? "876600h" : "none", // ~100 años o desbanear

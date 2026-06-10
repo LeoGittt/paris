@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
+import { requireAdmin } from "./guard"
 
 export type PointConfigResult = { ok: true } | { ok: false; error: string }
 
@@ -9,6 +10,9 @@ export async function updatePointConfig(
   configId: string,
   values: { correct_winner: number; correct_exact: number; correct_diff: number }
 ): Promise<PointConfigResult> {
+  const guard = await requireAdmin()
+  if (!guard.ok) return guard
+
   // Validar que los valores sean enteros no negativos
   const { correct_winner, correct_exact, correct_diff } = values
   if (!Number.isInteger(correct_winner) || !Number.isInteger(correct_exact) || !Number.isInteger(correct_diff))

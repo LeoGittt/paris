@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server"
 import { createClient as createAdminClient } from "@supabase/supabase-js"
 import type { Database } from "@/lib/supabase/types"
 import { revalidatePath } from "next/cache"
+import { requireAdmin } from "./guard"
 
 function adminClient() {
   return createAdminClient<Database>(
@@ -19,6 +20,9 @@ export async function createPrize(data: {
   prize_type: string
   image_url?: string
 }) {
+  const guard = await requireAdmin()
+  if (!guard.ok) return guard
+
   if (!data.title.trim())
     return { ok: false, error: "El título del premio es requerido." }
   if (!data.stage.trim())
@@ -36,6 +40,9 @@ export async function createPrize(data: {
 }
 
 export async function assignWinner(prizeId: string, participantId: string) {
+  const guard = await requireAdmin()
+  if (!guard.ok) return guard
+
   const admin = adminClient()
 
   const { data: participant } = await admin
@@ -58,6 +65,9 @@ export async function assignWinner(prizeId: string, participantId: string) {
 }
 
 export async function markPrizeDelivered(prizeId: string) {
+  const guard = await requireAdmin()
+  if (!guard.ok) return guard
+
   const admin = adminClient()
 
   const { data: prize } = await admin
@@ -80,6 +90,9 @@ export async function markPrizeDelivered(prizeId: string) {
 }
 
 export async function deletePrize(prizeId: string) {
+  const guard = await requireAdmin()
+  if (!guard.ok) return guard
+
   const { error } = await adminClient().from("prizes").delete().eq("id", prizeId)
   if (error) return { ok: false, error: error.message }
   revalidatePath("/admin/premios")
