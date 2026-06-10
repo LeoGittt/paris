@@ -132,7 +132,7 @@ function LoginContent() {
         {/* Logo */}
         <div className="flex flex-col items-center mb-10">
           <div className="relative mb-5" style={{ width: 300, height: 102 }}>
-            <Image src="/logo-grupo-paris-new.png" alt="Chevrolet Grupo Paris" fill className="object-contain" priority />
+            <Image src="/ChatGPT_Image_7_jun_2026__23_41_29-removebg-preview.png" alt="Chevrolet Grupo Paris" fill className="object-contain" priority />
           </div>
           <h1 className="text-white font-black uppercase text-3xl">PRODE 2026</h1>
         </div>

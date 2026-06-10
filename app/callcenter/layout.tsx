@@ -27,7 +27,7 @@ export default async function CallCenterLayout({ children }: { children: React.R
       <header className="bg-[#030b16] border-b border-white/6 px-5 md:px-10 h-16 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="relative" style={{ width: 40, height: 17 }}>
-            <Image src="/logo-grupo-paris.png" alt="Grupo Paris" fill className="object-contain" />
+            <Image src="/ChatGPT_Image_7_jun_2026__23_41_29-removebg-preview.png" alt="Grupo Paris" fill className="object-contain" />
           </div>
           <div className="w-px h-5 bg-white/15" />
           <div className="flex items-center gap-2">

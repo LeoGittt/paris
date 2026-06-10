@@ -80,7 +80,7 @@ export default function ResetPasswordPage() {
       <div className="relative w-full max-w-sm">
         <div className="flex flex-col items-center mb-8">
           <div className="relative mb-4" style={{ width: 80, height: 34 }}>
-            <Image src="/logo-grupo-paris.png" alt="Grupo Paris" fill className="object-contain" />
+            <Image src="/ChatGPT_Image_7_jun_2026__23_41_29-removebg-preview.png" alt="Grupo Paris" fill className="object-contain" />
           </div>
           <h1 className="text-white font-black uppercase text-2xl">Nueva contraseña</h1>
           <p className="text-white/35 text-sm mt-1">Elegí una contraseña segura</p>

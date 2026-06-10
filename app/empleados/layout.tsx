@@ -43,7 +43,7 @@ export default async function EmpleadosLayout({ children }: { children: React.Re
             <Link href="/" className="flex items-center gap-2.5 group">
               <div className="relative shrink-0" style={{ width: 100, height: 27 }}>
                 <Image
-                  src="/logo-grupo-paris.png"
+                  src="/ChatGPT_Image_7_jun_2026__23_41_29-removebg-preview.png"
                   alt="Grupo Paris"
                   fill
                   className="object-contain opacity-80 group-hover:opacity-100 transition-opacity"

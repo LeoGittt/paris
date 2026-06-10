@@ -16,7 +16,7 @@ export default function BasesPage() {
       <header className="bg-[#040f1c] border-b border-white/6 px-5 md:px-10 h-16 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="relative" style={{ width: 48, height: 20 }}>
-            <Image src="/logo-grupo-paris.png" alt="Grupo Paris" fill className="object-contain" />
+            <Image src="/ChatGPT_Image_7_jun_2026__23_41_29-removebg-preview.png" alt="Grupo Paris" fill className="object-contain" />
           </div>
           <div className="w-px h-5 bg-white/15" />
           <span className="text-white font-black text-[13px] uppercase tracking-wide">Prode 2026</span>
