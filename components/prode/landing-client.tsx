@@ -258,58 +258,106 @@ export function LandingClient({ rankingRows, prizes, upcomingMatches }: Props) {
       </header>
 
       {/* HERO */}
-      <section className="relative w-full overflow-hidden" style={{ height: "100svh", minHeight: "600px", maxHeight: "960px" }}>
+      <section className="relative w-full overflow-hidden" style={{ height: "100svh", minHeight: "620px", maxHeight: "1000px" }}>
+
+        {/* Imagen de fondo */}
         <Image src="/hero-final.png" alt="Prode Chevrolet Grupo Paris — Mundial 2026" fill
-          className="object-cover object-[center_10%] md:object-[center_20%]" priority quality={95} />
-        <div className="absolute inset-0 bg-[#020e1f]/55 md:hidden" />
-        <div className="absolute inset-0 bg-linear-to-t from-[#020e1f] from-0% via-transparent via-50% to-transparent md:hidden" />
-        <div className="absolute inset-0 bg-[#020e1f]/40 hidden md:block" />
-        <div className="absolute bottom-0 inset-x-0 h-48 bg-linear-to-t from-[#06192c] to-transparent hidden md:block" />
-        <div className="absolute inset-0 flex flex-col justify-center pb-0 px-5 md:justify-center md:items-center md:pb-0 md:px-10 pt-20">
-          <div className="w-full md:max-w-3xl md:text-center">
-            <div className="inline-flex items-center gap-3 bg-[#054a9d]/20 border border-[#054a9d]/50 backdrop-blur-md rounded-2xl px-4 py-2 mb-4 md:mb-6">
-              <div className="flex items-center gap-1.5 text-base leading-none select-none">
-                <span title="USA">🇺🇸</span><span title="México">🇲🇽</span><span title="Canadá">🇨🇦</span>
+          className="object-cover object-[center_15%] md:object-center" priority quality={95} />
+
+        {/* Capas de gradiente — mobile */}
+        <div className="absolute inset-0 md:hidden" style={{
+          background: "linear-gradient(180deg, rgba(2,10,24,0.65) 0%, rgba(2,10,24,0.15) 40%, rgba(2,10,24,0.7) 70%, rgba(6,25,44,1) 100%)"
+        }} />
+
+        {/* Capas de gradiente — desktop */}
+        <div className="absolute inset-0 hidden md:block" style={{
+          background: "linear-gradient(105deg, rgba(2,10,24,0.92) 0%, rgba(2,10,24,0.75) 35%, rgba(2,10,24,0.25) 65%, rgba(2,10,24,0.05) 100%)"
+        }} />
+        <div className="absolute bottom-0 inset-x-0 hidden md:block" style={{ height: "35%", background: "linear-gradient(to top, #06192c, transparent)" }} />
+
+        {/* Contenido */}
+        <div className="absolute inset-0 flex flex-col justify-end md:justify-center px-5 md:px-14 lg:px-20 pb-10 md:pb-0 pt-20">
+          <div className="w-full md:max-w-2xl">
+
+            {/* Badge */}
+            <div className="flex items-center gap-2.5 mb-5 md:mb-7">
+              <div className="flex items-center gap-0.5 bg-white/8 backdrop-blur-md border border-white/12 rounded-full px-3 py-1.5">
+                <span className="text-sm leading-none">🇺🇸</span>
+                <span className="text-sm leading-none">🇲🇽</span>
+                <span className="text-sm leading-none">🇨🇦</span>
                 <button
                   onClick={() => document.getElementById("pain-mania")?.scrollIntoView({ behavior: "smooth" })}
-                  className="leading-none cursor-default hover:scale-125 transition-transform duration-200"
+                  className="text-sm leading-none cursor-default hover:scale-125 transition-transform duration-200"
                   style={{ background: "none", border: "none", padding: 0 }}
                   title="🇳🇿"
                 >🇳🇿</button>
               </div>
-              <div className="w-px h-4 bg-white/20" />
-              <span className="text-white font-black text-[11px] md:text-[12px] tracking-[0.18em] uppercase" style={{ fontFamily: "'ChevySans', sans-serif" }}>FIFA World Cup 2026</span>
+              <div className="h-3.5 w-px bg-white/15" />
+              <span className="text-white/60 text-[11px] font-black uppercase tracking-[0.22em]" style={{ fontFamily: "'ChevySans', sans-serif" }}>
+                FIFA World Cup 2026
+              </span>
             </div>
-            <h1 className="font-black text-white uppercase leading-[0.88] tracking-tight mb-3 md:mb-5 text-[3.2rem] md:text-[6rem]" style={{ fontFamily: "'ChevySans', sans-serif" }}>
+
+            {/* Headline */}
+            <h1 className="font-black text-white uppercase leading-[0.85] tracking-tighter mb-4 md:mb-5" style={{ fontFamily: "'ChevySans', sans-serif", fontSize: "clamp(3.6rem, 11vw, 7.5rem)" }}>
               PRODE<br />
-              <span style={{ background: "linear-gradient(135deg, #e8a832 0%, #c3871e 50%, #9a6815 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>MUNDIAL</span>
-              <span className="md:hidden"> 2026</span>
-              <span className="hidden md:block"><br />2026</span>
+              <span style={{
+                background: "linear-gradient(135deg, #f5c842 0%, #e8a832 40%, #c3871e 80%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}>
+                MUNDIAL
+              </span><br />
+              <span className="text-white/90">2026</span>
             </h1>
-            <p className="hidden md:block text-white/65 text-lg leading-relaxed mb-7 font-medium">
-              Predecí los partidos de Argentina, sumá puntos y ganá premios increíbles con Chevrolet Grupo Paris.
+
+            {/* Tagline — visible en todas las pantallas */}
+            <p className="text-white/55 text-[13px] md:text-base leading-relaxed mb-6 md:mb-8 font-medium max-w-xs md:max-w-sm">
+              Predecí los partidos de Argentina, sumá puntos y ganá premios con Chevrolet Grupo Paris.
             </p>
-            <div className="mb-5 md:mb-8">
-              <p className="text-white/35 text-[9px] uppercase tracking-[0.3em] font-bold mb-2.5">El mundial comienza en</p>
+
+            {/* Countdown */}
+            <div className="mb-7 md:mb-9">
+              <p className="text-white/30 text-[9px] uppercase tracking-[0.35em] font-black mb-2" style={{ fontFamily: "'ChevySans', sans-serif" }}>
+                El mundial comienza en
+              </p>
               <Countdown />
             </div>
-            <div className="flex flex-row gap-2.5 md:gap-3 md:justify-center">
-              <button onClick={() => setShowModal(true)}
-                className="group flex-1 md:flex-none inline-flex items-center justify-center gap-2 bg-[#054a9d] hover:bg-[#1558b8] active:bg-[#0e3f87] text-white font-black uppercase tracking-wide px-5 md:px-8 h-11 md:h-13 rounded-xl text-[13px] md:text-[15px] shadow-xl shadow-[#054a9d]/40 transition-all duration-200 active:scale-[0.97]">
-                Participar<ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+
+            {/* CTAs */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={() => setShowModal(true)}
+                className="group inline-flex items-center justify-center gap-2.5 text-white font-black uppercase tracking-[0.08em] px-7 h-13 rounded-xl text-[14px] transition-all duration-200 active:scale-[0.97] shadow-2xl"
+                style={{
+                  background: "linear-gradient(135deg, #1a6fd4 0%, #054a9d 60%, #033a7a 100%)",
+                  boxShadow: "0 8px 32px rgba(5,74,157,0.5), inset 0 1px 0 rgba(255,255,255,0.1)",
+                }}
+              >
+                Participar gratis
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
               </button>
-              <button onClick={() => scrollTo("como-funciona")}
-                className="flex-1 md:flex-none inline-flex items-center justify-center bg-white/10 hover:bg-white/18 backdrop-blur-sm border border-white/20 text-white font-bold uppercase tracking-wide px-5 md:px-8 h-11 md:h-13 rounded-xl text-[13px] md:text-[15px] transition-all duration-200">
-                Cómo Funciona
+              <button
+                onClick={() => scrollTo("como-funciona")}
+                className="inline-flex items-center justify-center gap-2 bg-white/8 hover:bg-white/14 backdrop-blur-sm border border-white/15 text-white/80 hover:text-white font-bold uppercase tracking-[0.08em] px-6 h-13 rounded-xl text-[13px] transition-all duration-200"
+              >
+                Cómo funciona
+                <ChevronDown className="w-3.5 h-3.5 opacity-60" />
               </button>
             </div>
+
           </div>
         </div>
-        <button onClick={() => scrollTo("como-funciona")}
-          className="absolute right-8 bottom-10 hidden lg:flex flex-col items-center gap-2 text-white/25 hover:text-white/60 transition-colors">
-          <span className="text-[9px] uppercase tracking-[0.3em] font-bold [writing-mode:vertical-rl]">Scroll</span>
-          <ChevronDown className="w-3.5 h-3.5 animate-bounce" />
+
+        {/* Scroll indicator — centrado abajo */}
+        <button
+          onClick={() => scrollTo("como-funciona")}
+          className="absolute bottom-7 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center gap-1.5 text-white/25 hover:text-white/50 transition-colors group"
+        >
+          <ChevronDown className="w-5 h-5 animate-bounce" />
         </button>
+
       </section>
 
       {/* PAIN MANÍA BANNER */}
