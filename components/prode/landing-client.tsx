@@ -271,7 +271,7 @@ export function LandingClient({ rankingRows, prizes, upcomingMatches }: Props) {
               <div className="flex items-center gap-1.5 text-base leading-none select-none">
                 <span title="USA">🇺🇸</span><span title="México">🇲🇽</span><span title="Canadá">🇨🇦</span>
                 <button
-                  onClick={() => setShowPainMania(true)}
+                  onClick={() => document.getElementById("pain-mania")?.scrollIntoView({ behavior: "smooth" })}
                   className="leading-none cursor-default hover:scale-125 transition-transform duration-200"
                   style={{ background: "none", border: "none", padding: 0 }}
                   title="🇳🇿"
@@ -439,6 +439,71 @@ export function LandingClient({ rankingRows, prizes, upcomingMatches }: Props) {
                 Ver ranking completo (top 50) →
               </a>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* PAIN MANÍA BANNER */}
+      <section id="pain-mania" className="overflow-hidden bg-[#03080f]">
+        <div className="flex flex-col md:flex-row md:min-h-[540px]">
+
+          {/* Foto — arriba en mobile, derecha en desktop */}
+          <div className="relative w-full md:w-[44%] md:order-2 overflow-hidden" style={{ minHeight: "56vw", maxHeight: "420px" }}>
+            <img
+              src="/tim.png"
+              alt="Tim Payne — Nueva Zelanda"
+              className="absolute inset-0 w-full h-full object-cover object-top"
+            />
+            {/* fade hacia el contenido: abajo en mobile, izquierda en desktop */}
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#03080f] md:hidden" />
+            <div className="absolute inset-0 hidden md:block bg-gradient-to-r from-[#03080f] via-[#03080f]/20 to-transparent" />
+            {/* badge NZ */}
+            <div className="absolute top-4 left-4 md:left-auto md:right-4 flex items-center gap-1.5 bg-black/50 backdrop-blur-md rounded-xl px-3 py-1.5 border border-white/10">
+              <span className="text-lg leading-none">🇳🇿</span>
+              <span className="text-white font-black text-[10px] tracking-[0.2em] uppercase">#PainManía</span>
+            </div>
+          </div>
+
+          {/* Contenido — abajo en mobile, izquierda en desktop */}
+          <div className="flex-1 md:order-1 px-6 pb-12 pt-2 md:px-14 md:py-16 flex flex-col justify-center -mt-8 md:mt-0 relative z-10">
+
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-5 h-0.5 bg-[#c3871e]" />
+              <span className="text-[#c3871e] text-[10px] font-black uppercase tracking-[0.3em]">El fenómeno del Mundial</span>
+            </div>
+
+            <h2 className="font-black text-white uppercase leading-[0.85] mb-4 text-[3.4rem] md:text-[4.5rem]" style={{ fontFamily: "'ChevySans', sans-serif" }}>
+              PAIN<br />
+              <span style={{ background: "linear-gradient(135deg, #e8a832 0%, #c3871e 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>MANÍA</span>
+            </h2>
+
+            <div className="flex items-end gap-2 mb-4">
+              <span className="font-black text-white text-[2.2rem] tabular-nums leading-none" style={{ fontFamily: "'ChevySans', sans-serif" }}>+5.000.000</span>
+              <span className="text-white/35 text-[12px] font-medium mb-1">seguidores en 15 días</span>
+            </div>
+
+            <p className="text-white/45 text-[13px] leading-relaxed mb-6 max-w-xs">
+              Tim Payne, defensor de Nueva Zelanda, pasó de{" "}
+              <span className="text-white/80 font-bold">4.000</span> seguidores a más de{" "}
+              <span className="text-[#c3871e] font-bold">5.000.000</span> gracias a la campaña de{" "}
+              <span className="text-white/80 font-bold">@elscarso</span>.
+            </p>
+
+            <div className="max-w-xs">
+              <PainManiaVote />
+            </div>
+
+            <a
+              href="https://www.instagram.com/timpayne__/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-5 inline-flex items-center gap-2 text-white/25 hover:text-white/60 text-[11px] font-medium transition-colors w-fit"
+            >
+              <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+              </svg>
+              @timpayne__ · Seguir en Instagram
+            </a>
           </div>
         </div>
       </section>
