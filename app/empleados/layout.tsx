@@ -41,13 +41,13 @@ export default async function EmpleadosLayout({ children }: { children: React.Re
           {/* Logo + título */}
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="relative shrink-0" style={{ width: 100, height: 27 }}>
+              <div className="relative shrink-0 overflow-hidden" style={{ width: 140, height: 39 }}>
                 <Image
                   src="/logo-paris.png"
                   alt="Grupo Paris"
                   fill
-                  className="object-contain opacity-80 group-hover:opacity-100 transition-opacity"
-                  style={{ mixBlendMode: "screen" }}
+                  className="object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                  style={{ objectPosition: "50% 52%", mixBlendMode: "screen" }}
                 />
               </div>
             </Link>

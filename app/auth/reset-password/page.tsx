@@ -79,8 +79,8 @@ export default function ResetPasswordPage() {
     <div className="min-h-screen bg-[#06192c] flex flex-col items-center justify-center px-5" style={{ fontFamily: "'ChevySans', sans-serif" }}>
       <div className="relative w-full max-w-sm">
         <div className="flex flex-col items-center mb-8">
-          <div className="relative mb-4" style={{ width: 80, height: 34 }}>
-            <Image src="/logo-paris.png" alt="Grupo Paris" fill className="object-contain" />
+          <div className="relative overflow-hidden mb-4" style={{ width: 180, height: 50 }}>
+            <Image src="/logo-paris.png" alt="Grupo Paris" fill className="object-cover" style={{ objectPosition: "50% 52%" }} />
           </div>
           <h1 className="text-white font-black uppercase text-2xl">Nueva contraseña</h1>
           <p className="text-white/35 text-sm mt-1">Elegí una contraseña segura</p>

@@ -63,10 +63,11 @@ export function AdminNav() {
       {/* Logo */}
       <div className="px-5 py-5 border-b border-white/6">
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative shrink-0" style={{ width: 120, height: 32 }}>
+          <div className="relative shrink-0 overflow-hidden" style={{ width: 160, height: 45 }}>
             <Image
               src="/logo-paris.png" alt="Grupo Paris" fill
-              className="object-contain opacity-75 group-hover:opacity-100 transition-opacity"
+              className="object-cover opacity-75 group-hover:opacity-100 transition-opacity"
+              style={{ objectPosition: "50% 52%" }}
             />
           </div>
           <div className="w-px bg-white/15 self-stretch" />

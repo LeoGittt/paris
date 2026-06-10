@@ -26,8 +26,8 @@ export default async function CallCenterLayout({ children }: { children: React.R
     <div className="min-h-screen bg-[#040f1c]" style={{ fontFamily: "'ChevySans', sans-serif" }}>
       <header className="bg-[#030b16] border-b border-white/6 px-5 md:px-10 h-16 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="relative" style={{ width: 40, height: 17 }}>
-            <Image src="/logo-paris.png" alt="Grupo Paris" fill className="object-contain" />
+          <div className="relative overflow-hidden" style={{ width: 120, height: 34 }}>
+            <Image src="/logo-paris.png" alt="Grupo Paris" fill className="object-cover" style={{ objectPosition: "50% 52%" }} />
           </div>
           <div className="w-px h-5 bg-white/15" />
           <div className="flex items-center gap-2">

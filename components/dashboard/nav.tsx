@@ -41,8 +41,8 @@ export function DashboardNav({ participant, isEmployee = false }: Props) {
       {/* Logo */}
       <div className="px-5 py-6 border-b border-white/6">
         <Link href="/" className="flex items-center gap-3">
-          <div className="relative shrink-0" style={{ width: 120, height: 32 }}>
-            <Image src="/logo-paris.png" alt="Grupo Paris" fill className="object-contain" />
+          <div className="relative shrink-0 overflow-hidden" style={{ width: 160, height: 45 }}>
+            <Image src="/logo-paris.png" alt="Grupo Paris" fill className="object-cover" style={{ objectPosition: "50% 52%" }} />
           </div>
           <div className="w-px bg-white/20 self-stretch" />
           <p className="text-white font-black text-[13px] uppercase tracking-wide">PRODE 2026</p>
@@ -130,8 +130,8 @@ export function DashboardNav({ participant, isEmployee = false }: Props) {
       {/* Header móvil */}
       <header className="md:hidden fixed top-0 inset-x-0 z-50 bg-[#040f1c]/95 backdrop-blur-xl border-b border-white/6 h-16 flex items-center justify-between px-5">
         <Link href="/" className="flex items-center gap-2.5">
-          <div className="relative" style={{ width: 100, height: 27 }}>
-            <Image src="/logo-paris.png" alt="Grupo Paris" fill className="object-contain" />
+          <div className="relative overflow-hidden" style={{ width: 140, height: 39 }}>
+            <Image src="/logo-paris.png" alt="Grupo Paris" fill className="object-cover" style={{ objectPosition: "50% 52%" }} />
           </div>
         </Link>
         <button
