@@ -485,8 +485,8 @@ export function LandingClient({ rankingRows, prizes, upcomingMatches }: Props) {
             <p className="text-white/45 text-[13px] leading-relaxed mb-6 max-w-xs">
               Tim Payne, defensor de Nueva Zelanda, pasó de{" "}
               <span className="text-white/80 font-bold">4.000</span> seguidores a más de{" "}
-              <span className="text-[#c3871e] font-bold">5.000.000</span> gracias a la campaña de{" "}
-              <span className="text-white/80 font-bold">@elscarso</span>.
+              <span className="text-[#c3871e] font-bold">5.000.000</span> en menos de 15 días.
+              El jugador viral del Mundial 2026.
             </p>
 
             <div className="max-w-xs">
@@ -668,9 +668,8 @@ export function LandingClient({ rankingRows, prizes, upcomingMatches }: Props) {
                 <p className="text-white/45 text-[13px] leading-relaxed mb-4 text-left">
                   Tim Payne, defensor de Nueva Zelanda, pasó de{" "}
                   <span className="text-white font-bold">4.000 seguidores</span> a más de{" "}
-                  <span className="text-[#c3871e] font-bold">5.000.000</span> gracias a la campaña viral de{" "}
-                  <span className="text-white font-bold">@elscarso</span>. El objetivo: encontrar al jugador
-                  con menos seguidores del Mundial y convertirlo en el protagonista. Lo lograron. Hasta lo invitaron a Miami.
+                  <span className="text-[#c3871e] font-bold">5.000.000</span> en menos de 15 días.
+                  El jugador más viral del Mundial 2026. Hasta lo invitaron a Miami.
                 </p>
 
                 <div className="mb-4">
@@ -691,7 +690,7 @@ export function LandingClient({ rankingRows, prizes, upcomingMatches }: Props) {
                 </a>
 
                 <p className="text-white/15 text-[10px] font-medium">
-                  iniciativa de @elscarso · Argentina 🇦🇷
+                  Nueva Zelanda 🇳🇿 · Mundial 2026
                 </p>
               </div>
             </div>
