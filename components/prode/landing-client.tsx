@@ -51,31 +51,30 @@ function PainManiaCounter() {
 
 function PainManiaVote() {
   const [vote, setVote] = useState<"si" | "no" | null>(null)
-  const [counts, setCounts] = useState({ si: 8241, no: 1423 })
-  const [animating, setAnimating] = useState(false)
+  const [counts, setCounts] = useState<{ si: number; no: number } | null>(null)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     const saved = localStorage.getItem("pain-mania-vote")
     if (saved === "si" || saved === "no") setVote(saved)
-    const savedSi = localStorage.getItem("pain-mania-si")
-    const savedNo = localStorage.getItem("pain-mania-no")
-    if (savedSi && savedNo) setCounts({ si: parseInt(savedSi), no: parseInt(savedNo) })
+    import("@/lib/actions/pain-mania").then(({ getPainManiaCounts }) =>
+      getPainManiaCounts().then(setCounts)
+    )
   }, [])
 
-  const handleVote = (v: "si" | "no") => {
-    if (vote) return
-    const newCounts = { ...counts, [v]: counts[v] + 1 }
-    setCounts(newCounts)
-    setVote(v)
-    setAnimating(true)
+  const handleVote = async (v: "si" | "no") => {
+    if (vote || loading) return
+    setLoading(true)
     localStorage.setItem("pain-mania-vote", v)
-    localStorage.setItem("pain-mania-si", String(newCounts.si))
-    localStorage.setItem("pain-mania-no", String(newCounts.no))
-    setTimeout(() => setAnimating(false), 600)
+    setVote(v)
+    const { castPainManiaVote } = await import("@/lib/actions/pain-mania")
+    const updated = await castPainManiaVote(v)
+    setCounts(updated)
+    setLoading(false)
   }
 
-  const total = counts.si + counts.no
-  const pctSi = Math.round((counts.si / total) * 100)
+  const total = (counts?.si ?? 0) + (counts?.no ?? 0)
+  const pctSi = total > 0 ? Math.round(((counts?.si ?? 0) / total) * 100) : 50
   const pctNo = 100 - pctSi
 
   return (
@@ -87,19 +86,21 @@ function PainManiaVote() {
         <div className="flex gap-2">
           <button
             onClick={() => handleVote("si")}
-            className="flex-1 h-10 rounded-xl font-black uppercase text-[13px] text-white bg-emerald-600/80 hover:bg-emerald-500 transition-all hover:scale-105 active:scale-95"
+            disabled={loading}
+            className="flex-1 h-10 rounded-xl font-black uppercase text-[13px] text-white bg-emerald-600/80 hover:bg-emerald-500 transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
           >
             ⚽ Sí, anota
           </button>
           <button
             onClick={() => handleVote("no")}
-            className="flex-1 h-10 rounded-xl font-black uppercase text-[13px] text-white bg-red-700/70 hover:bg-red-600 transition-all hover:scale-105 active:scale-95"
+            disabled={loading}
+            className="flex-1 h-10 rounded-xl font-black uppercase text-[13px] text-white bg-red-700/70 hover:bg-red-600 transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
           >
-            ❌ Ni en pedo
+            ❌ No anota
           </button>
         </div>
       ) : (
-        <div className={`space-y-2 transition-all duration-500 ${animating ? "opacity-0 scale-95" : "opacity-100 scale-100"}`}>
+        <div className="space-y-2">
           <div>
             <div className="flex justify-between text-[11px] font-bold mb-1">
               <span className="text-emerald-400">⚽ Sí, anota</span>
@@ -111,7 +112,7 @@ function PainManiaVote() {
           </div>
           <div>
             <div className="flex justify-between text-[11px] font-bold mb-1">
-              <span className="text-red-400">❌ Ni en pedo</span>
+              <span className="text-red-400">❌ No anota</span>
               <span className="text-red-400">{pctNo}%</span>
             </div>
             <div className="h-2.5 bg-white/8 rounded-full overflow-hidden">
@@ -119,7 +120,10 @@ function PainManiaVote() {
             </div>
           </div>
           <p className="text-white/20 text-[10px] text-center pt-1">
-            {total.toLocaleString("es-AR")} votos · vos votaste <span className={vote === "si" ? "text-emerald-400" : "text-red-400"}>{vote === "si" ? "sí" : "no"}</span>
+            {total.toLocaleString("es-AR")} votos · vos votaste{" "}
+            <span className={vote === "si" ? "text-emerald-400" : "text-red-400"}>
+              {vote === "si" ? "sí" : "no"}
+            </span>
           </p>
         </div>
       )}

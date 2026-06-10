@@ -80,14 +80,15 @@ describe("Bug 17: lock_started_matches — partidos no se bloquean automáticame
   // La función existe en la DB pero nunca se llamaba desde ningún cron.
   // Fix: nuevo endpoint /api/cron/lock-matches + entrada en vercel.json
 
-  it("vercel.json debe tener el cron de lock-matches cada minuto", async () => {
+  it("vercel.json debe tener el cron de lock-matches", async () => {
     const { readFileSync } = await import("fs")
     const vercel = JSON.parse(readFileSync("vercel.json", "utf-8"))
     const cronPaths = vercel.crons.map((c: { path: string }) => c.path)
     expect(cronPaths).toContain("/api/cron/lock-matches")
 
+    // Hobby plan solo permite crons diarios — se cambió de */5 * * * * a 0 0 * * *
     const lockCron = vercel.crons.find((c: { path: string }) => c.path === "/api/cron/lock-matches")
-    expect(lockCron.schedule).toBe("* * * * *") // cada minuto
+    expect(lockCron.schedule).toBe("0 0 * * *")
   })
 })
 
