@@ -234,12 +234,12 @@ function LoginContent() {
         </div>
 
         <div className="flex flex-col items-center gap-3 mt-6">
-          <button
+          {/* <button
             onClick={() => setShowForgot(true)}
             className="text-white/30 hover:text-white/60 text-sm font-medium transition-colors"
           >
             ¿Olvidaste tu contraseña?
-          </button>
+          </button> */}
           <p className="text-white/25 text-sm font-medium">
             ¿No tenés cuenta?{" "}
             <a href="/?registro=1" className="text-[#7ab0e8] hover:text-white transition-colors font-bold">

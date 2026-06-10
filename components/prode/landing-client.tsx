@@ -228,10 +228,10 @@ export function LandingClient({ rankingRows, prizes, upcomingMatches }: Props) {
             </button>
           </nav>
           <div className="md:hidden flex items-center gap-2">
-            <a href="/login"
+            <Link href="/login"
               className="px-3 py-1.5 text-[12px] font-black uppercase tracking-wide text-white/70 hover:text-white border border-white/20 hover:border-white/40 rounded-lg transition-all">
               Iniciar sesión
-            </a>
+            </Link>
             <button className="p-2 text-white/60 hover:text-white hover:bg-white/8 rounded-lg transition-all" onClick={() => setMobileOpen(!mobileOpen)}>
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
