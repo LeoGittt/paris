@@ -202,6 +202,22 @@ function PredictionCard({
               <ScoreStepper value={s2} onChange={changeS2} />
             </div>
 
+            {/* Aviso 0 – 0 */}
+            {s1 === 0 && s2 === 0 && status === "idle" && (
+              <div className="flex items-center justify-between gap-3 bg-white/4 border border-white/8 rounded-xl px-3 py-2.5">
+                <p className="text-white/35 text-[10px] leading-snug">
+                  Sin cambios el resultado queda guardado como <span className="text-white/60 font-bold">0 – 0</span>
+                </p>
+                <button
+                  type="button"
+                  onClick={() => doSave(0, 0)}
+                  className="shrink-0 text-[10px] font-black uppercase tracking-wide text-[#7ab0e8] hover:text-white bg-[#054a9d]/20 hover:bg-[#054a9d]/40 border border-[#054a9d]/30 px-3 py-1.5 rounded-lg transition-all whitespace-nowrap"
+                >
+                  Guardar 0 – 0
+                </button>
+              </div>
+            )}
+
             {status === "error" && (
               <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-xl px-3 py-2.5 mt-1">
                 <AlertCircle className="w-3.5 h-3.5 text-red-400 shrink-0" />

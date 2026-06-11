@@ -53,14 +53,11 @@ export default function TerminosPage() {
           </Section>
 
           <Section title="3. Elegibilidad">
-            Podrán participar del Prode únicamente aquellas personas físicas que:
+            Podrán participar del Prode todas aquellas personas físicas que:
             <ul className="list-disc pl-5 mt-2 space-y-1">
               <li>Sean mayores de 18 años de edad.</li>
-              <li>Sean clientes de Grupo Paris que hayan realizado servicios en Taller, adquirido repuestos o participado de campañas comerciales.</li>
               <li>Residan en la República Argentina.</li>
-              <li>Completen correctamente el formulario de registro.</li>
             </ul>
-            Quedan excluidos de participar los empleados de Grupo Paris S.A. y sus familiares directos.
           </Section>
 
           <Section title="4. Registro y cuenta">

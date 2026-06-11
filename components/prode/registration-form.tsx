@@ -229,6 +229,235 @@ const CAR_MODELS_BY_BRAND: Record<string, string[]> = {
   ],
 }
 
+const PROVINCES = [
+  "Buenos Aires", "Ciudad Autónoma de Buenos Aires", "Catamarca", "Chaco",
+  "Chubut", "Córdoba", "Corrientes", "Entre Ríos", "Formosa", "Jujuy",
+  "La Pampa", "La Rioja", "Mendoza", "Misiones", "Neuquén", "Río Negro",
+  "Salta", "San Juan", "San Luis", "Santa Cruz", "Santa Fe",
+  "Santiago del Estero", "Tierra del Fuego", "Tucumán",
+]
+
+const LOCALITIES_BY_PROVINCE: Record<string, string[]> = {
+  "Buenos Aires": [
+    "La Plata", "Mar del Plata", "Quilmes", "Lanús", "Lomas de Zamora", "Moreno", "La Matanza",
+    "Merlo", "San Isidro", "Tigre", "Pilar", "Escobar", "José C. Paz", "Malvinas Argentinas",
+    "San Miguel", "Hurlingham", "Ituzaingó", "Tres de Febrero", "Vicente López", "San Martín",
+    "Avellaneda", "Berazategui", "Florencio Varela", "Esteban Echeverría", "Ezeiza",
+    "Presidente Perón", "San Vicente", "Cañuelas", "Marcos Paz", "Mercedes", "Luján",
+    "Morón", "Bahía Blanca", "Tandil", "Junín", "Pergamino", "San Nicolás de los Arroyos",
+    "Necochea", "Olavarría", "Tres Arroyos", "Azul", "Chivilcoy", "Lincoln",
+    "San Pedro", "Zárate", "Campana", "Ramallo", "Baradero", "San Andrés de Giles",
+    "Exaltación de la Cruz", "General Rodríguez", "General Las Heras", "Navarro",
+    "Lobos", "Saladillo", "Las Flores", "Rauch", "Balcarce", "Miramar", "Villa Gesell",
+    "Pinamar", "La Costa", "San Clemente del Tuyú", "Mar de Ajó", "Dolores", "Chascomús",
+    "Brandsen", "Magdalena", "Berisso", "Ensenada", "Coronel Suárez", "Saavedra",
+    "Tornquist", "Villarino", "Patagones", "Monte Hermoso", "Coronel Rosales",
+    "Coronel Dorrego", "Lobería", "General Alvarado", "San Cayetano",
+    "Trenque Lauquen", "Pehuajó", "Nueve de Julio", "Carlos Casares", "Bolívar",
+    "General La Madrid", "Laprida", "Benito Juárez", "Bragado", "Chacabuco",
+    "Rojas", "Salto", "Florentino Ameghino", "Rivadavia", "Guaminí", "Daireaux",
+    "General Pinto", "Carlos Tejedor", "Hipólito Yrigoyen", "General Viamonte",
+    "General Villegas", "Pellegrini", "Salliqueló", "Monte", "General Paz",
+    "Roque Pérez", "General Belgrano", "Pila", "Lezama", "General Juan Madariaga",
+    "Maipú", "General Lavalle", "Tordillo", "General Guido",
+  ],
+  "Ciudad Autónoma de Buenos Aires": [
+    "Buenos Aires (CABA)", "Palermo", "Belgrano", "Recoleta", "San Telmo", "La Boca",
+    "Caballito", "Flores", "Villa Urquiza", "Almagro", "Balvanera", "Barracas",
+    "Boedo", "Chacarita", "Colegiales", "Constitución", "Floresta", "La Paternal",
+    "Liniers", "Mataderos", "Monserrat", "Nueva Pompeya", "Núñez", "Parque Chas",
+    "Parque Patricios", "Puerto Madero", "Retiro", "Saavedra", "San Cristóbal",
+    "San Nicolás", "Vélez Sársfield", "Villa Crespo", "Villa del Parque",
+    "Villa Devoto", "Villa Lugano", "Villa Luro", "Villa Ortúzar",
+    "Villa Pueyrredón", "Villa Real", "Villa Riachuelo", "Villa Santa Rita",
+    "Villa Soldati", "Villa General Mitre",
+  ],
+  "Catamarca": [
+    "San Fernando del Valle de Catamarca", "Belén", "Tinogasta", "Santa María",
+    "Andalgalá", "La Paz", "Recreo", "Valle Viejo", "El Alto", "Hualfín",
+    "Fiambalá", "Antofagasta de la Sierra", "Capayán", "Paclín", "Ambato",
+    "Ancasti", "Santa Rosa", "Pomán", "Aconquija",
+  ],
+  "Chaco": [
+    "Resistencia", "Barranqueras", "Fontana", "Villa Ángela", "Presidencia Roque Sáenz Peña",
+    "Charata", "Quitilipi", "Las Breñas", "General San Martín", "Machagai",
+    "Pampa del Infierno", "Corzuela", "Tres Isletas", "Juan José Castelli",
+    "El Sauzalito", "Colonias Unidas", "Makallé", "La Tigra", "Hermoso Campo",
+    "Avia Terai", "Gancedo", "Miraflores", "Río Muerto", "Colonia Elisa",
+  ],
+  "Chubut": [
+    "Rawson", "Trelew", "Comodoro Rivadavia", "Puerto Madryn", "Esquel",
+    "Rada Tilly", "Gaiman", "Dolavon", "Puerto Pirámides", "Lago Puelo",
+    "El Bolsón", "Río Mayo", "Corcovado", "Gobernador Costa", "Camarones",
+    "Paso de Indios", "Gastre", "Las Plumas", "Lago Posadas", "Sarmiento",
+    "Perito Moreno", "Alto Río Senguer", "Río Pico", "Tecka",
+  ],
+  "Córdoba": [
+    "Córdoba", "Villa Carlos Paz", "Río Cuarto", "San Francisco", "Villa María",
+    "Alta Gracia", "Río Tercero", "Bell Ville", "Jesús María", "Cosquín",
+    "La Falda", "Cruz del Eje", "Dean Funes", "Laboulaye", "Marcos Juárez",
+    "Morteros", "Oncativo", "Río Ceballos", "Salsipuedes", "Unquillo",
+    "Villa Allende", "La Calera", "Malvinas Argentinas", "Laguna Larga",
+    "Oliva", "Pilar", "San Justo", "Hernando", "Leones", "General Cabrera",
+    "Ucacha", "Almafuerte", "Villa del Rosario", "Arroyito", "Obispo Trejo",
+    "Mina Clavero", "Villa Dolores", "Huerta Grande", "Villa Giardino",
+    "Capilla del Monte", "Serrano", "Jovita", "General Roca", "Adelia María",
+    "Berrotarán", "La Carlota", "Sampacho", "Monte Maíz", "Las Varillas",
+    "San Marcos Sierras", "Miramar", "Embalse", "Los Cóndores",
+    "General Deheza", "Río de los Sauces", "Lucio V. Mansilla", "Idiazábal",
+  ],
+  "Corrientes": [
+    "Corrientes", "Goya", "Mercedes", "Curuzú Cuatiá", "Paso de los Libres",
+    "Santo Tomé", "Bella Vista", "Esquina", "Monte Caseros", "Saladas",
+    "San Luis del Palmar", "Ituzaingó", "Lavalle", "Sauce", "Mburucuyá",
+    "General Alvear", "Empedrado", "Itatí", "Caá Catí", "Perugorría",
+    "San Miguel", "Santa Lucía", "Mocoretá", "Felipe Yofré",
+  ],
+  "Entre Ríos": [
+    "Paraná", "Concordia", "Gualeguaychú", "Concepción del Uruguay",
+    "Villaguay", "Gualeguay", "Federal", "La Paz", "Victoria",
+    "Diamante", "Crespo", "Basavilbaso", "Colón", "San José",
+    "Chajarí", "Federación", "Nogoyá", "Rosario del Tala", "Urdinarrain",
+    "Cerrito", "Viale", "Hernandarias", "Seguí", "María Grande",
+    "Bovril", "General Campos", "San Salvador", "Santa Elena",
+    "Maciá", "Tala", "Colón", "Villa Elisa",
+  ],
+  "Formosa": [
+    "Formosa", "Clorinda", "Pirané", "El Colorado", "Ingeniero Juárez",
+    "Laguna Blanca", "Ibarreta", "Las Lomitas", "Pozo del Tigre",
+    "Estanislao del Campo", "Subteniente Perín", "Villa Dos Trece",
+    "Gran Guardia", "Palo Santo", "General Lucio Mansilla",
+  ],
+  "Jujuy": [
+    "San Salvador de Jujuy", "San Pedro de Jujuy", "Palpalá",
+    "Libertador General San Martín", "Humahuaca", "Tilcara", "Perico",
+    "El Carmen", "Monterrico", "La Quiaca", "Abra Pampa", "Purmamarca",
+    "Maimará", "Susques", "Santa Catalina", "Rinconada", "Yavi",
+    "Calilegua", "Fraile Pintado", "Ledesma", "Libertad", "San Antonio",
+    "Valle Grande", "Santa Clara", "Caspalá",
+  ],
+  "La Pampa": [
+    "Santa Rosa", "General Pico", "Toay", "Eduardo Castex", "Victorica",
+    "General Acha", "Realicó", "Macachín", "Guatraché", "Quetrequén",
+    "Winifreda", "Intendente Alvear", "Rancul", "Quemú Quemú", "Catriló",
+    "Doblas", "General Campos", "Lonquimay", "Uriburu", "Anguil",
+    "Telén", "Colonia Baron", "La Adela", "Alpachiri", "Bernasconi",
+    "Puelén", "25 de Mayo", "Ingeniero Luiggi",
+  ],
+  "La Rioja": [
+    "La Rioja", "Chilecito", "Aimogasta", "Chamical", "Vinchina",
+    "Villa Unión", "Famatina", "Patquía", "Chepes", "Arauco",
+    "Castro Barros", "Olta", "Ulapes", "Guandacol", "Villa Castelli",
+    "San Blas de los Sauces", "Coronel Felipe Varela", "Independencia",
+  ],
+  "Mendoza": [
+    "Mendoza", "Godoy Cruz", "Guaymallén", "Las Heras", "Maipú",
+    "Luján de Cuyo", "San Martín", "Rivadavia", "Junín", "San Rafael",
+    "Tunuyán", "Tupungato", "San Carlos", "Malargüe", "La Paz",
+    "Santa Rosa", "General Alvear", "Lavalle", "Palmira", "Rodeo del Medio",
+    "Perdriel", "Agrelo", "Ugarteche", "Vistalba", "Chacras de Coria",
+    "El Carrizal", "Medrano", "Barrancas", "Bowen", "Monte Comán",
+    "Real del Padre", "Villa Atuel", "Bardas Blancas", "Pareditas",
+    "San Rafael", "Alvear", "El Sosneado",
+  ],
+  "Misiones": [
+    "Posadas", "Oberá", "Eldorado", "Apóstoles", "Leandro N. Alem",
+    "Puerto Iguazú", "San Vicente", "Jardín América", "Puerto Rico",
+    "Wanda", "Montecarlo", "San Ignacio", "Loreto", "Santa Ana",
+    "Aristóbulo del Valle", "Dos de Mayo", "Garuhapé", "San Pedro",
+    "25 de Mayo", "Bernardo de Irigoyen", "Pozo Azul", "El Dorado",
+    "Capiovi", "Campo Viera", "Concepción de la Sierra", "Gobernador Roca",
+    "Candelaria", "Corpus Christi", "Mártires", "San Javier",
+    "Cerro Corá", "Colonia Aurora", "Ruiz de Montoya",
+  ],
+  "Neuquén": [
+    "Neuquén", "San Martín de los Andes", "Zapala", "Cutral Có",
+    "Plaza Huincul", "Plottier", "Centenario", "Chos Malal",
+    "Junín de los Andes", "Villa La Angostura", "Loncopué", "Picún Leufú",
+    "Piedra del Águila", "Las Lajas", "Aluminé", "Caviahue", "Copahue",
+    "Andacollo", "Buta Ranquil", "El Huecú", "Rincón de los Sauces",
+    "Senillosa", "Vista Alegre", "El Cholar", "Taquimilán",
+  ],
+  "Río Negro": [
+    "Viedma", "Bariloche", "General Roca", "Cipolletti", "Allen",
+    "Villa Regina", "Ingeniero Jacobacci", "Choele Choel", "Lamarque",
+    "Luis Beltrán", "Chichinales", "Cinco Saltos", "El Bolsón",
+    "Sierra Colorada", "Valcheta", "San Antonio Oeste", "Las Grutas",
+    "El Cóndor", "San Javier", "Comallo", "Ñorquinco", "Río Colorado",
+    "Catriel", "Los Menucos", "Maquinchao", "Pilcaniyeu", "Ing. Huergo",
+    "Mainqué", "Coronel Belisle", "General Conesa",
+  ],
+  "Salta": [
+    "Salta", "San Ramón de la Nueva Orán", "Tartagal", "Güemes", "Metán",
+    "Rosario de la Frontera", "General José de San Martín", "Cafayate",
+    "Cerrillos", "La Caldera", "Joaquín V. González", "Embarcación",
+    "Aguaray", "Salvador Mazza", "Pichanal", "Rivadavia", "Iruya",
+    "Rosario de Lerma", "Campo Quijano", "El Carril", "Chicoana",
+    "La Viña", "Coronel Moldes", "Cobos", "General Mosconi", "Orán",
+    "Molinos", "Cachi", "Payogasta", "Hipólito Yrigoyen", "Angastaco",
+    "Animaná", "Colomé", "San Antonio de los Cobres", "Tolar Grande",
+  ],
+  "San Juan": [
+    "San Juan", "Rawson", "Rivadavia", "Santa Lucía", "Pocito",
+    "Chimbas", "Caucete", "San Martín", "9 de Julio", "Sarmiento",
+    "Ullum", "Albardón", "Angaco", "Iglesia", "Jáchal",
+    "Valle Fértil", "25 de Mayo", "Calingasta", "Zonda",
+    "Médano de Oro", "Villa Krause", "Marquesado", "Cuesta del Viento",
+    "Rodeo", "Barreal", "Las Flores", "Tupungato",
+  ],
+  "San Luis": [
+    "San Luis", "Villa Mercedes", "Merlo", "Justo Daract", "Villa del Carmen",
+    "Quines", "Concarán", "Buena Esperanza", "Río Grande", "La Punta",
+    "El Trapiche", "Potrero de los Funes", "Naschel", "Luján",
+    "San Francisco del Monte de Oro", "Tilisarao", "Renca", "Nogolí",
+    "Leandro N. Alem", "Candelaria", "Balde", "Arizona", "Fortuna",
+    "La Calera", "Varela",
+  ],
+  "Santa Cruz": [
+    "Río Gallegos", "Caleta Olivia", "Pico Truncado", "Las Heras",
+    "El Calafate", "El Chaltén", "Río Turbio", "28 de Noviembre",
+    "Puerto Santa Cruz", "Gobernador Gregores", "Los Antiguos",
+    "Perito Moreno", "Jaramillo", "Fitz Roy", "Tres Lagos",
+    "La Esperanza", "Hipólito Yrigoyen", "Puerto Deseado",
+    "Comandante Luis Piedra Buena",
+  ],
+  "Santa Fe": [
+    "Rosario", "Santa Fe", "Venado Tuerto", "Rafaela", "Villa Constitución",
+    "Santo Tomé", "Reconquista", "Esperanza", "San Lorenzo", "Gálvez",
+    "Casilda", "Cañada de Gómez", "Firmat", "Rufino", "Las Rosas",
+    "Sunchales", "San Jorge", "Tostado", "Vera", "Avellaneda",
+    "San Justo", "Sastre", "Coronda", "Capitán Bermúdez",
+    "Fray Luis Beltrán", "Puerto General San Martín", "Pérez",
+    "Funes", "Roldán", "Granadero Baigorria", "Arroyo Seco",
+    "Villa Gobernador Gálvez", "Ceres", "San Cristóbal", "Malabrigo",
+    "Villa Ocampo", "San Javier", "Calchaquí", "Helvecia", "Cayastá",
+    "Pilar", "Alcorta", "Melincué", "Pérez", "San Genaro",
+    "El Trébol", "Máximo Paz", "Wheelwright", "Hughes", "Pueblo Gral. San Martín",
+  ],
+  "Santiago del Estero": [
+    "Santiago del Estero", "La Banda", "Termas de Río Hondo", "Añatuya",
+    "Frías", "Fernández", "Loreto", "Suncho Corral", "Quimilí",
+    "Monte Quemado", "Clodomira", "Villa Atamisqui", "Icaño",
+    "Ojo de Agua", "Salavina", "Lavalle", "San Pedro", "Rivadavia",
+    "Tintina", "Fortín Inca", "Los Telares", "Nueva Esperanza",
+    "Pinto", "Beltrán", "Malbrán", "Pampa de los Guanacos",
+    "Colonia Dora", "Bandera", "Herrera", "Wesbter", "Forres",
+    "Campo Gallo", "Taboada", "Villa Río Hondo",
+  ],
+  "Tierra del Fuego": [
+    "Ushuaia", "Río Grande", "Tolhuin",
+  ],
+  "Tucumán": [
+    "San Miguel de Tucumán", "Yerba Buena", "Tafí Viejo", "Banda del Río Salí",
+    "Alderetes", "Aguilares", "Concepción", "Monteros", "Famaillá",
+    "Bella Vista", "Simoca", "Graneros", "Burruyacu", "Trancas",
+    "Tafí del Valle", "Amaicha del Valle", "El Cadillal", "La Cocha",
+    "Juan Bautista Alberdi", "Acheral", "Río Chico", "Los Ralos",
+    "Lules", "Manantial", "San Javier", "Soldado Maldonado",
+    "Colalao del Valle", "El Mollar", "Raco", "Las Cejas", "Monteagudo",
+  ],
+}
+
 const THIS_YEAR = new Date().getFullYear()
 const YEARS = Array.from({ length: THIS_YEAR - 1979 }, (_, i) => THIS_YEAR - i)
 
@@ -290,6 +519,8 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
   const captchaRef = useRef<HCaptcha>(null)
   const [customBrand, setCustomBrand] = useState(false)
   const [customModel, setCustomModel] = useState(false)
+  const [province, setProvince]       = useState("")
+  const [customCity, setCustomCity]   = useState(false)
 
   const [form, setForm] = useState({
     first_name:        "",
@@ -320,10 +551,11 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
 
   const step2Valid =
     form.license_plate.trim().length >= 6 &&
+    !!province &&
+    form.city.trim().length > 0 &&
     form.car_brand.trim().length > 0 &&
     form.car_model.trim().length > 0 &&
     !!form.car_year &&
-    form.city.trim().length > 0 &&
     form.accepts_terms
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -484,11 +716,46 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
                 className={inputCls + " uppercase"} />
             </div>
             <div>
-              <label className={labelCls}>Localidad</label>
-              <input type="text" required placeholder="San Juan"
-                value={form.city} onChange={e => set("city", e.target.value)}
-                className={inputCls} />
+              <label className={labelCls}>Provincia</label>
+              <SelectField required value={province}
+                onChange={e => {
+                  setProvince(e.target.value)
+                  set("city", "")
+                  setCustomCity(false)
+                }}>
+                <option value="">Seleccioná una provincia</option>
+                {PROVINCES.map(p => <option key={p} value={p} className="bg-[#06192c] text-white">{p}</option>)}
+              </SelectField>
             </div>
+          </div>
+
+          <div>
+            <label className={labelCls}>Localidad</label>
+            {customCity ? (
+              <div className="space-y-1">
+                <input type="text" required placeholder="Ingresá tu localidad"
+                  value={form.city} onChange={e => set("city", e.target.value)}
+                  className={inputCls} />
+                <button type="button"
+                  onClick={() => { setCustomCity(false); set("city", "") }}
+                  className="text-white/25 text-[10px] hover:text-white/50 transition-colors">
+                  ← volver al listado
+                </button>
+              </div>
+            ) : (
+              <SelectField required value={form.city}
+                onChange={e => {
+                  if (e.target.value === "__other__") { setCustomCity(true); set("city", "") }
+                  else { set("city", e.target.value) }
+                }}
+                disabled={!province}>
+                <option value="">{province ? "Seleccioná una localidad" : "Primero elegí provincia"}</option>
+                {(LOCALITIES_BY_PROVINCE[province] ?? []).map(l => (
+                  <option key={l} value={l} className="bg-[#06192c] text-white">{l}</option>
+                ))}
+                {province && <option value="__other__" className="bg-[#06192c] text-white/50">Otra localidad...</option>}
+              </SelectField>
+            )}
           </div>
 
           <div className="grid grid-cols-3 gap-3">
