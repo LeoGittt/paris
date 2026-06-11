@@ -506,6 +506,18 @@ const inputCls = `
 
 const labelCls = "block text-white/50 text-[11px] font-bold uppercase tracking-[0.2em] mb-1.5"
 
+function FieldError({ msg }: { msg: string }) {
+  if (!msg) return null
+  return (
+    <p className="flex items-center gap-1 text-red-400 text-[11px] font-medium mt-1.5">
+      <svg className="w-3 h-3 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+      </svg>
+      {msg}
+    </p>
+  )
+}
+
 type Step = 1 | 2
 
 export function RegistrationForm({ onClose, leadSource }: Props) {
@@ -521,6 +533,11 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
   const [customModel, setCustomModel] = useState(false)
   const [province, setProvince]       = useState("")
   const [customCity, setCustomCity]   = useState(false)
+  const [touched, setTouched]         = useState<Record<string, boolean>>({})
+
+  const touch  = (k: string) => setTouched(t => ({ ...t, [k]: true }))
+  const touchAll = (...keys: string[]) => setTouched(t => Object.fromEntries([...Object.entries(t), ...keys.map(k => [k, true])]))
+  const err = (k: string, valid: boolean, msg: string) => touched[k] && !valid ? msg : ""
 
   const [form, setForm] = useState({
     first_name:        "",
@@ -561,10 +578,12 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (step === 1) {
+      touchAll("first_name", "last_name", "dni", "phone", "email", "password")
       if (!step1Valid) return
       setStep(2)
       return
     }
+    touchAll("license_plate", "province", "city", "car_brand", "car_model", "car_year", "accepts_terms")
     if (!step2Valid) return
     if (HCAPTCHA_SITE_KEY && !captchaToken) {
       setError("Por favor completá el captcha para continuar.")
@@ -636,14 +655,20 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
             <div>
               <label className={labelCls}>Nombre</label>
               <input type="text" required placeholder="Juan"
-                value={form.first_name} onChange={e => set("first_name", e.target.value)}
+                value={form.first_name}
+                onChange={e => set("first_name", e.target.value)}
+                onBlur={() => touch("first_name")}
                 className={inputCls} />
+              <FieldError msg={err("first_name", form.first_name.trim().length > 1, "Ingresá tu nombre completo")} />
             </div>
             <div>
               <label className={labelCls}>Apellido</label>
               <input type="text" required placeholder="Pérez"
-                value={form.last_name} onChange={e => set("last_name", e.target.value)}
+                value={form.last_name}
+                onChange={e => set("last_name", e.target.value)}
+                onBlur={() => touch("last_name")}
                 className={inputCls} />
+              <FieldError msg={err("last_name", form.last_name.trim().length > 1, "Ingresá tu apellido completo")} />
             </div>
           </div>
 
@@ -651,22 +676,31 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
             <div>
               <label className={labelCls}>DNI</label>
               <input type="text" required placeholder="12345678"
-                value={form.dni} onChange={e => set("dni", e.target.value)}
+                value={form.dni}
+                onChange={e => set("dni", e.target.value)}
+                onBlur={() => touch("dni")}
                 className={inputCls} />
+              <FieldError msg={err("dni", form.dni.replace(/\D/g, "").length >= 7, "DNI inválido — mínimo 7 dígitos")} />
             </div>
             <div>
               <label className={labelCls}>Celular</label>
               <input type="tel" required placeholder="+54 264 ..."
-                value={form.phone} onChange={e => set("phone", e.target.value)}
+                value={form.phone}
+                onChange={e => set("phone", e.target.value)}
+                onBlur={() => touch("phone")}
                 className={inputCls} />
+              <FieldError msg={err("phone", form.phone.trim().length >= 8, "Número muy corto — mínimo 8 dígitos")} />
             </div>
           </div>
 
           <div>
             <label className={labelCls}>Correo electrónico</label>
             <input type="email" required placeholder="tu@email.com"
-              value={form.email} onChange={e => set("email", e.target.value)}
+              value={form.email}
+              onChange={e => set("email", e.target.value)}
+              onBlur={() => touch("email")}
               className={inputCls} />
+            <FieldError msg={err("email", form.email.includes("@") && form.email.includes("."), "Ingresá un email válido")} />
           </div>
 
           <div>
@@ -679,6 +713,7 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
                 minLength={8}
                 value={form.password}
                 onChange={e => set("password", e.target.value)}
+                onBlur={() => touch("password")}
                 className={inputCls + " pr-11"}
               />
               <button
@@ -689,11 +724,12 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
                 {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
+            <FieldError msg={err("password", form.password.length >= 8, "La contraseña debe tener al menos 8 caracteres")} />
           </div>
 
           <button
             type="submit"
-            disabled={!step1Valid}
+            disabled={false}
             className="group w-full h-12 bg-[#054a9d] hover:bg-[#1558b8] disabled:opacity-40 disabled:cursor-not-allowed
                        text-white font-black uppercase tracking-wide rounded-xl text-sm
                        flex items-center justify-center gap-2 transition-all"
@@ -713,7 +749,9 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
               <input type="text" required placeholder="AA123BB"
                 value={form.license_plate}
                 onChange={e => set("license_plate", e.target.value.toUpperCase())}
+                onBlur={() => touch("license_plate")}
                 className={inputCls + " uppercase"} />
+              <FieldError msg={err("license_plate", form.license_plate.replace(/\s/g, "").length >= 6, "Patente inválida — mínimo 6 caracteres (ej: AB123CD)")} />
             </div>
             <div>
               <label className={labelCls}>Provincia</label>
@@ -722,10 +760,12 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
                   setProvince(e.target.value)
                   set("city", "")
                   setCustomCity(false)
+                  touch("province")
                 }}>
                 <option value="">Seleccioná una provincia</option>
                 {PROVINCES.map(p => <option key={p} value={p} className="bg-[#06192c] text-white">{p}</option>)}
               </SelectField>
+              <FieldError msg={err("province", !!province, "Seleccioná una provincia")} />
             </div>
           </div>
 
@@ -734,7 +774,9 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
             {customCity ? (
               <div className="space-y-1">
                 <input type="text" required placeholder="Ingresá tu localidad"
-                  value={form.city} onChange={e => set("city", e.target.value)}
+                  value={form.city}
+                  onChange={e => set("city", e.target.value)}
+                  onBlur={() => touch("city")}
                   className={inputCls} />
                 <button type="button"
                   onClick={() => { setCustomCity(false); set("city", "") }}
@@ -746,7 +788,7 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
               <SelectField required value={form.city}
                 onChange={e => {
                   if (e.target.value === "__other__") { setCustomCity(true); set("city", "") }
-                  else { set("city", e.target.value) }
+                  else { set("city", e.target.value); touch("city") }
                 }}
                 disabled={!province}>
                 <option value="">{province ? "Seleccioná una localidad" : "Primero elegí provincia"}</option>
@@ -756,6 +798,7 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
                 {province && <option value="__other__" className="bg-[#06192c] text-white/50">Otra localidad...</option>}
               </SelectField>
             )}
+            <FieldError msg={err("city", form.city.trim().length > 0, "Seleccioná una localidad")} />
           </div>
 
           <div className="grid grid-cols-3 gap-3">
@@ -764,7 +807,9 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
               {customBrand ? (
                 <div className="space-y-1">
                   <input type="text" required placeholder="Ej: Citroen"
-                    value={form.car_brand} onChange={e => set("car_brand", e.target.value)}
+                    value={form.car_brand}
+                    onChange={e => set("car_brand", e.target.value)}
+                    onBlur={() => touch("car_brand")}
                     className={inputCls} />
                   <button type="button"
                     onClick={() => { setCustomBrand(false); setCustomModel(false); set("car_brand", ""); set("car_model", "") }}
@@ -779,7 +824,7 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
                       setCustomBrand(true); setCustomModel(true)
                       set("car_brand", ""); set("car_model", "")
                     } else {
-                      set("car_brand", e.target.value); set("car_model", ""); setCustomModel(false)
+                      set("car_brand", e.target.value); set("car_model", ""); setCustomModel(false); touch("car_brand")
                     }
                   }}>
                   <option value="">Seleccioná una marca</option>
@@ -787,13 +832,16 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
                   <option value="__other__" className="bg-[#06192c] text-white/50">Otra marca...</option>
                 </SelectField>
               )}
+              <FieldError msg={err("car_brand", form.car_brand.trim().length > 0, "Seleccioná una marca")} />
             </div>
             <div>
               <label className={labelCls}>Modelo</label>
               {(customBrand || customModel) ? (
                 <div className="space-y-1">
                   <input type="text" required placeholder="Ej: Tracker"
-                    value={form.car_model} onChange={e => set("car_model", e.target.value)}
+                    value={form.car_model}
+                    onChange={e => set("car_model", e.target.value)}
+                    onBlur={() => touch("car_model")}
                     className={inputCls} />
                   {!customBrand && (
                     <button type="button"
@@ -807,7 +855,7 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
                 <SelectField required value={form.car_model}
                   onChange={e => {
                     if (e.target.value === "__other__") { setCustomModel(true); set("car_model", "") }
-                    else { set("car_model", e.target.value) }
+                    else { set("car_model", e.target.value); touch("car_model") }
                   }}
                   disabled={!form.car_brand}>
                   <option value="">{form.car_brand ? "Seleccioná un modelo" : "Primero elegí marca"}</option>
@@ -815,14 +863,16 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
                   {form.car_brand && <option value="__other__" className="bg-[#06192c] text-white/50">Otro modelo...</option>}
                 </SelectField>
               )}
+              <FieldError msg={err("car_model", form.car_model.trim().length > 0, "Seleccioná un modelo")} />
             </div>
             <div>
               <label className={labelCls}>Año</label>
               <SelectField required value={form.car_year}
-                onChange={e => set("car_year", e.target.value)}>
+                onChange={e => { set("car_year", e.target.value); touch("car_year") }}>
                 <option value="">Año</option>
                 {YEARS.map(y => <option key={y} value={String(y)} className="bg-[#06192c] text-white">{y}</option>)}
               </SelectField>
+              <FieldError msg={err("car_year", !!form.car_year, "Seleccioná el año del vehículo")} />
             </div>
           </div>
 
@@ -831,7 +881,7 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
             <label className="flex items-start gap-3 cursor-pointer">
               <input type="checkbox" required
                 checked={form.accepts_terms}
-                onChange={e => set("accepts_terms", e.target.checked)}
+                onChange={e => { set("accepts_terms", e.target.checked); touch("accepts_terms") }}
                 className="mt-0.5 w-4 h-4 rounded border-white/20 bg-[#06192c] accent-[#054a9d] cursor-pointer shrink-0"
               />
               <span className="text-white/35 text-xs leading-relaxed">
@@ -856,6 +906,7 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
                 Acepto recibir comunicaciones comerciales de Grupo Paris
               </span>
             </label>
+            <FieldError msg={err("accepts_terms", form.accepts_terms, "Debés aceptar los términos para continuar")} />
           </div>
 
           {/* hCaptcha — solo renderiza si la site key está configurada */}
