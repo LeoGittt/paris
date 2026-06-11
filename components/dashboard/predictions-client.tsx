@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useTransition } from "react"
-import { CheckCircle2, Clock, Lock, XCircle, ChevronDown } from "lucide-react"
+import { useState, useTransition, useRef, useCallback, useEffect } from "react"
+import { CheckCircle2, Clock, Lock, XCircle, ChevronDown, AlertCircle } from "lucide-react"
 import { savePrediction } from "@/lib/actions/predictions"
 import { Flag } from "@/components/ui/flag"
 import type { MatchRow, PredictionRow } from "@/app/dashboard/pronosticos/page"
@@ -13,27 +13,84 @@ interface Props {
 }
 
 const STAGE_LABELS: Record<string, string> = {
-  group:         "Fase de Grupos",
-  round_of_32:   "Ronda de 32",
-  round_of_16:   "Octavos de Final",
-  quarterfinal:  "Cuartos de Final",
-  semifinal:     "Semifinales",
-  third_place:   "Tercer Puesto",
-  final:         "Final",
+  group:        "Fase de Grupos",
+  round_of_32:  "Ronda de 32",
+  round_of_16:  "Octavos de Final",
+  quarterfinal: "Cuartos de Final",
+  semifinal:    "Semifinales",
+  third_place:  "Tercer Puesto",
+  final:        "Final",
 }
 
 const RESULT_CONFIG: Record<string, { color: string; label: string; icon: typeof CheckCircle2 }> = {
-  correct_exact:  { color: "#4ade80", label: "Exacto",    icon: CheckCircle2 },
-  correct_winner: { color: "#7ab0e8", label: "Correcto",  icon: CheckCircle2 },
-  correct_diff:   { color: "#c3871e", label: "Diferencia",icon: CheckCircle2 },
-  wrong:          { color: "#f87171", label: "Incorrecto", icon: XCircle },
-  pending:        { color: "#ffffff40", label: "Pendiente", icon: Clock },
+  correct_exact:  { color: "#c3871e",   label: "Exacto",     icon: CheckCircle2 },
+  correct_winner: { color: "#7ab0e8",   label: "Correcto",   icon: CheckCircle2 },
+  correct_diff:   { color: "#4ade80",   label: "Diferencia", icon: CheckCircle2 },
+  wrong:          { color: "#f87171",   label: "Incorrecto", icon: XCircle      },
+  pending:        { color: "#ffffff40", label: "Pendiente",  icon: Clock        },
 }
 
+type SaveStatus = "idle" | "dirty" | "saving" | "saved" | "error"
+
+/* ─── Score stepper ──────────────────────────────────────── */
+function ScoreStepper({ value, onChange }: { value: number; onChange: (v: number) => void }) {
+  return (
+    <div className="flex-1 flex items-center justify-center gap-3">
+      <button
+        onClick={() => onChange(Math.max(0, value - 1))}
+        className="w-11 h-11 rounded-xl bg-white/6 hover:bg-white/12 active:scale-90 border border-white/8 hover:border-white/16 text-white font-black text-xl transition-all duration-100 flex items-center justify-center select-none"
+      >
+        –
+      </button>
+      <span className="text-white font-black text-4xl tabular-nums w-10 text-center select-none leading-none">
+        {value}
+      </span>
+      <button
+        onClick={() => onChange(value + 1)}
+        className="w-11 h-11 rounded-xl bg-white/6 hover:bg-white/12 active:scale-90 border border-white/8 hover:border-white/16 text-white font-black text-xl transition-all duration-100 flex items-center justify-center select-none"
+      >
+        +
+      </button>
+    </div>
+  )
+}
+
+/* ─── Save status indicator ──────────────────────────────── */
+function SaveIndicator({ status }: { status: SaveStatus }) {
+  if (status === "idle") return null
+
+  if (status === "dirty") return (
+    <span className="flex items-center gap-1.5 text-[#c3871e]/80 text-[10px] font-black uppercase tracking-wide">
+      <span className="w-1.5 h-1.5 rounded-full bg-[#c3871e]/80 animate-pulse" />
+      Sin guardar
+    </span>
+  )
+
+  if (status === "saving") return (
+    <span className="flex items-center gap-1.5 text-white/35 text-[10px] font-black uppercase tracking-wide">
+      <svg className="animate-spin w-3 h-3 shrink-0" viewBox="0 0 24 24" fill="none">
+        <circle className="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+        <path className="opacity-60" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+      </svg>
+      Guardando
+    </span>
+  )
+
+  if (status === "saved") return (
+    <span className="flex items-center gap-1 text-emerald-400 text-[10px] font-black uppercase tracking-wide">
+      <svg className="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+      </svg>
+      Guardado
+    </span>
+  )
+
+  return null
+}
+
+/* ─── Prediction card ────────────────────────────────────── */
 function PredictionCard({
-  match,
-  prediction,
-  participantId,
+  match, prediction, participantId,
 }: {
   match: MatchRow
   prediction: PredictionRow | undefined
@@ -41,133 +98,120 @@ function PredictionCard({
 }) {
   const [s1, setS1] = useState(prediction?.predicted_score1 ?? 0)
   const [s2, setS2] = useState(prediction?.predicted_score2 ?? 0)
-  const [saved, setSaved] = useState(false)
-  const [error, setError] = useState("")
-  const [isPending, startTransition] = useTransition()
+  const [status, setStatus]   = useState<SaveStatus>(prediction ? "saved" : "idle")
+  const [errorMsg, setErrorMsg] = useState("")
+  const [, startTransition]   = useTransition()
 
-  const isLocked   = match.predictions_locked || match.is_finished
-  const hasPred    = !!prediction
-  const resultCfg  = prediction ? (RESULT_CONFIG[prediction.result] ?? RESULT_CONFIG.pending) : null
+  const debounceRef  = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const savedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const handleSave = () => {
-    setError("")
-    setSaved(false)
+  const isLocked  = match.predictions_locked || match.is_finished
+  const hasPred   = !!prediction
+  const resultCfg = prediction ? (RESULT_CONFIG[prediction.result] ?? RESULT_CONFIG.pending) : null
+
+  // Cleanup on unmount
+  useEffect(() => () => {
+    if (debounceRef.current)  clearTimeout(debounceRef.current)
+    if (savedTimerRef.current) clearTimeout(savedTimerRef.current)
+  }, [])
+
+  const doSave = useCallback((score1: number, score2: number) => {
+    setStatus("saving")
+    setErrorMsg("")
     startTransition(async () => {
-      const res = await savePrediction(participantId, match.id, s1, s2)
+      const res = await savePrediction(participantId, match.id, score1, score2)
       if (res.ok) {
-        setSaved(true)
-        setTimeout(() => setSaved(false), 2500)
+        setStatus("saved")
+        if (savedTimerRef.current) clearTimeout(savedTimerRef.current)
+        savedTimerRef.current = setTimeout(() => setStatus("idle"), 3000)
       } else {
-        setError(res.error)
+        setStatus("error")
+        setErrorMsg(res.error)
       }
     })
-  }
+  }, [participantId, match.id])
 
-  const dateStr = match.formatted_date
-  const timeStr = match.formatted_time
+  const scheduleAutoSave = useCallback((score1: number, score2: number) => {
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    setStatus("dirty")
+    debounceRef.current = setTimeout(() => doSave(score1, score2), 800)
+  }, [doSave])
+
+  const changeS1 = (v: number) => { setS1(v); scheduleAutoSave(v, s2) }
+  const changeS2 = (v: number) => { setS2(v); scheduleAutoSave(s1, v) }
 
   return (
-    <div className={`bg-[#0b2440] border rounded-2xl overflow-hidden transition-all ${
-      isLocked ? "border-white/5 opacity-70" : "border-white/8 hover:border-white/14"
+    <div className={`bg-[#0b2440] border rounded-2xl overflow-hidden transition-all duration-200 ${
+      isLocked
+        ? "border-white/5 opacity-70"
+        : "border-white/8 hover:border-white/15 hover:shadow-lg hover:shadow-black/30"
     }`}>
 
-      {/* Header del partido */}
-      <div className="px-5 py-3 bg-[#06192c]/60 border-b border-white/5 flex items-center justify-between">
-        <div className="flex items-center gap-2">
+      {/* Header */}
+      <div className="px-5 py-3 bg-[#06192c]/60 border-b border-white/5 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 min-w-0">
           {match.group_name && (
-            <span className="text-[10px] font-black uppercase tracking-wider text-white/30 bg-white/5 px-2 py-0.5 rounded-md">
+            <span className="text-[10px] font-black uppercase tracking-wider text-white/30 bg-white/5 px-2 py-0.5 rounded-md shrink-0">
               {match.group_name}
             </span>
           )}
-          <span className="text-white/25 text-[11px] font-medium capitalize">{dateStr} · {timeStr} hs</span>
+          <span className="text-white/25 text-[11px] font-medium capitalize truncate">
+            {match.formatted_date} · {match.formatted_time} hs
+          </span>
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2 shrink-0">
           {isLocked && <Lock className="w-3 h-3 text-white/20" />}
           {match.is_finished && resultCfg && (
             <span className="text-[10px] font-black uppercase" style={{ color: resultCfg.color }}>
               {hasPred ? `+${prediction!.points_earned}pts` : "Sin pronóstico"}
             </span>
           )}
+          {!isLocked && <SaveIndicator status={status} />}
         </div>
       </div>
 
       <div className="px-5 py-5">
-        {/* Equipos y marcador */}
+        {/* Teams + real score */}
         <div className="flex items-center gap-3 mb-5">
-          {/* Local */}
           <div className="flex-1 flex items-center gap-2.5">
             <Flag emoji={match.team1_flag} size={28} />
             <span className="text-white font-black text-sm uppercase tracking-wide leading-tight">{match.team1}</span>
           </div>
-
-          {/* Resultado real o "VS" */}
-          <div className="shrink-0 text-center">
+          <div className="shrink-0 text-center min-w-[3rem]">
             {match.is_finished ? (
               <span className="text-white font-black text-lg tabular-nums">{match.score1} – {match.score2}</span>
             ) : (
               <span className="text-white/20 font-black text-sm">VS</span>
             )}
           </div>
-
-          {/* Visitante */}
           <div className="flex-1 flex items-center justify-end gap-2.5">
             <span className="text-white font-black text-sm uppercase tracking-wide leading-tight text-right">{match.team2}</span>
             <Flag emoji={match.team2_flag} size={28} />
           </div>
         </div>
 
-        {/* Input de pronóstico */}
+        {/* Prediction input (unlocked) */}
         {!isLocked ? (
           <div className="space-y-3">
             <p className="text-white/30 text-[10px] font-black uppercase tracking-[0.25em] text-center">
               Tu pronóstico
             </p>
-            <div className="flex items-center gap-3">
-              {/* Score 1 */}
-              <div className="flex-1 flex items-center justify-center gap-2">
-                <button
-                  onClick={() => setS1(v => Math.max(0, v - 1))}
-                  className="w-8 h-8 rounded-lg bg-white/6 hover:bg-white/12 text-white font-black text-lg transition-colors flex items-center justify-center"
-                >–</button>
-                <span className="text-white font-black text-3xl tabular-nums w-8 text-center">{s1}</span>
-                <button
-                  onClick={() => setS1(v => v + 1)}
-                  className="w-8 h-8 rounded-lg bg-white/6 hover:bg-white/12 text-white font-black text-lg transition-colors flex items-center justify-center"
-                >+</button>
-              </div>
-
-              <span className="text-white/20 font-black text-xl">–</span>
-
-              {/* Score 2 */}
-              <div className="flex-1 flex items-center justify-center gap-2">
-                <button
-                  onClick={() => setS2(v => Math.max(0, v - 1))}
-                  className="w-8 h-8 rounded-lg bg-white/6 hover:bg-white/12 text-white font-black text-lg transition-colors flex items-center justify-center"
-                >–</button>
-                <span className="text-white font-black text-3xl tabular-nums w-8 text-center">{s2}</span>
-                <button
-                  onClick={() => setS2(v => v + 1)}
-                  className="w-8 h-8 rounded-lg bg-white/6 hover:bg-white/12 text-white font-black text-lg transition-colors flex items-center justify-center"
-                >+</button>
-              </div>
+            <div className="flex items-center gap-2">
+              <ScoreStepper value={s1} onChange={changeS1} />
+              <span className="text-white/20 font-black text-2xl shrink-0 px-1">–</span>
+              <ScoreStepper value={s2} onChange={changeS2} />
             </div>
 
-            {error && <p className="text-red-400 text-[11px] font-medium text-center">{error}</p>}
-
-            <button
-              onClick={handleSave}
-              disabled={isPending}
-              className={`w-full h-10 rounded-xl text-[12px] font-black uppercase tracking-wide transition-all ${
-                saved
-                  ? "bg-emerald-500/15 border border-emerald-500/30 text-emerald-400"
-                  : "bg-[#054a9d] hover:bg-[#1558b8] text-white disabled:opacity-50"
-              }`}
-            >
-              {isPending ? "Guardando..." : saved ? "✓ Guardado" : hasPred ? "Actualizar" : "Guardar pronóstico"}
-            </button>
+            {status === "error" && (
+              <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-xl px-3 py-2.5 mt-1">
+                <AlertCircle className="w-3.5 h-3.5 text-red-400 shrink-0" />
+                <p className="text-red-400 text-[11px] font-medium leading-tight">{errorMsg}</p>
+              </div>
+            )}
           </div>
+
         ) : (
-          /* Partido bloqueado o finalizado — mostrar pronóstico cargado */
+          /* Locked / finished — show saved prediction */
           <div className="text-center">
             {hasPred ? (
               <div className="space-y-1">
@@ -202,14 +246,13 @@ function PredictionCard({
   )
 }
 
+/* ─── Main client ────────────────────────────────────────── */
 export function PredictionsClient({ matches, predsByMatch, participantId }: Props) {
   const [expandedStages, setExpandedStages] = useState<Record<string, boolean>>({ group: true })
 
-  // Agrupar por stage
   const grouped = matches.reduce<Record<string, MatchRow[]>>((acc, m) => {
-    const key = m.stage
-    if (!acc[key]) acc[key] = []
-    acc[key].push(m)
+    if (!acc[m.stage]) acc[m.stage] = []
+    acc[m.stage].push(m)
     return acc
   }, {})
 
@@ -217,6 +260,10 @@ export function PredictionsClient({ matches, predsByMatch, participantId }: Prop
 
   const toggleStage = (stage: string) =>
     setExpandedStages(v => ({ ...v, [stage]: !v[stage] }))
+
+  // Overall progress
+  const totalMatches  = matches.filter(m => !m.predictions_locked && !m.is_finished).length
+  const filledMatches = matches.filter(m => !m.predictions_locked && !m.is_finished && predsByMatch[m.id]).length
 
   if (!matches.length) {
     return (
@@ -228,16 +275,48 @@ export function PredictionsClient({ matches, predsByMatch, participantId }: Prop
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
+
+      {/* Progress banner — solo si hay partidos abiertos */}
+      {totalMatches > 0 && (
+        <div className="bg-[#0b2440] border border-white/8 rounded-2xl px-5 py-4 flex items-center gap-4">
+          <div className="flex-1">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-white/50 text-[11px] font-black uppercase tracking-[0.25em]">
+                Pronósticos cargados
+              </p>
+              <p className="text-white/60 text-[11px] font-black tabular-nums">
+                <span className="text-white">{filledMatches}</span> / {totalMatches}
+              </p>
+            </div>
+            <div className="h-1.5 bg-white/6 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-[#054a9d] rounded-full transition-all duration-500"
+                style={{ width: totalMatches > 0 ? `${(filledMatches / totalMatches) * 100}%` : "0%" }}
+              />
+            </div>
+          </div>
+          {filledMatches === totalMatches && totalMatches > 0 && (
+            <div className="flex items-center gap-1.5 text-emerald-400 text-[11px] font-black uppercase tracking-wide shrink-0">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              Completo
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Stages */}
       {stageOrder.filter(s => grouped[s]?.length).map(stage => {
         const stageMatches = grouped[stage]
-        const isOpen = expandedStages[stage] ?? false
-        const pending = stageMatches.filter(m => !m.predictions_locked && !m.is_finished).length
+        const isOpen  = expandedStages[stage] ?? false
+        const open    = stageMatches.filter(m => !m.predictions_locked && !m.is_finished).length
+        const filled  = stageMatches.filter(m => !m.predictions_locked && !m.is_finished && predsByMatch[m.id]).length
         const total   = stageMatches.length
 
         return (
           <div key={stage} className="bg-[#0b2440] border border-white/8 rounded-2xl overflow-hidden">
-            {/* Stage header */}
             <button
               onClick={() => toggleStage(stage)}
               className="w-full flex items-center justify-between px-6 py-4 hover:bg-white/3 transition-colors"
@@ -246,15 +325,19 @@ export function PredictionsClient({ matches, predsByMatch, participantId }: Prop
                 <span className="text-white font-black uppercase text-sm tracking-wide">
                   {STAGE_LABELS[stage] ?? stage}
                 </span>
-                {pending > 0 && (
-                  <span className="bg-[#054a9d]/30 border border-[#054a9d]/40 text-[#7ab0e8] text-[10px] font-black px-2 py-0.5 rounded-full">
-                    {pending} pendiente{pending > 1 ? "s" : ""}
+                {open > 0 && (
+                  <span className={`text-[10px] font-black px-2 py-0.5 rounded-full border ${
+                    filled === open
+                      ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+                      : "bg-[#054a9d]/20 border-[#054a9d]/30 text-[#7ab0e8]"
+                  }`}>
+                    {filled === open ? "✓ Completo" : `${filled}/${open} cargados`}
                   </span>
                 )}
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-white/25 text-[11px] font-medium">{total} partidos</span>
-                <ChevronDown className={`w-4 h-4 text-white/30 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+                <span className="text-white/25 text-[11px] font-medium">{total} partido{total !== 1 ? "s" : ""}</span>
+                <ChevronDown className={`w-4 h-4 text-white/30 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
               </div>
             </button>
 
