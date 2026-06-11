@@ -6,7 +6,7 @@ export const revalidate = 30
 
 export const metadata: Metadata = {
   title: 'Ranking General',
-  description: 'Seguí el ranking en tiempo real del Prode Chevrolet Grupo Paris 2026. Mirá quiénes lideran la tabla de posiciones del Mundial 2026.',
+  description: 'Seguí el ranking en tiempo real del Prode Grupo Paris 2026. Mirá quiénes lideran la tabla de posiciones del Mundial 2026.',
   alternates: { canonical: '/ranking' },
 }
 

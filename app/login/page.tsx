@@ -133,7 +133,7 @@ function LoginContent() {
         {/* Logo */}
         <div className="flex flex-col items-center mb-10">
           <Link href="/" className="relative overflow-hidden mb-5 block" style={{ width: 300, height: 84 }}>
-            <Image src="/logo-paris.png" alt="Chevrolet Grupo Paris" fill className="object-cover" style={{ objectPosition: "50% 52%" }} priority />
+            <Image src="/logo-paris.png" alt="Grupo Paris" fill className="object-cover" style={{ objectPosition: "50% 52%" }} priority />
           </Link>
           <h1 className="text-white font-black uppercase text-3xl">PRODE 2026</h1>
         </div>

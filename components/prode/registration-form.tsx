@@ -236,7 +236,7 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
           <div className="grid grid-cols-3 gap-3">
             <div>
               <label className={labelCls}>Marca</label>
-              <input type="text" required placeholder="Chevrolet"
+              <input type="text" required placeholder="Toyota"
                 value={form.car_brand} onChange={e => set("car_brand", e.target.value)}
                 className={inputCls} />
             </div>
@@ -283,7 +283,7 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
                 className="mt-0.5 w-4 h-4 rounded border-white/20 bg-[#06192c] accent-[#054a9d] cursor-pointer shrink-0"
               />
               <span className="text-white/35 text-xs leading-relaxed">
-                Acepto recibir comunicaciones comerciales de Chevrolet Grupo Paris
+                Acepto recibir comunicaciones comerciales de Grupo Paris
               </span>
             </label>
           </div>

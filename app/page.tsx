@@ -7,8 +7,8 @@ import type { Metadata } from "next"
 export const revalidate = 30
 
 export const metadata: Metadata = {
-  title: 'Prode Chevrolet Grupo Paris | Mundial 2026',
-  description: 'El prode oficial del Mundial 2026 de Chevrolet Grupo Paris. Registrate gratis, predecí los partidos de Argentina y ganá premios en cada etapa. Solo para clientes Grupo Paris.',
+  title: 'Prode Grupo Paris | Mundial 2026',
+  description: 'El prode oficial del Mundial 2026 de Grupo Paris. Registrate gratis, predecí los partidos de Argentina y ganá premios en cada etapa..',
   alternates: { canonical: '/' },
 }
 

@@ -131,3 +131,75 @@ export async function deleteParticipant(participantId: string): Promise<Particip
   revalidatePath("/admin/participantes")
   return { ok: true }
 }
+
+export type ParticipantPrediction = {
+  id: string
+  match_id: string
+  team1: string
+  team2: string
+  team1_flag: string
+  team2_flag: string
+  match_date: string
+  stage: string
+  predicted_score1: number
+  predicted_score2: number
+  real_score1: number | null
+  real_score2: number | null
+  is_finished: boolean
+  points_earned: number
+  result: "pending" | "correct_winner" | "correct_exact" | "correct_diff" | "wrong"
+  submitted_at: string
+}
+
+export async function getParticipantPredictions(
+  participantId: string
+): Promise<{ ok: true; predictions: ParticipantPrediction[] } | { ok: false; error: string }> {
+  const guard = await requireAdmin()
+  if (!guard.ok) return guard
+
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from("predictions")
+    .select(`
+      id,
+      predicted_score1,
+      predicted_score2,
+      points_earned,
+      result,
+      submitted_at,
+      matches (
+        id, team1, team2, team1_flag, team2_flag,
+        match_date, stage, score1, score2, is_finished
+      )
+    `)
+    .eq("participant_id", participantId)
+
+  if (error) return { ok: false, error: error.message }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const predictions: ParticipantPrediction[] = (data ?? []).map((row: any) => {
+    const m = Array.isArray(row.matches) ? row.matches[0] : row.matches
+    return {
+      id:               row.id,
+      match_id:         m?.id ?? "",
+      team1:            m?.team1 ?? "",
+      team2:            m?.team2 ?? "",
+      team1_flag:       m?.team1_flag ?? "",
+      team2_flag:       m?.team2_flag ?? "",
+      match_date:       m?.match_date ?? "",
+      stage:            m?.stage ?? "",
+      predicted_score1: row.predicted_score1,
+      predicted_score2: row.predicted_score2,
+      real_score1:      m?.score1 ?? null,
+      real_score2:      m?.score2 ?? null,
+      is_finished:      m?.is_finished ?? false,
+      points_earned:    row.points_earned,
+      result:           row.result,
+      submitted_at:     row.submitted_at,
+    }
+  })
+
+  predictions.sort((a, b) => new Date(b.match_date).getTime() - new Date(a.match_date).getTime())
+
+  return { ok: true, predictions }
+}

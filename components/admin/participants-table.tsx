@@ -1,10 +1,11 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useState, useEffect, useTransition } from "react"
 import { useRouter } from "next/navigation"
-import { Search, Download, Ban, CheckCircle2, Trash2, ChevronLeft, ChevronRight, FileSpreadsheet, FileText, Edit3, AlertCircle } from "lucide-react"
+import { Search, Download, Ban, CheckCircle2, Trash2, ChevronLeft, ChevronRight, FileSpreadsheet, FileText, Edit3, AlertCircle, BarChart2, X } from "lucide-react"
 import * as XLSX from "xlsx"
-import { toggleBlockParticipant, deleteParticipant, updateParticipantProfile } from "@/lib/actions/admin/participants"
+import { toggleBlockParticipant, deleteParticipant, updateParticipantProfile, getParticipantPredictions } from "@/lib/actions/admin/participants"
+import type { ParticipantPrediction } from "@/lib/actions/admin/participants"
 import type { ParticipantRow } from "@/app/admin/participantes/page"
 
 const LEAD_LABELS: Record<string, string> = {
@@ -138,6 +139,173 @@ function EditParticipantModal({ p, onClose }: { p: ParticipantRow; onClose: () =
   )
 }
 
+const STAGE_LABELS: Record<string, string> = {
+  group:        "Grupos",
+  round_of_32:  "32vos",
+  round_of_16:  "Octavos",
+  quarterfinal: "Cuartos",
+  semifinal:    "Semis",
+  third_place:  "3er puesto",
+  final:        "Final",
+}
+
+const RESULT_CONFIG = {
+  correct_exact:  { label: "Exacto",     bg: "bg-[#c3871e]/15",   text: "text-[#c3871e]",    border: "border-[#c3871e]/30"   },
+  correct_winner: { label: "Ganador",    bg: "bg-[#7ab0e8]/15",   text: "text-[#7ab0e8]",    border: "border-[#7ab0e8]/30"   },
+  correct_diff:   { label: "Diferencia", bg: "bg-emerald-500/15", text: "text-emerald-400",  border: "border-emerald-500/30" },
+  wrong:          { label: "Incorrecto", bg: "bg-red-500/10",     text: "text-red-400",      border: "border-red-500/20"     },
+  pending:        { label: "Pendiente",  bg: "bg-white/5",        text: "text-white/30",     border: "border-white/10"       },
+} as const
+
+function ParticipantPredictionsModal({ participant, onClose }: { participant: ParticipantRow; onClose: () => void }) {
+  const [loading, setLoading]       = useState(true)
+  const [predictions, setPredictions] = useState<ParticipantPrediction[]>([])
+  const [fetchError, setFetchError]  = useState("")
+
+  useEffect(() => {
+    getParticipantPredictions(participant.id).then(res => {
+      if (res.ok) setPredictions(res.predictions)
+      else setFetchError(res.error)
+      setLoading(false)
+    })
+  }, [participant.id])
+
+  const stats = {
+    total:   predictions.length,
+    exact:   predictions.filter(p => p.result === "correct_exact").length,
+    winner:  predictions.filter(p => p.result === "correct_winner").length,
+    diff:    predictions.filter(p => p.result === "correct_diff").length,
+    wrong:   predictions.filter(p => p.result === "wrong").length,
+    pending: predictions.filter(p => p.result === "pending").length,
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/75 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-[#0b2440] border border-white/10 rounded-2xl w-full max-w-3xl shadow-2xl max-h-[90vh] flex flex-col">
+
+        {/* Header */}
+        <div className="flex items-start justify-between p-6 border-b border-white/6 shrink-0">
+          <div>
+            <p className="text-white/40 text-[10px] font-black uppercase tracking-[0.3em] mb-1">Pronósticos del participante</p>
+            <h3 className="text-white font-black text-xl">{participant.first_name} {participant.last_name}</h3>
+            <p className="text-white/30 text-sm font-mono mt-0.5">
+              DNI {participant.dni} · {participant.total_points} pts · #{participant.ranking_position ?? "—"}
+            </p>
+          </div>
+          <button onClick={onClose} className="text-white/25 hover:text-white/70 p-2 hover:bg-white/6 rounded-xl transition-all">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Stats summary */}
+        {!loading && predictions.length > 0 && (
+          <div className="grid grid-cols-6 divide-x divide-white/5 border-b border-white/6 shrink-0">
+            {([
+              { label: "Total",       value: stats.total,   color: "text-white/60"    },
+              { label: "Exactos",     value: stats.exact,   color: "text-[#c3871e]"   },
+              { label: "Ganadores",   value: stats.winner,  color: "text-[#7ab0e8]"   },
+              { label: "Diferencia",  value: stats.diff,    color: "text-emerald-400" },
+              { label: "Incorrectos", value: stats.wrong,   color: "text-red-400"     },
+              { label: "Pendientes",  value: stats.pending, color: "text-white/30"    },
+            ] as const).map(s => (
+              <div key={s.label} className="flex flex-col items-center py-4 gap-1">
+                <span className={`font-black text-xl tabular-nums ${s.color}`}>{s.value}</span>
+                <span className="text-white/25 text-[9px] font-black uppercase tracking-widest">{s.label}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Body */}
+        <div className="overflow-y-auto flex-1">
+          {loading ? (
+            <div className="flex items-center justify-center py-16 gap-3">
+              <svg className="animate-spin w-5 h-5 text-[#054a9d]" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-80" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+              <span className="text-white/30 text-sm font-medium">Cargando pronósticos...</span>
+            </div>
+          ) : fetchError ? (
+            <div className="flex items-center gap-3 m-6 bg-red-500/10 border border-red-500/20 rounded-xl px-5 py-4">
+              <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
+              <p className="text-red-400 text-sm">{fetchError}</p>
+            </div>
+          ) : predictions.length === 0 ? (
+            <div className="flex flex-col items-center gap-3 py-16">
+              <BarChart2 className="w-10 h-10 text-white/10" />
+              <p className="text-white/25 text-sm font-medium">Todavía no cargó ningún pronóstico</p>
+            </div>
+          ) : (
+            <table className="w-full">
+              <thead className="sticky top-0 bg-[#0b2440]">
+                <tr className="border-b border-white/6">
+                  {["Partido", "Etapa", "Mi pronóstico", "Resultado real", "Estado", "Pts"].map(h => (
+                    <th key={h} className="px-5 py-3 text-left text-white/20 text-[9px] font-black uppercase tracking-[0.25em] whitespace-nowrap">
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/4">
+                {predictions.map(pred => {
+                  const cfg = RESULT_CONFIG[pred.result] ?? RESULT_CONFIG.pending
+                  return (
+                    <tr key={pred.id} className="hover:bg-white/2 transition-colors">
+                      <td className="px-5 py-3.5 whitespace-nowrap">
+                        <div className="flex items-center gap-2 text-sm">
+                          <span className="text-base leading-none">{pred.team1_flag}</span>
+                          <span className="text-white/70 font-bold">{pred.team1}</span>
+                          <span className="text-white/20 text-xs font-black">VS</span>
+                          <span className="text-white/70 font-bold">{pred.team2}</span>
+                          <span className="text-base leading-none">{pred.team2_flag}</span>
+                        </div>
+                        <p className="text-white/25 text-[10px] font-medium mt-0.5">
+                          {new Date(pred.match_date).toLocaleDateString("es-AR", { day: "2-digit", month: "short", year: "numeric" })}
+                        </p>
+                      </td>
+                      <td className="px-5 py-3.5 whitespace-nowrap">
+                        <span className="text-[10px] font-black uppercase px-2 py-1 rounded-lg bg-white/5 text-white/35">
+                          {STAGE_LABELS[pred.stage] ?? pred.stage}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3.5 whitespace-nowrap">
+                        <span className="font-black text-white tabular-nums text-base">
+                          {pred.predicted_score1} <span className="text-white/25">–</span> {pred.predicted_score2}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3.5 whitespace-nowrap">
+                        {pred.is_finished && pred.real_score1 !== null ? (
+                          <span className="font-black tabular-nums text-base text-white/50">
+                            {pred.real_score1} <span className="text-white/20">–</span> {pred.real_score2}
+                          </span>
+                        ) : (
+                          <span className="text-white/20 text-sm font-medium">—</span>
+                        )}
+                      </td>
+                      <td className="px-5 py-3.5 whitespace-nowrap">
+                        <span className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-lg border ${cfg.bg} ${cfg.text} ${cfg.border}`}>
+                          {cfg.label}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3.5 whitespace-nowrap">
+                        <span className={`font-black text-base tabular-nums ${pred.points_earned > 0 ? "text-[#c3871e]" : "text-white/20"}`}>
+                          {pred.points_earned > 0 ? `+${pred.points_earned}` : pred.result === "pending" ? "—" : "0"}
+                        </span>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 interface Props {
   participants: ParticipantRow[]
   total: number
@@ -153,8 +321,9 @@ export function ParticipantsTable({ participants, total, page, pageSize, query, 
   const [search, setSearch]   = useState(query)
   const [fromDate, setFromDate] = useState(dateFrom)
   const [toDate, setToDate]     = useState(dateTo)
-  const [editTarget, setEditTarget] = useState<ParticipantRow | null>(null)
-  const [isPending, startTransition] = useTransition()
+  const [editTarget, setEditTarget]             = useState<ParticipantRow | null>(null)
+  const [predictionsTarget, setPredictionsTarget] = useState<ParticipantRow | null>(null)
+  const [isPending, startTransition]             = useTransition()
 
   const totalPages = Math.ceil(total / pageSize)
 
@@ -409,7 +578,7 @@ export function ParticipantsTable({ participants, total, page, pageSize, query, 
           <table className="w-full">
             <thead>
               <tr className="bg-[#06192c]/60 border-b border-white/6">
-                {["Participante","DNI","Email","Patente","Vehículo","Ciudad","Origen","Pts","Pos","Estado","Acciones"].map(h => (
+                {["Participante","DNI","Email","Patente","Vehículo","Ciudad","Origen","Pts","Pos","Estado","Pronósticos","Acciones"].map(h => (
                   <th key={h} className="px-4 py-3 text-left text-white/20 text-[9px] font-black uppercase tracking-[0.25em] whitespace-nowrap">
                     {h}
                   </th>
@@ -419,7 +588,7 @@ export function ParticipantsTable({ participants, total, page, pageSize, query, 
             <tbody className="divide-y divide-white/4">
               {participants.length === 0 ? (
                 <tr>
-                  <td colSpan={11} className="px-4 py-12 text-center text-white/20 text-sm">
+                  <td colSpan={12} className="px-4 py-12 text-center text-white/20 text-sm">
                     No se encontraron participantes
                   </td>
                 </tr>
@@ -460,6 +629,15 @@ export function ParticipantsTable({ participants, total, page, pageSize, query, 
                     }`}>
                       {p.is_blocked ? "Bloqueado" : "Activo"}
                     </span>
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <button
+                      onClick={() => setPredictionsTarget(p)}
+                      className="flex items-center gap-1.5 px-3 h-8 rounded-lg bg-[#054a9d]/15 hover:bg-[#054a9d]/30 border border-[#054a9d]/30 text-[#7ab0e8] hover:text-white text-[11px] font-black uppercase tracking-wide transition-all"
+                    >
+                      <BarChart2 className="w-3.5 h-3.5" />
+                      Ver
+                    </button>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1.5">
@@ -528,6 +706,13 @@ export function ParticipantsTable({ participants, total, page, pageSize, query, 
         <EditParticipantModal
           p={editTarget}
           onClose={() => { setEditTarget(null); router.refresh() }}
+        />
+      )}
+
+      {predictionsTarget && (
+        <ParticipantPredictionsModal
+          participant={predictionsTarget}
+          onClose={() => setPredictionsTarget(null)}
         />
       )}
     </div>
