@@ -1,9 +1,17 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
+import { createClient as createAdminClient } from "@supabase/supabase-js"
 import { revalidatePath } from "next/cache"
-import type { MatchStage } from "@/lib/supabase/types"
+import type { MatchStage, Database } from "@/lib/supabase/types"
 import { requireAdmin } from "./guard"
+
+function getAdminClient() {
+  return createAdminClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  )
+}
 
 const VALID_STAGES: MatchStage[] = [
   "group", "round_of_32", "round_of_16", "quarterfinal", "semifinal", "third_place", "final"
@@ -38,17 +46,18 @@ export async function saveMatchResult(
   if (score1 > 30 || score2 > 30)
     return { ok: false, error: "Marcador fuera de rango razonable (máx 30)." }
 
-  const supabase = await createClient()
+  const admin = getAdminClient()
 
-  const { error } = await supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (admin as any)
     .from("matches")
     .update({ score1, score2, is_finished: true, predictions_locked: true })
     .eq("id", matchId)
 
   if (error) return { ok: false, error: error.message }
 
-  // Recalcular puntos automáticamente
-  const { error: rpcError } = await supabase.rpc("recalculate_points", { p_match_id: matchId })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error: rpcError } = await (admin as any).rpc("recalculate_points", { p_match_id: matchId })
   if (rpcError) return { ok: false, error: `Resultado guardado pero error al recalcular: ${rpcError.message}` }
 
   revalidatePath("/admin/partidos")
@@ -65,8 +74,8 @@ export async function updateMatchDate(matchId: string, matchDate: string): Promi
   if (!isValidISODate(matchDate))
     return { ok: false, error: "Formato de fecha inválido. Usar ISO 8601 (ej: 2026-06-15T18:00:00Z)." }
 
-  const supabase = await createClient()
-  const { error } = await supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (getAdminClient() as any)
     .from("matches")
     .update({ match_date: matchDate })
     .eq("id", matchId)
@@ -85,8 +94,8 @@ export async function updateMatchTeams(
   if (team1.trim().toLowerCase() === team2.trim().toLowerCase())
     return { ok: false, error: "El local y el visitante no pueden ser el mismo equipo." }
 
-  const supabase = await createClient()
-  const { error } = await supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (getAdminClient() as any)
     .from("matches")
     .update({ team1: team1.trim(), team2: team2.trim() })
     .eq("id", matchId)
@@ -99,8 +108,8 @@ export async function lockMatch(matchId: string): Promise<MatchResult> {
   const guard = await requireAdmin()
   if (!guard.ok) return guard
 
-  const supabase = await createClient()
-  const { error } = await supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (getAdminClient() as any)
     .from("matches")
     .update({ predictions_locked: true })
     .eq("id", matchId)
@@ -128,9 +137,8 @@ export async function createMatch(data: {
   if (!isValidISODate(data.match_date))
     return { ok: false, error: "Formato de fecha inválido. Usar ISO 8601 (ej: 2026-06-15T18:00:00Z)." }
 
-  const supabase = await createClient()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any).from("matches").insert({
+  const { error } = await (getAdminClient() as any).from("matches").insert({
     team1:      data.team1,
     team2:      data.team2,
     team1_flag: data.team1_flag,
@@ -150,41 +158,43 @@ export async function deleteMatch(matchId: string): Promise<MatchResult> {
   const guard = await requireAdmin()
   if (!guard.ok) return guard
 
-  const supabase = await createClient()
+  const admin = getAdminClient()
 
   // Verificar si el partido tiene resultado cargado
-  const { data: match } = await supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: match } = await (admin as any)
     .from("matches")
     .select("is_finished")
     .eq("id", matchId)
     .single()
 
   if (match?.is_finished) {
-    // Eliminar y luego recalcular todos los puntos para mantener integridad
-    const { error } = await supabase.from("matches").delete().eq("id", matchId)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (admin as any).from("matches").delete().eq("id", matchId)
     if (error) return { ok: false, error: error.message }
 
-    // Recalcular para que los puntos de ese partido desaparezcan
-    const { data: remaining } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: remaining } = await (admin as any)
       .from("matches")
       .select("id")
       .eq("is_finished", true) as { data: { id: string }[] | null }
 
     if (remaining?.length) {
       await Promise.all(
-        remaining.map(m => supabase.rpc("recalculate_points", { p_match_id: m.id }))
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        remaining.map(m => (admin as any).rpc("recalculate_points", { p_match_id: m.id }))
       )
     } else {
-      // No quedan partidos finalizados: resetear todos los puntos a 0
-      // neq("total_points", -1) fuerza el filtro explícito requerido por PostgREST
-      const { error: resetError } = await supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error: resetError } = await (admin as any)
         .from("participants")
         .update({ total_points: 0, ranking_position: null })
-        .neq("total_points", -1) // aplica a todos (ningún participante tiene -1)
+        .neq("total_points", -1)
       if (resetError) return { ok: false, error: `Error al resetear puntos: ${resetError.message}` }
     }
   } else {
-    const { error } = await supabase.from("matches").delete().eq("id", matchId)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (admin as any).from("matches").delete().eq("id", matchId)
     if (error) return { ok: false, error: error.message }
   }
 
@@ -213,8 +223,8 @@ export async function updateMatchDetails(
   if (!data.match_date)
     return { ok: false, error: "La fecha del partido es requerida." }
 
-  const supabase = await createClient()
-  const { error } = await supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (getAdminClient() as any)
     .from("matches")
     .update({
       team1:      data.team1,
@@ -240,9 +250,8 @@ export async function bulkCreateMatches(matches: {
   const invalid = matches.find(m => !isValidStage(m.stage))
   if (invalid) return { ok: false, error: `Fase inválida en el CSV: "${invalid.stage}". Valores válidos: ${VALID_STAGES.join(", ")}` }
 
-  const supabase = await createClient()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any).from("matches").insert(matches)
+  const { error } = await (getAdminClient() as any).from("matches").insert(matches)
   if (error) return { ok: false, error: error.message }
   revalidatePath("/admin/partidos")
   revalidatePath("/")
@@ -253,9 +262,10 @@ export async function recalculateAllPoints(): Promise<MatchResult> {
   const guard = await requireAdmin()
   if (!guard.ok) return guard
 
-  const supabase = await createClient()
+  const admin = getAdminClient()
 
-  const { data: finishedMatches } = await supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: finishedMatches } = await (admin as any)
     .from("matches")
     .select("id")
     .eq("is_finished", true) as { data: { id: string }[] | null }
@@ -263,9 +273,8 @@ export async function recalculateAllPoints(): Promise<MatchResult> {
   if (!finishedMatches?.length) return { ok: true }
 
   const results = await Promise.all(
-    finishedMatches.map(match =>
-      supabase.rpc("recalculate_points", { p_match_id: match.id })
-    )
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    finishedMatches.map(match => (admin as any).rpc("recalculate_points", { p_match_id: match.id }))
   )
 
   const failed = results.filter(r => r.error)
