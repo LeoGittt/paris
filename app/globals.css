@@ -54,10 +54,10 @@
   font-display: swap;
 }
 
-/* ─── Chevrolet brand color palette ─────────────────── */
+/* ─── Brand color palette ───────────────────────────── */
 /* #06192c  Navy (dark bg)                               */
-/* #054a9d  Chevrolet Blue (primary)                     */
-/* #c3871e  Chevrolet Gold (bowtie / premium accent)     */
+/* #054a9d  Blue (primary)                               */
+/* #c3871e  Gold (premium accent)                        */
 /* #b18633  Gold secondary                               */
 /* #1e1e1e  Near-black                                   */
 /* #363636  Dark gray                                    */
@@ -72,7 +72,7 @@
   --popover:             #0b2440;
   --popover-foreground:  #f0f4f8;
 
-  /* Chevrolet Blue as primary interactive */
+  /* Blue as primary interactive */
   --primary:             #054a9d;
   --primary-foreground:  #ffffff;
 

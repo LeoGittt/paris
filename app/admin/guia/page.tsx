@@ -201,7 +201,7 @@ export default function GuiaPage() {
           }}>SISTEMA</span>
         </h1>
         <p className="text-white/35 text-sm font-medium max-w-lg">
-          Manual completo para administradores del Prode Chevrolet Grupo Paris 2026.
+          Manual completo para administradores del Prode Grupo Paris 2026.
           Cubre registro, pronósticos, puntos, premios, empleados y todos los flujos operativos.
         </p>
       </div>
@@ -238,7 +238,7 @@ export default function GuiaPage() {
           <GuideSection id="overview" icon={BookOpen} title="Visión general">
             <Prose>
               <p>
-                El <strong className="text-white">Prode Chevrolet Grupo Paris 2026</strong> es una plataforma
+                El <strong className="text-white">Prode Grupo Paris 2026</strong> es una plataforma
                 de pronósticos deportivos para el Mundial FIFA 2026. Los participantes predicen resultados
                 de partidos, acumulan puntos y compiten por premios en cada etapa del torneo.
               </p>
@@ -815,7 +815,7 @@ export default function GuiaPage() {
           {/* Footer de la guía */}
           <div className="rounded-2xl border border-white/6 bg-[#0b2440]/40 px-6 py-5 text-center">
             <p className="text-white/20 text-xs font-medium">
-              Prode Chevrolet Grupo Paris 2026 · Documentación interna · Uso exclusivo del equipo Paris
+              Prode Grupo Paris 2026 · Documentación interna · Uso exclusivo del equipo Paris
             </p>
           </div>
 

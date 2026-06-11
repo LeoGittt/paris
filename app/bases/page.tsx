@@ -4,7 +4,7 @@ import { ArrowLeft } from "lucide-react"
 
 export const metadata = {
   title: "Bases y Condiciones",
-  description: "Leé las bases y condiciones del Prode oficial del Mundial 2026 organizado por Chevrolet Grupo Paris.",
+  description: "Leé las bases y condiciones del Prode oficial del Mundial 2026 organizado por Grupo Paris.",
   alternates: { canonical: '/bases' },
 }
 
@@ -163,7 +163,7 @@ export default function BasesPage() {
 
         {/* Footer */}
         <div className="mt-12 pt-8 border-t border-white/6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-white/20 text-xs">© 2026 Chevrolet Grupo Paris. Todos los derechos reservados.</p>
+          <p className="text-white/20 text-xs">© 2026 Grupo Paris. Todos los derechos reservados.</p>
           <Link
             href="/terminos"
             className="text-[#7ab0e8] hover:text-white text-sm font-bold transition-colors"

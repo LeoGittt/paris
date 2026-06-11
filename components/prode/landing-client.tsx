@@ -9,7 +9,7 @@ import { MatchCard } from "@/components/prode/match-card"
 import { RankingTable, type RankingRow } from "@/components/prode/ranking-table"
 import { PrizesSection } from "@/components/prode/prizes-section"
 import { RegistrationForm } from "@/components/prode/registration-form"
-import { ChevronDown, Menu, X, ArrowRight, CheckCircle2 } from "lucide-react"
+import { ChevronDown, Menu, X, ArrowRight, CheckCircle2, UserPlus, Crosshair, Trophy } from "lucide-react"
 import { Flag } from "@/components/ui/flag"
 import type { LandingPrize, LandingMatch } from "@/app/page"
 
@@ -25,7 +25,7 @@ function Logo({ compact = false }: { compact?: boolean }) {
   const h = compact ? 56 : 72
   return (
     <Link href="/" className="relative select-none shrink-0 block overflow-hidden" style={{ width: w, height: h }}>
-      <Image src="/logo-paris.png" alt="Chevrolet Grupo Paris" fill className="object-cover" style={{ objectPosition: "50% 52%" }} priority />
+      <Image src="/logo-paris.png" alt="Grupo Paris" fill className="object-cover" style={{ objectPosition: "50% 52%" }} priority />
     </Link>
   )
 }
@@ -259,7 +259,7 @@ export function LandingClient({ rankingRows, prizes, upcomingMatches }: Props) {
 
       {/* HERO */}
       <section className="relative w-full overflow-hidden" style={{ height: "100svh", minHeight: "600px", maxHeight: "960px" }}>
-        <Image src="/hero-final.png" alt="Prode Chevrolet Grupo Paris — Mundial 2026" fill
+        <Image src="/hero-final.png" alt="Prode Grupo Paris — Mundial 2026" fill
           className="object-cover object-[center_10%] md:object-[center_20%]" priority quality={95} />
         <div className="absolute inset-0 bg-[#020e1f]/55 md:hidden" />
         <div className="absolute inset-0 bg-linear-to-t from-[#020e1f] from-0% via-transparent via-50% to-transparent md:hidden" />
@@ -287,7 +287,7 @@ export function LandingClient({ rankingRows, prizes, upcomingMatches }: Props) {
               <span className="hidden md:block"><br />2026</span>
             </h1>
             <p className="hidden md:block text-white/65 text-lg leading-relaxed mb-7 font-medium">
-              Predecí los partidos de Argentina, sumá puntos y ganá premios increíbles con Chevrolet Grupo Paris.
+              Predecí los partidos de Argentina, sumá puntos y ganá premios increíbles con Grupo Paris.
             </p>
             <div className="mb-5 md:mb-8">
               <p className="text-white/35 text-[9px] uppercase tracking-[0.3em] font-bold mb-2.5">El mundial comienza en</p>
@@ -381,53 +381,104 @@ export function LandingClient({ rankingRows, prizes, upcomingMatches }: Props) {
       {/* CÓMO FUNCIONA */}
       <section id="como-funciona" className="py-24 md:py-32 bg-[#040f1c] relative overflow-hidden">
         <div className="absolute top-0 inset-x-0 h-px bg-linear-to-r from-transparent via-[#c3871e]/40 to-transparent" />
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-[#054a9d]/5 blur-3xl" />
+        </div>
         <div className="max-w-7xl mx-auto px-5 md:px-10">
           <div className="text-center mb-16 md:mb-20">
             <SectionLabel>Paso a paso</SectionLabel>
             <h2 className="font-black text-white uppercase leading-none text-5xl md:text-7xl mb-5">CÓMO FUNCIONA</h2>
-            <p className="text-white/45 text-base md:text-lg max-w-md mx-auto leading-relaxed font-medium">Participá gratis, predecí resultados y competí por premios en cada etapa del torneo.</p>
+            <p className="text-white/45 text-base md:text-lg max-w-md mx-auto leading-relaxed font-medium">Participá gratis, predecí los marcadores y escalá el ranking.</p>
           </div>
-          <div className="relative grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            <div className="hidden md:block absolute top-10 left-[calc(16.66%+2rem)] right-[calc(16.66%+2rem)] h-px bg-linear-to-r from-[#054a9d]/30 via-[#054a9d]/50 to-[#054a9d]/30 z-0" />
-            {[
-              { number: "01", title: "Registrate", description: "Ingresá tus datos y creá tu cuenta gratuita para unirte al prode oficial de Chevrolet Grupo Paris.", color: "#054a9d" },
-              { number: "02", title: "Predecí",    description: "Elegí el resultado de los partidos de Argentina antes del pitido inicial y sumá puntos por cada acierto.",  color: "#c3871e" },
-              { number: "03", title: "Ganá",       description: "Escalá el ranking y llevate premios increíbles en cada etapa del torneo con Argentina.",     color: "#054a9d" },
-            ].map((step, i) => (
-              <div key={i} className="group flex flex-col items-center text-center">
-                <div className="relative z-10 w-20 h-20 rounded-full flex items-center justify-center mb-6 transition-all duration-300 group-hover:scale-110 bg-[#040f1c]"
-                     style={{ border: `2px solid ${step.color}50` }}>
-                  <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                       style={{ background: `radial-gradient(circle, ${step.color}20 0%, transparent 70%)` }} />
-                  <span className="relative font-black text-3xl tabular-nums leading-none" style={{ color: step.color, fontFamily: "'ChevySans', sans-serif" }}>{step.number}</span>
-                </div>
-                <div className="w-full flex-1 bg-[#0b2440] border border-white/6 rounded-2xl px-6 pt-6 pb-8 transition-all duration-300 group-hover:border-white/14 group-hover:-translate-y-1">
-                  <div className="w-8 h-0.5 mx-auto mb-5 rounded-full" style={{ backgroundColor: step.color }} />
-                  <h3 className="font-black text-white uppercase text-2xl tracking-wide mb-3">{step.title}</h3>
+
+          {/* Steps */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
+            {([
+              {
+                number: "01", Icon: UserPlus, title: "Registrate",
+                description: "Completá el formulario con tus datos en menos de un minuto. Sin costo, sin tarjeta.",
+                color: "#054a9d", glow: "rgba(5,74,157,0.15)",
+              },
+              {
+                number: "02", Icon: Crosshair, title: "Predecí",
+                description: "Antes del pitido inicial ingresá el marcador exacto que creés que va a terminar el partido de Argentina.",
+                color: "#c3871e", glow: "rgba(195,135,30,0.15)",
+              },
+              {
+                number: "03", Icon: Trophy, title: "Ganá",
+                description: "Acumulá puntos en el ranking y llevate premios al final de cada etapa del Mundial.",
+                color: "#4ade80", glow: "rgba(74,222,128,0.15)",
+              },
+            ] as const).map((step, i) => (
+              <div key={i} className="group relative rounded-2xl bg-[#0b2440] border border-white/7 overflow-hidden transition-all duration-300 hover:border-white/15 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-black/50">
+                <div className="absolute top-0 inset-x-0 h-28 bg-linear-to-b from-white/3 to-transparent" />
+                <div className="absolute bottom-0 inset-x-0 h-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                     style={{ background: `linear-gradient(90deg, transparent, ${step.color}70, transparent)` }} />
+                <div className="relative p-7">
+                  <div className="flex items-start justify-between mb-7">
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
+                         style={{ background: step.glow, border: `1px solid ${step.color}35` }}>
+                      <step.Icon className="w-5 h-5" style={{ color: step.color }} />
+                    </div>
+                    <span className="font-black text-6xl leading-none tabular-nums text-white/6 select-none"
+                          style={{ fontFamily: "'ChevySans', sans-serif" }}>
+                      {step.number}
+                    </span>
+                  </div>
+                  <div className="w-7 h-0.5 mb-4 rounded-full" style={{ backgroundColor: step.color }} />
+                  <h3 className="font-black text-white uppercase text-2xl tracking-wide mb-3"
+                      style={{ fontFamily: "'ChevySans', sans-serif" }}>
+                    {step.title}
+                  </h3>
                   <p className="text-white/40 text-sm leading-relaxed font-medium">{step.description}</p>
                 </div>
               </div>
             ))}
           </div>
-          <div className="rounded-2xl border border-white/8 bg-[#0b2440]/60 overflow-hidden">
-            <div className="px-6 py-3.5 border-b border-white/6 text-center">
-              <p className="text-white/30 text-[10px] font-black uppercase tracking-[0.3em]">Sistema de puntuación</p>
+
+          {/* Scoring */}
+          <div className="rounded-2xl bg-[#070e1a] border border-white/8 overflow-hidden">
+            <div className="px-6 md:px-8 py-4 border-b border-white/6 flex items-center gap-3">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#c3871e]" />
+              <p className="text-white/40 text-[10px] font-black uppercase tracking-[0.35em]">Puntos por partido</p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-white/6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-white/5">
               {[
-                { pts: "10", unit: "pts", label: "Resultado exacto",   sub: "Marcador correcto",  color: "#4ade80" },
-                { pts: "5",  unit: "pts", label: "Ganador o empate",    sub: "Resultado correcto", color: "#7ab0e8" },
-                { pts: "2",  unit: "pts", label: "Diferencia de goles", sub: "Spread exacto",      color: "#c3871e" },
-              ].map(p => (
-                <div key={p.label} className="flex items-center gap-4 px-7 py-5 hover:bg-white/3 transition-colors">
-                  <div className="shrink-0 w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: `${p.color}12`, border: `1px solid ${p.color}25` }}>
-                    <span className="font-black text-xl leading-none" style={{ color: p.color, fontFamily: "'ChevySans', sans-serif" }}>{p.pts}</span>
+                {
+                  pts: "10", label: "Marcador exacto",
+                  sub: "Acertás el resultado final exacto — p. ej. 2–1",
+                  color: "#c3871e", badge: "MÁXIMO",
+                },
+                {
+                  pts: "5", label: "Ganador o empate",
+                  sub: "Acertás quién gana o si termina empatado",
+                  color: "#7ab0e8", badge: null,
+                },
+                {
+                  pts: "2", label: "Diferencia de goles",
+                  sub: "Acertás la diferencia entre los equipos",
+                  color: "#4ade80", badge: null,
+                },
+              ].map((p, i) => (
+                <div key={p.label} className="relative flex items-center gap-5 px-7 py-6 hover:bg-white/2 transition-colors">
+                  {p.badge && (
+                    <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest"
+                         style={{ background: `${p.color}18`, color: p.color, border: `1px solid ${p.color}30` }}>
+                      {p.badge}
+                    </div>
+                  )}
+                  <div className="shrink-0 w-16 h-16 rounded-2xl flex flex-col items-center justify-center"
+                       style={{ background: `${p.color}10`, border: `1px solid ${p.color}20` }}>
+                    <span className="font-black text-2xl leading-none tabular-nums"
+                          style={{ color: p.color, fontFamily: "'ChevySans', sans-serif" }}>
+                      {p.pts}
+                    </span>
+                    <span className="text-[9px] font-black uppercase tracking-widest mt-0.5" style={{ color: `${p.color}80` }}>pts</span>
                   </div>
-                  <div className="flex-1">
-                    <p className="text-white font-black text-sm uppercase tracking-wide">{p.label}</p>
-                    <p className="text-white/30 text-xs font-medium mt-0.5">{p.sub}</p>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white font-black text-sm uppercase tracking-wide mb-1">{p.label}</p>
+                    <p className="text-white/30 text-xs leading-relaxed font-medium">{p.sub}</p>
                   </div>
-                  <span className="text-[10px] font-black uppercase tracking-widest shrink-0" style={{ color: p.color }}>{p.unit}</span>
                 </div>
               ))}
             </div>
@@ -508,7 +559,7 @@ export function LandingClient({ rankingRows, prizes, upcomingMatches }: Props) {
         <div className="relative z-10 max-w-7xl mx-auto px-5 md:px-10 text-center">
           <div className="flex justify-center mb-8">
             <div className="relative overflow-hidden" style={{ width: 280, height: 78 }}>
-              <Image src="/logo-paris.png" alt="Chevrolet Grupo Paris" fill className="object-cover" style={{ objectPosition: "50% 52%" }} />
+              <Image src="/logo-paris.png" alt="Grupo Paris" fill className="object-cover" style={{ objectPosition: "50% 52%" }} />
             </div>
           </div>
           <h2 className="font-black text-white uppercase leading-none mb-6" style={{ fontSize: "clamp(2.8rem, 8vw, 6rem)" }}>
@@ -516,10 +567,10 @@ export function LandingClient({ rankingRows, prizes, upcomingMatches }: Props) {
             <span style={{ background: "linear-gradient(135deg, #e8a832 0%, #c3871e 50%, #9a6815 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>JUGAR?</span>
           </h2>
           <p className="text-white/60 text-base md:text-xl mb-10 max-w-lg mx-auto leading-relaxed font-medium">
-            Registrate ahora y sé parte de la mejor experiencia del Mundial 2026 con Chevrolet Grupo Paris.
+            Registrate ahora y sé parte de la mejor experiencia del Mundial 2026 con Grupo Paris.
           </p>
           <div className="flex flex-wrap justify-center gap-4 mb-10">
-            {["Participación gratuita", "Premios en cada fase", "Solo para clientes Grupo Paris"].map(t => (
+            {["Participación gratuita", "Premios en cada fase"].map(t => (
               <div key={t} className="flex items-center gap-2 text-white/60 text-sm font-medium">
                 <CheckCircle2 className="w-4 h-4 text-[#c3871e] shrink-0" />{t}
               </div>
@@ -539,13 +590,13 @@ export function LandingClient({ rankingRows, prizes, upcomingMatches }: Props) {
           <div className="text-center mb-14">
             <SectionLabel>Quiénes somos</SectionLabel>
             <h2 className="font-black text-white uppercase leading-none text-5xl md:text-7xl mb-4">GRUPO PARIS</h2>
-            <p className="text-white/50 text-base md:text-lg max-w-md mx-auto font-medium">El concesionario oficial Chevrolet que organiza el Prode del Mundial 2026.</p>
+            <p className="text-white/50 text-base md:text-lg max-w-md mx-auto font-medium">La concesionaria que organiza el Prode del Mundial 2026.</p>
           </div>
           {/* Foto de la concesionaria — full width */}
           <div className="relative rounded-2xl overflow-hidden border border-white/8 group max-w-3xl mx-auto" style={{ height: 280 }}>
             <Image
               src="/concesionaria.jpg"
-              alt="Chevrolet Grupo Paris — Concesionaria"
+              alt="Grupo Paris — Concesionaria"
               fill
               className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
               sizes="(max-width: 768px) 100vw, 800px"
@@ -555,7 +606,7 @@ export function LandingClient({ rankingRows, prizes, upcomingMatches }: Props) {
             <div className="absolute bottom-0 inset-x-0 p-6">
               <p className="text-white/40 text-[10px] font-black uppercase tracking-[0.3em] mb-1">Concesionaria oficial</p>
               <p className="text-white font-black text-xl" style={{ fontFamily: "'ChevySans', sans-serif" }}>Grupo Paris</p>
-              <p className="text-white/45 text-sm font-medium mt-0.5">Chevrolet · Argentina</p>
+              <p className="text-white/45 text-sm font-medium mt-0.5">San Juan · Argentina</p>
             </div>
           </div>
         </div>
@@ -567,7 +618,7 @@ export function LandingClient({ rankingRows, prizes, upcomingMatches }: Props) {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-10">
             <div>
               <div className="mb-5"><Logo compact /></div>
-              <p className="text-white/35 text-sm leading-relaxed font-medium">El prode oficial del Mundial 2026 de Chevrolet Grupo Paris.</p>
+              <p className="text-white/35 text-sm leading-relaxed font-medium">El prode oficial del Mundial 2026 de Grupo Paris.</p>
             </div>
             <div>
               <p className="text-white/60 text-[11px] font-black uppercase tracking-[0.3em] mb-5">Navegación</p>
@@ -594,7 +645,7 @@ export function LandingClient({ rankingRows, prizes, upcomingMatches }: Props) {
               <div className="relative rounded-xl overflow-hidden aspect-video w-full border border-white/8 group">
                 <Image
                   src="/concesionaria.jpg"
-                  alt="Chevrolet Grupo Paris — Concesionaria"
+                  alt="Grupo Paris — Concesionaria"
                   fill
                   className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
                   sizes="220px"
@@ -602,13 +653,13 @@ export function LandingClient({ rankingRows, prizes, upcomingMatches }: Props) {
                 <div className="absolute inset-0 bg-linear-to-t from-[#020b15]/70 via-transparent to-transparent" />
                 <div className="absolute bottom-2 left-2.5">
                   <p className="text-white/80 text-[10px] font-black uppercase tracking-wide">Grupo Paris</p>
-                  <p className="text-white/40 text-[9px] font-medium">Concesionario oficial Chevrolet</p>
+                  <p className="text-white/40 text-[9px] font-medium">Concesionaria Grupo Paris</p>
                 </div>
               </div>
             </div>
           </div>
           <div className="pt-8 border-t border-white/6 flex flex-col md:flex-row justify-between items-center gap-3">
-            <p className="text-white/20 text-xs font-medium">© 2026 Chevrolet Grupo Paris. Todos los derechos reservados.</p>
+            <p className="text-white/20 text-xs font-medium">© 2026 Grupo Paris. Todos los derechos reservados.</p>
             <p className="text-white/20 text-xs font-medium">Mundial FIFA 2026 · USA · México · Canadá</p>
           </div>
         </div>
@@ -704,7 +755,7 @@ export function LandingClient({ rankingRows, prizes, upcomingMatches }: Props) {
               <div className="text-center mb-7">
                 <div className="flex justify-center mb-5">
                   <div className="relative overflow-hidden" style={{ width: 220, height: 61 }}>
-                    <Image src="/logo-paris.png" alt="Chevrolet Grupo Paris" fill className="object-cover" style={{ objectPosition: "50% 52%" }} />
+                    <Image src="/logo-paris.png" alt="Grupo Paris" fill className="object-cover" style={{ objectPosition: "50% 52%" }} />
                   </div>
                 </div>
                 <h3 className="font-black text-white uppercase text-3xl mb-1.5" style={{ fontFamily: "'ChevySans', sans-serif" }}>UNITE AL PRODE</h3>
