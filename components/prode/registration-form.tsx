@@ -42,6 +42,7 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
     license_plate:     "",
     car_brand:         "",
     car_model:         "",
+    car_year:          "",
     city:              "",
     accepts_terms:     false,
     accepts_marketing: false,
@@ -58,10 +59,12 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
     form.email.includes("@") &&
     form.password.length >= 8
 
+  const currentYear = new Date().getFullYear()
   const step2Valid =
     form.license_plate.trim().length >= 6 &&
     form.car_brand.trim().length > 0 &&
     form.car_model.trim().length > 0 &&
+    Number(form.car_year) >= 1950 && Number(form.car_year) <= currentYear + 1 &&
     form.city.trim().length > 0 &&
     form.accepts_terms
 
@@ -230,7 +233,7 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <div>
               <label className={labelCls}>Marca</label>
               <input type="text" required placeholder="Chevrolet"
@@ -241,6 +244,14 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
               <label className={labelCls}>Modelo</label>
               <input type="text" required placeholder="Tracker"
                 value={form.car_model} onChange={e => set("car_model", e.target.value)}
+                className={inputCls} />
+            </div>
+            <div>
+              <label className={labelCls}>Año</label>
+              <input
+                type="number" required placeholder={String(currentYear)}
+                min="1950" max={currentYear + 1}
+                value={form.car_year} onChange={e => set("car_year", e.target.value)}
                 className={inputCls} />
             </div>
           </div>

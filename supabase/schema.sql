@@ -40,6 +40,7 @@ create table participants (
   license_plate    text not null unique,
   car_brand        text not null default '',
   car_model        text not null default '',
+  car_year         smallint,
   city             text not null default '',
   lead_source      lead_source not null default 'direct',
   accepts_terms    boolean not null default false,

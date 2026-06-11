@@ -21,6 +21,7 @@ export interface Database {
           license_plate: string
           car_brand: string
           car_model: string
+          car_year: number | null
           city: string
           lead_source: LeadSource
           accepts_terms: boolean
@@ -42,6 +43,7 @@ export interface Database {
           license_plate: string
           car_brand?: string
           car_model?: string
+          car_year?: number | null
           city?: string
           lead_source?: LeadSource
           accepts_terms: boolean

@@ -15,7 +15,7 @@ export default async function AdminParticipantesPage({
 
   let query = supabase
     .from("participants")
-    .select("id, first_name, last_name, dni, email, phone, city, license_plate, car_brand, car_model, lead_source, is_blocked, total_points, ranking_position, created_at", { count: "exact" })
+    .select("id, first_name, last_name, dni, email, phone, city, license_plate, car_brand, car_model, car_year, lead_source, is_blocked, total_points, ranking_position, created_at", { count: "exact" })
     .order("created_at", { ascending: false })
     .range(rangeFrom, rangeTo)
 
@@ -63,6 +63,7 @@ export interface ParticipantRow {
   license_plate: string
   car_brand: string
   car_model: string
+  car_year: number | null
   lead_source: string
   is_blocked: boolean
   total_points: number

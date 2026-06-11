@@ -26,6 +26,7 @@ export async function updateParticipantProfile(
     license_plate: string
     car_brand: string
     car_model: string
+    car_year: string
     city: string
     lead_source: string
   }
@@ -57,6 +58,7 @@ export async function updateParticipantProfile(
       license_plate: data.license_plate.toUpperCase().replace(/\s/g, ""),
       car_brand:     data.car_brand.trim(),
       car_model:     data.car_model.trim(),
+      car_year:      data.car_year ? Number(data.car_year) : null,
       city:          data.city.trim(),
       lead_source:   (["taller","repuestos","digital","qr","direct"].includes(data.lead_source)
                       ? data.lead_source

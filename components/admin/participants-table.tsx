@@ -32,6 +32,7 @@ function EditParticipantModal({ p, onClose }: { p: ParticipantRow; onClose: () =
     license_plate: p.license_plate,
     car_brand:     p.car_brand,
     car_model:     p.car_model,
+    car_year:      String(p.car_year ?? ""),
     city:          p.city,
     lead_source:   p.lead_source,
   })
@@ -94,7 +95,7 @@ function EditParticipantModal({ p, onClose }: { p: ParticipantRow; onClose: () =
               <input value={form.city} onChange={e => set("city", e.target.value)} className={inputCls} />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <div>
               <label className={labelCls}>Marca</label>
               <input value={form.car_brand} onChange={e => set("car_brand", e.target.value)} className={inputCls} />
@@ -102,6 +103,11 @@ function EditParticipantModal({ p, onClose }: { p: ParticipantRow; onClose: () =
             <div>
               <label className={labelCls}>Modelo</label>
               <input value={form.car_model} onChange={e => set("car_model", e.target.value)} className={inputCls} />
+            </div>
+            <div>
+              <label className={labelCls}>Año</label>
+              <input type="number" min="1950" max={new Date().getFullYear() + 1}
+                value={form.car_year} onChange={e => set("car_year", e.target.value)} className={inputCls} />
             </div>
           </div>
           <div>
@@ -182,6 +188,7 @@ export function ParticipantsTable({ participants, total, page, pageSize, query, 
       Patente:     p.license_plate,
       Marca:       p.car_brand,
       Modelo:      p.car_model,
+      Año:         p.car_year ?? "",
       Localidad:   p.city,
       Origen:      LEAD_LABELS[p.lead_source] ?? p.lead_source,
       Puntos:      p.total_points,
@@ -214,7 +221,7 @@ export function ParticipantsTable({ participants, total, page, pageSize, query, 
     const ws   = XLSX.utils.json_to_sheet(rows)
     ws["!cols"] = [
       { wch: 15 }, { wch: 15 }, { wch: 12 }, { wch: 28 }, { wch: 18 },
-      { wch: 10 }, { wch: 12 }, { wch: 15 }, { wch: 15 }, { wch: 10 },
+      { wch: 10 }, { wch: 12 }, { wch: 15 }, { wch: 8  }, { wch: 15 }, { wch: 10 },
       { wch: 8  }, { wch: 8  }, { wch: 10 }, { wch: 12 },
     ]
     const wb = XLSX.utils.book_new()
@@ -249,11 +256,11 @@ export function ParticipantsTable({ participants, total, page, pageSize, query, 
       startY: 35,
       head: [[
         "Nombre", "Apellido", "DNI", "Email", "Celular",
-        "Patente", "Ciudad", "Origen", "Pts", "Pos", "Estado"
+        "Patente", "Vehículo", "Año", "Ciudad", "Origen", "Pts", "Pos", "Estado"
       ]],
       body: rows.map(r => [
         r.Nombre, r.Apellido, r.DNI, r.Email, r.Celular,
-        r.Patente, r.Localidad, r.Origen, r.Puntos, r.Posición, r.Bloqueado
+        r.Patente, [r.Marca, r.Modelo].filter(Boolean).join(" "), r.Año, r.Localidad, r.Origen, r.Puntos, r.Posición, r.Bloqueado
       ]),
       styles: {
         fontSize: 7,
@@ -270,17 +277,19 @@ export function ParticipantsTable({ participants, total, page, pageSize, query, 
         fillColor: [245, 248, 255],
       },
       columnStyles: {
-        0: { cellWidth: 22 },
-        1: { cellWidth: 22 },
-        2: { cellWidth: 18 },
-        3: { cellWidth: 45 },
-        4: { cellWidth: 25 },
-        5: { cellWidth: 18 },
-        6: { cellWidth: 22 },
-        7: { cellWidth: 18 },
-        8: { cellWidth: 10 },
-        9: { cellWidth: 10 },
-        10: { cellWidth: 16 },
+        0: { cellWidth: 20 },
+        1: { cellWidth: 20 },
+        2: { cellWidth: 16 },
+        3: { cellWidth: 38 },
+        4: { cellWidth: 20 },
+        5: { cellWidth: 16 },
+        6: { cellWidth: 25 },
+        7: { cellWidth: 12 },
+        8: { cellWidth: 18 },
+        9: { cellWidth: 14 },
+        10: { cellWidth: 8  },
+        11: { cellWidth: 8  },
+        12: { cellWidth: 13 },
       },
       didDrawPage: (data) => {
         // Footer en cada página
@@ -400,7 +409,7 @@ export function ParticipantsTable({ participants, total, page, pageSize, query, 
           <table className="w-full">
             <thead>
               <tr className="bg-[#06192c]/60 border-b border-white/6">
-                {["Participante","DNI","Email","Patente","Ciudad","Origen","Pts","Pos","Estado","Acciones"].map(h => (
+                {["Participante","DNI","Email","Patente","Vehículo","Ciudad","Origen","Pts","Pos","Estado","Acciones"].map(h => (
                   <th key={h} className="px-4 py-3 text-left text-white/20 text-[9px] font-black uppercase tracking-[0.25em] whitespace-nowrap">
                     {h}
                   </th>
@@ -410,7 +419,7 @@ export function ParticipantsTable({ participants, total, page, pageSize, query, 
             <tbody className="divide-y divide-white/4">
               {participants.length === 0 ? (
                 <tr>
-                  <td colSpan={10} className="px-4 py-12 text-center text-white/20 text-sm">
+                  <td colSpan={11} className="px-4 py-12 text-center text-white/20 text-sm">
                     No se encontraron participantes
                   </td>
                 </tr>
@@ -425,6 +434,16 @@ export function ParticipantsTable({ participants, total, page, pageSize, query, 
                   <td className="px-4 py-3 text-white/50 text-sm font-mono">{p.dni}</td>
                   <td className="px-4 py-3 text-white/50 text-sm max-w-[160px] truncate">{p.email}</td>
                   <td className="px-4 py-3 text-white/50 text-sm font-mono uppercase">{p.license_plate}</td>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <div>
+                      <p className="text-white/70 font-bold text-sm">{p.car_brand || "—"}</p>
+                      {(p.car_model || p.car_year) && (
+                        <p className="text-white/30 text-[10px]">
+                          {[p.car_model, p.car_year].filter(Boolean).join(" · ")}
+                        </p>
+                      )}
+                    </div>
+                  </td>
                   <td className="px-4 py-3 text-white/50 text-sm">{p.city}</td>
                   <td className="px-4 py-3">
                     <span className="text-[10px] font-black uppercase px-2 py-1 rounded-lg bg-white/5 text-white/40">

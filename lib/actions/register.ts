@@ -23,6 +23,7 @@ export interface RegisterData {
   license_plate: string
   car_brand: string
   car_model: string
+  car_year: string
   city: string
   accepts_terms: boolean
   accepts_marketing: boolean
@@ -86,6 +87,7 @@ export async function registerParticipant(data: RegisterData, captchaToken?: str
     license_plate:     data.license_plate.toUpperCase().replace(/\s/g, ""),
     car_brand:         data.car_brand,
     car_model:         data.car_model,
+    car_year:          data.car_year ? Number(data.car_year) : null,
     city:              data.city,
     accepts_terms:     data.accepts_terms,
     accepts_marketing: data.accepts_marketing,
