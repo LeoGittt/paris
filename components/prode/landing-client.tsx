@@ -494,6 +494,16 @@ export function LandingClient({ rankingRows, prizes, upcomingMatches }: Props) {
             <h2 className="font-black text-white uppercase leading-none text-5xl md:text-7xl mb-4">PREMIOS</h2>
             <p className="text-white/50 text-base md:text-lg max-w-md mx-auto leading-relaxed font-medium">Mientras más acertás, más ganás. Premios en cada etapa.</p>
           </div>
+          <div className="mb-12 rounded-3xl overflow-hidden border border-white/10 shadow-2xl shadow-black/20">
+            <Image
+              src="/premios1.jpeg"
+              alt="Premios del Prode Chevrolet"
+              width={1600}
+              height={800}
+              className="w-full h-auto object-cover"
+              quality={90}
+            />
+          </div>
           <PrizesSection prizes={prizes} />
         </div>
       </section>
@@ -528,6 +538,7 @@ export function LandingClient({ rankingRows, prizes, upcomingMatches }: Props) {
       </section>
 
       {/* RANKING */}
+      {/*
       <section id="ranking" className="py-24 md:py-32 bg-[#06192c]">
         <div className="absolute inset-x-0 h-px bg-linear-to-r from-transparent via-[#c3871e]/40 to-transparent" />
         <div className="max-w-7xl mx-auto px-5 md:px-10">
@@ -549,6 +560,7 @@ export function LandingClient({ rankingRows, prizes, upcomingMatches }: Props) {
           </div>
         </div>
       </section>
+      */}
 
       {/* CTA FINAL */}
       <section className="relative py-36 md:py-48 overflow-hidden">

@@ -10,9 +10,13 @@ export function PrizesSection({ prizes }: Props) {
 
   if (data.length === 0) {
     return (
-      <div className="flex items-center justify-center bg-[#0b2440] border border-white/6 rounded-2xl p-12 text-center">
-        <p className="text-white/20 text-sm font-medium">Los premios se anunciarán pronto</p>
-      </div>
+      <>
+        {/*
+        <div className="flex items-center justify-center bg-[#0b2440] border border-white/6 rounded-2xl p-12 text-center">
+          <p className="text-white/20 text-sm font-medium">Los premios se anunciarán pronto</p>
+        </div>
+        */}
+      </>
     )
   }
 
