@@ -35,19 +35,19 @@ type SaveStatus = "idle" | "dirty" | "saving" | "saved" | "error"
 /* ─── Score stepper ──────────────────────────────────────── */
 function ScoreStepper({ value, onChange }: { value: number; onChange: (v: number) => void }) {
   return (
-    <div className="flex items-center justify-center gap-3">
+    <div className="flex items-center justify-center gap-1.5">
       <button
         onClick={() => onChange(Math.max(0, value - 1))}
-        className="w-11 h-11 shrink-0 rounded-xl bg-white/6 hover:bg-white/12 active:scale-90 border border-white/8 hover:border-white/16 text-white font-black text-xl transition-all duration-100 flex items-center justify-center select-none"
+        className="w-7 h-7 shrink-0 rounded-lg bg-white/6 hover:bg-white/12 active:scale-90 border border-white/8 hover:border-white/16 text-white font-black text-sm transition-all duration-100 flex items-center justify-center select-none"
       >
         –
       </button>
-      <span className="text-white font-black text-4xl tabular-nums w-10 text-center select-none leading-none shrink-0">
+      <span className="text-white font-black text-2xl tabular-nums w-7 text-center select-none leading-none shrink-0">
         {value}
       </span>
       <button
         onClick={() => onChange(value + 1)}
-        className="w-11 h-11 shrink-0 rounded-xl bg-white/6 hover:bg-white/12 active:scale-90 border border-white/8 hover:border-white/16 text-white font-black text-xl transition-all duration-100 flex items-center justify-center select-none"
+        className="w-7 h-7 shrink-0 rounded-lg bg-white/6 hover:bg-white/12 active:scale-90 border border-white/8 hover:border-white/16 text-white font-black text-sm transition-all duration-100 flex items-center justify-center select-none"
       >
         +
       </button>
