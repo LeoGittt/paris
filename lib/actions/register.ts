@@ -3,7 +3,6 @@
 import { createClient } from "@/lib/supabase/server"
 import { createClient as createAdminClient } from "@supabase/supabase-js"
 import type { Database, LeadSource, UserRole } from "@/lib/supabase/types"
-import { checkRateLimit } from "@/lib/rate-limit"
 
 type ParticipantInsert = Database["public"]["Tables"]["participants"]["Insert"]
 type UserRoleInsert    = Database["public"]["Tables"]["user_roles"]["Insert"]
@@ -47,14 +46,6 @@ export async function registerParticipant(data: RegisterData, captchaToken?: str
     return { ok: false, error: "La contraseña debe tener al menos 8 caracteres." }
   if (data.license_plate.replace(/\s/g, "").length < 6)
     return { ok: false, error: "Patente inválida." }
-
-  // Rate limit antes del signUp
-  const { allowed, retryAfter } = await checkRateLimit("register", {
-    maxRequests:   3,
-    windowMinutes: 60,
-  })
-  if (!allowed)
-    return { ok: false, error: `Demasiados intentos de registro. Intentá de nuevo en ${retryAfter} minutos.` }
 
   // Crear usuario en Supabase Auth
   const supabase = await createClient()
