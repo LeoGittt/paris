@@ -7,7 +7,7 @@ export default async function AdminPremiosPage() {
   const [{ data: prizes }, { data: participants }] = await Promise.all([
     supabase.from("prizes").select("*").order("created_at", { ascending: false }),
     supabase.from("participants").select("id, first_name, last_name, total_points, ranking_position")
-      .eq("is_blocked", false).order("total_points", { ascending: false }),
+      .eq("is_blocked", false).eq("is_employee", false).order("total_points", { ascending: false }),
   ])
 
   return (
