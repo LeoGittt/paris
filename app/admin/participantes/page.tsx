@@ -8,12 +8,14 @@ export default async function AdminParticipantesPage({
 }) {
   const { q = "", page = "1", from: dateFrom = "", to: dateTo = "" } = await searchParams
   const supabase = await createClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const db = supabase as any
   const pageSize = 20
   const pageNum  = Math.max(1, parseInt(page) || 1)
   const rangeFrom = (pageNum - 1) * pageSize
   const rangeTo   = rangeFrom + pageSize - 1
 
-  let query = supabase
+  let query = db
     .from("participants")
     .select("id, first_name, last_name, dni, email, phone, city, license_plate, car_brand, car_model, car_year, lead_source, is_blocked, total_points, ranking_position, created_at", { count: "exact" })
     .eq("is_employee", false)

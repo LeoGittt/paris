@@ -4,6 +4,8 @@ import { Users, Calendar, Trophy, Gift, Target, TrendingUp, ArrowRight, CheckCir
 
 export default async function AdminPage() {
   const supabase = await createClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const db = supabase as any
 
   const [
     { count: totalParticipants },
@@ -15,13 +17,13 @@ export default async function AdminPage() {
     { data: recentParticipants },
     { data: topRanking },
   ] = await Promise.all([
-    supabase.from("participants").select("*", { count: "exact", head: true }).eq("is_employee", false),
-    supabase.from("participants").select("*", { count: "exact", head: true }).eq("is_blocked", false).eq("is_employee", false),
+    db.from("participants").select("*", { count: "exact", head: true }).eq("is_employee", false),
+    db.from("participants").select("*", { count: "exact", head: true }).eq("is_blocked", false).eq("is_employee", false),
     supabase.from("matches").select("*", { count: "exact", head: true }),
     supabase.from("matches").select("*", { count: "exact", head: true }).eq("is_finished", true),
     supabase.from("predictions").select("*", { count: "exact", head: true }),
     supabase.from("prizes").select("*", { count: "exact", head: true }),
-    supabase.from("participants").select("first_name, last_name, email, city, created_at").eq("is_employee", false).order("created_at", { ascending: false }).limit(5),
+    db.from("participants").select("first_name, last_name, email, city, created_at").eq("is_employee", false).order("created_at", { ascending: false }).limit(5),
     supabase.from("ranking_view").select("first_name, last_name, total_points, ranking_position").order("ranking_position", { ascending: true }).limit(5),
   ])
 

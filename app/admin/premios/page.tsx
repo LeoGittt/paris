@@ -3,10 +3,12 @@ import { PrizesAdmin } from "@/components/admin/prizes-admin"
 
 export default async function AdminPremiosPage() {
   const supabase = await createClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const db = supabase as any
 
   const [{ data: prizes }, { data: participants }] = await Promise.all([
     supabase.from("prizes").select("*").order("created_at", { ascending: false }),
-    supabase.from("participants").select("id, first_name, last_name, total_points, ranking_position")
+    db.from("participants").select("id, first_name, last_name, total_points, ranking_position")
       .eq("is_blocked", false).eq("is_employee", false).order("total_points", { ascending: false }),
   ])
 

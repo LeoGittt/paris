@@ -13,7 +13,7 @@ export default async function AdminReportesPage() {
     { data: predictions },
     { data: snapshots },
   ] = await Promise.all([
-    supabase
+    db
       .from("participants")
       .select("first_name, last_name, dni, email, phone, city, license_plate, car_brand, car_model, lead_source, total_points, ranking_position, is_blocked, created_at")
       .eq("is_employee", false)
