@@ -7,6 +7,8 @@ export default async function AdminPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = supabase as any
 
+  type RecentP = { first_name: string; last_name: string; email: string; city: string; created_at: string }
+
   const [
     { count: totalParticipants },
     { count: activeParticipants },
@@ -101,13 +103,13 @@ export default async function AdminPage() {
               Ver todos →
             </Link>
           </div>
-          {!recentParticipants?.length ? (
+          {!(recentParticipants as RecentP[] | null)?.length ? (
             <div className="px-6 py-10 text-center">
               <p className="text-white/20 text-sm">Sin participantes todavía</p>
             </div>
           ) : (
             <div className="divide-y divide-white/4">
-              {recentParticipants.map((p, i) => (
+              {(recentParticipants as RecentP[]).map((p, i) => (
                 <div key={i} className="flex items-center gap-4 px-6 py-3.5">
                   <div className="w-8 h-8 rounded-lg bg-white/4 border border-white/8 flex items-center justify-center shrink-0">
                     <span className="text-white/40 text-[10px] font-black">

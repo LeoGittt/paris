@@ -85,7 +85,7 @@ describe("Empleado: flujo de registro exitoso", () => {
     expect(result.ok).toBe(true)
     if (!result.ok) return
 
-    const { data } = await admin
+    const { data } = await (admin as any)
       .from("participants")
       .select("is_employee")
       .eq("user_id", result.userId)
@@ -124,7 +124,7 @@ describe("Empleado: todos los campos se persisten correctamente", () => {
     expect(result.ok).toBe(true)
     if (!result.ok) return
 
-    const { data } = await admin
+    const { data } = await (admin as any)
       .from("participants")
       .select("first_name, last_name, email, phone, dni, is_employee, total_points, is_blocked, accepts_terms")
       .eq("user_id", result.userId)
@@ -257,7 +257,7 @@ describe("Registro con email normal → is_employee = false", () => {
     })
     // NO se llama .update({ is_employee: true })
 
-    const { data } = await admin
+    const { data } = await (admin as any)
       .from("participants")
       .select("is_employee")
       .eq("user_id", userId)

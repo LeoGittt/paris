@@ -1,7 +1,8 @@
 import { describe, it, expect } from "vitest"
 import { createAdminClient } from "../helpers/supabase"
 
-const admin = createAdminClient()
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const admin = createAdminClient() as any
 const TEST_IP = "test-rate-limit-ip"
 
 describe("Rate limiting — función SQL en Supabase", () => {
