@@ -7,7 +7,7 @@ import { usePathname, useRouter } from "next/navigation"
 import {
   LayoutDashboard, Users, Calendar, Gift, Settings,
   LogOut, Menu, X, Shield, BarChart3, Trophy, FileText,
-  BookOpen, ChevronDown,
+  BookOpen, ChevronDown, HardHat,
 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 
@@ -22,6 +22,7 @@ const NAV_GROUPS = [
     label: "Gestión",
     items: [
       { href: "/admin/participantes", icon: Users,           label: "Participantes" },
+      { href: "/admin/empleados",     icon: HardHat,         label: "Empleados"     },
       { href: "/admin/partidos",      icon: Calendar,        label: "Partidos"      },
       { href: "/admin/premios",       icon: Gift,            label: "Premios"       },
     ],
