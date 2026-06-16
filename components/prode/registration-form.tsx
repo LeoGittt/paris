@@ -567,12 +567,8 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
     form.password.length >= 8
 
   const step2Valid =
-    form.license_plate.trim().length >= 6 &&
     !!province &&
     form.city.trim().length > 0 &&
-    form.car_brand.trim().length > 0 &&
-    form.car_model.trim().length > 0 &&
-    !!form.car_year &&
     form.accepts_terms
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -583,7 +579,7 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
       setStep(2)
       return
     }
-    touchAll("license_plate", "province", "city", "car_brand", "car_model", "car_year", "accepts_terms")
+    touchAll("province", "city", "accepts_terms")
     if (!step2Valid) return
     if (HCAPTCHA_SITE_KEY && !captchaToken) {
       setError("Por favor completá el captcha para continuar.")
@@ -645,7 +641,7 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
           </div>
         ))}
         <span className="text-white/25 text-[11px] ml-1">
-          {step === 1 ? "Datos personales" : "Tu vehículo"}
+          {step === 1 ? "Datos personales" : "Ubicación y vehículo"}
         </span>
       </div>
 
@@ -745,8 +741,8 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
         <>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className={labelCls}>Patente</label>
-              <input type="text" required placeholder="AA123BB"
+              <label className={labelCls}>Patente <span className="text-white/25 normal-case">(opcional)</span></label>
+              <input type="text" placeholder="AA123BB"
                 value={form.license_plate}
                 onChange={e => set("license_plate", e.target.value.toUpperCase())}
                 onBlur={() => touch("license_plate")}
@@ -803,10 +799,10 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
 
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className={labelCls}>Marca</label>
+              <label className={labelCls}>Marca <span className="text-white/25 normal-case">(opcional)</span></label>
               {customBrand ? (
                 <div className="space-y-1">
-                  <input type="text" required placeholder="Ej: Citroen"
+                  <input type="text" placeholder="Ej: Citroen"
                     value={form.car_brand}
                     onChange={e => set("car_brand", e.target.value)}
                     onBlur={() => touch("car_brand")}
@@ -818,7 +814,7 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
                   </button>
                 </div>
               ) : (
-                <SelectField required value={form.car_brand}
+                <SelectField value={form.car_brand}
                   onChange={e => {
                     if (e.target.value === "__other__") {
                       setCustomBrand(true); setCustomModel(true)
@@ -835,10 +831,10 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
               <FieldError msg={err("car_brand", form.car_brand.trim().length > 0, "Seleccioná una marca")} />
             </div>
             <div>
-              <label className={labelCls}>Modelo</label>
+              <label className={labelCls}>Modelo <span className="text-white/25 normal-case">(opcional)</span></label>
               {(customBrand || customModel) ? (
                 <div className="space-y-1">
-                  <input type="text" required placeholder="Ej: Tracker"
+                  <input type="text" placeholder="Ej: Tracker"
                     value={form.car_model}
                     onChange={e => set("car_model", e.target.value)}
                     onBlur={() => touch("car_model")}
@@ -852,7 +848,7 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
                   )}
                 </div>
               ) : (
-                <SelectField required value={form.car_model}
+                <SelectField value={form.car_model}
                   onChange={e => {
                     if (e.target.value === "__other__") { setCustomModel(true); set("car_model", "") }
                     else { set("car_model", e.target.value); touch("car_model") }
@@ -866,8 +862,8 @@ export function RegistrationForm({ onClose, leadSource }: Props) {
               <FieldError msg={err("car_model", form.car_model.trim().length > 0, "Seleccioná un modelo")} />
             </div>
             <div>
-              <label className={labelCls}>Año</label>
-              <SelectField required value={form.car_year}
+              <label className={labelCls}>Año <span className="text-white/25 normal-case">(opcional)</span></label>
+              <SelectField value={form.car_year}
                 onChange={e => { set("car_year", e.target.value); touch("car_year") }}>
                 <option value="">Año</option>
                 {YEARS.map(y => <option key={y} value={String(y)} className="bg-[#06192c] text-white">{y}</option>)}

@@ -19,10 +19,10 @@ export interface RegisterData {
   phone: string
   email: string
   password: string
-  license_plate: string
-  car_brand: string
-  car_model: string
-  car_year: string
+  license_plate?: string
+  car_brand?: string
+  car_model?: string
+  car_year?: string
   city: string
   accepts_terms: boolean
   accepts_marketing: boolean
@@ -44,7 +44,7 @@ export async function registerParticipant(data: RegisterData, captchaToken?: str
     return { ok: false, error: "Email inválido." }
   if (data.password.length < 8)
     return { ok: false, error: "La contraseña debe tener al menos 8 caracteres." }
-  if (data.license_plate.replace(/\s/g, "").length < 6)
+  if (data.license_plate && data.license_plate.replace(/\s/g, "").length < 6)
     return { ok: false, error: "Patente inválida." }
 
   // Crear usuario en Supabase Auth
@@ -68,16 +68,17 @@ export async function registerParticipant(data: RegisterData, captchaToken?: str
     return { ok: false, error: "Error al crear el usuario. Intentá de nuevo." }
 
   // Insert solo con columnas que SIEMPRE existen en el schema base
-  const participantRow: ParticipantInsert = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const participantRow: any = {
     user_id:           authData.user.id,
     first_name:        data.first_name,
     last_name:         data.last_name,
     dni:               data.dni.replace(/\D/g, ""),
     phone:             data.phone,
     email:             data.email,
-    license_plate:     data.license_plate.toUpperCase().replace(/\s/g, ""),
-    car_brand:         data.car_brand,
-    car_model:         data.car_model,
+    license_plate:     data.license_plate ? data.license_plate.toUpperCase().replace(/\s/g, "") : null,
+    car_brand:         data.car_brand || null,
+    car_model:         data.car_model || null,
     car_year:          data.car_year ? Number(data.car_year) : null,
     city:              data.city,
     accepts_terms:     data.accepts_terms,
