@@ -70,7 +70,7 @@ function ResultModal({ match, onClose }: { match: MatchAdminRow; onClose: () => 
             <div className="flex items-center justify-center gap-2">
               <button onClick={() => setS1(v => Math.max(0, v-1))} className="w-9 h-9 rounded-xl bg-white/6 hover:bg-white/12 text-white font-black text-lg transition-colors">–</button>
               <span className="text-white font-black text-4xl tabular-nums w-10 text-center">{s1}</span>
-              <button onClick={() => setS1(v => v+1)} className="w-9 h-9 rounded-xl bg-white/6 hover:bg-white/12 text-white font-black text-lg transition-colors">+</button>
+              <button onClick={() => setS1(v => v+1)} className="w-9 h-9 rounded-xl bg-white/6 hover:bg-white/12 text-white font-black text-lg transition-colors">＋</button>
             </div>
           </div>
           <span className="text-white/20 font-black text-2xl">–</span>
@@ -80,7 +80,7 @@ function ResultModal({ match, onClose }: { match: MatchAdminRow; onClose: () => 
             <div className="flex items-center justify-center gap-2">
               <button onClick={() => setS2(v => Math.max(0, v-1))} className="w-9 h-9 rounded-xl bg-white/6 hover:bg-white/12 text-white font-black text-lg transition-colors">–</button>
               <span className="text-white font-black text-4xl tabular-nums w-10 text-center">{s2}</span>
-              <button onClick={() => setS2(v => v+1)} className="w-9 h-9 rounded-xl bg-white/6 hover:bg-white/12 text-white font-black text-lg transition-colors">+</button>
+              <button onClick={() => setS2(v => v+1)} className="w-9 h-9 rounded-xl bg-white/6 hover:bg-white/12 text-white font-black text-lg transition-colors">＋</button>
             </div>
           </div>
         </div>
