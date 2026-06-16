@@ -269,12 +269,12 @@ export function LandingClient({ rankingRows, prizes, upcomingMatches }: Props) {
             <div className="inline-flex items-center gap-3 bg-[#054a9d]/20 border border-[#054a9d]/50 backdrop-blur-md rounded-2xl px-4 py-2 mb-4 md:mb-6">
               <div className="flex items-center gap-1.5 text-base leading-none select-none">
                 <span title="USA">🇺🇸</span><span title="México">🇲🇽</span><span title="Canadá">🇨🇦</span>
-                <button
+                {/* <button
                   onClick={() => document.getElementById("pain-mania")?.scrollIntoView({ behavior: "smooth" })}
                   className="leading-none cursor-default hover:scale-125 transition-transform duration-200"
                   style={{ background: "none", border: "none", padding: 0 }}
                   title="🇳🇿"
-                >🇳🇿</button>
+                >🇳🇿</button> */}
               </div>
               <div className="w-px h-4 bg-white/20" />
               <span className="text-white font-black text-[11px] md:text-[12px] tracking-[0.18em] uppercase" style={{ fontFamily: "'ChevySans', sans-serif" }}>FIFA World Cup 2026</span>
