@@ -105,7 +105,7 @@ function PredictionCard({
   const debounceRef  = useRef<ReturnType<typeof setTimeout> | null>(null)
   const savedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const isLocked  = match.predictions_locked || match.is_finished
+  const isLocked  = match.predictions_locked || match.is_finished || new Date(match.match_date) <= new Date()
   const hasPred   = !!prediction
   const resultCfg = prediction ? (RESULT_CONFIG[prediction.result] ?? RESULT_CONFIG.pending) : null
 
@@ -278,8 +278,10 @@ export function PredictionsClient({ matches, predsByMatch, participantId }: Prop
     setExpandedStages(v => ({ ...v, [stage]: !v[stage] }))
 
   // Overall progress
-  const totalMatches  = matches.filter(m => !m.predictions_locked && !m.is_finished).length
-  const filledMatches = matches.filter(m => !m.predictions_locked && !m.is_finished && predsByMatch[m.id]).length
+  const isMatchOpen = (m: { predictions_locked: boolean; is_finished: boolean; match_date: string }) =>
+    !m.predictions_locked && !m.is_finished && new Date(m.match_date) > new Date()
+  const totalMatches  = matches.filter(isMatchOpen).length
+  const filledMatches = matches.filter(m => isMatchOpen(m) && predsByMatch[m.id]).length
 
   if (!matches.length) {
     return (
@@ -327,8 +329,8 @@ export function PredictionsClient({ matches, predsByMatch, participantId }: Prop
       {stageOrder.filter(s => grouped[s]?.length).map(stage => {
         const stageMatches = grouped[stage]
         const isOpen  = expandedStages[stage] ?? false
-        const open    = stageMatches.filter(m => !m.predictions_locked && !m.is_finished).length
-        const filled  = stageMatches.filter(m => !m.predictions_locked && !m.is_finished && predsByMatch[m.id]).length
+        const open    = stageMatches.filter(isMatchOpen).length
+        const filled  = stageMatches.filter(m => isMatchOpen(m) && predsByMatch[m.id]).length
         const total   = stageMatches.length
 
         return (
