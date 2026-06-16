@@ -1,8 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { Download, FileSpreadsheet, FileText, Clock, Calendar, ChevronDown } from "lucide-react"
+import { Download, FileSpreadsheet, FileText, Clock, Calendar, ChevronDown, Target } from "lucide-react"
 import * as XLSX from "xlsx"
+import { getPredictionsReport } from "@/lib/actions/admin/predictions-report"
 import type {
   ReportParticipant, ReportRanking, ReportPrize,
   ReportPredictions, ReportSnapshot,
@@ -28,6 +29,7 @@ export function ReportGenerator({ participants, ranking, prizes, predictions, sn
   const [dateFrom, setDateFrom] = useState("")
   const [dateTo, setDateTo]     = useState("")
   const [expandedSnapshot, setExpandedSnapshot] = useState<string | null>(null)
+  const [loadingPred, setLoadingPred] = useState(false)
 
   const generatedAt = new Date().toLocaleString("es-AR")
 
@@ -220,6 +222,95 @@ export function ReportGenerator({ participants, ranking, prizes, predictions, sn
     doc.save(`reporte-prode-${new Date().toISOString().slice(0, 10)}.pdf`)
   }
 
+  const RESULT_LABELS: Record<string, string> = {
+    correct_exact:  "Exacto",
+    correct_winner: "Ganador",
+    correct_diff:   "Dif. correcta",
+    wrong:          "Incorrecto",
+    pending:        "Pendiente",
+  }
+
+  const STAGE_LABELS: Record<string, string> = {
+    group:       "Fase de grupos",
+    round_of_32: "Ronda de 32",
+    round_of_16: "Octavos",
+    quarterfinal:"Cuartos",
+    semifinal:   "Semifinal",
+    third_place: "3er puesto",
+    final:       "Final",
+  }
+
+  const handleExportPredictions = async () => {
+    setLoadingPred(true)
+    const res = await getPredictionsReport()
+    setLoadingPred(false)
+    if (!res.ok) { alert(`Error: ${res.error}`); return }
+
+    const { default: jsPDF } = await import("jspdf")
+    const { default: autoTable } = await import("jspdf-autotable")
+
+    const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" })
+    const date = new Date().toLocaleString("es-AR")
+
+    // Header
+    doc.setFillColor(4, 15, 28)
+    doc.rect(0, 0, 297, 28, "F")
+    doc.setTextColor(255, 255, 255)
+    doc.setFontSize(16); doc.setFont("helvetica", "bold")
+    doc.text("PRODE GRUPO PARIS 2026 — Pronósticos de participantes", 14, 12)
+    doc.setFontSize(8); doc.setTextColor(195, 135, 30)
+    doc.text(`Generado: ${date}  ·  ${res.rows.length} pronósticos`, 14, 22)
+
+    autoTable(doc, {
+      startY: 34,
+      head: [["Participante", "DNI", "Partido", "Fase", "Fecha", "Pronóstico", "Resultado real", "Resultado", "Puntos"]],
+      body: res.rows.map(r => [
+        r.participant_name,
+        r.participant_dni,
+        `${r.team1} vs ${r.team2}`,
+        STAGE_LABELS[r.stage] ?? r.stage,
+        new Date(r.match_date).toLocaleDateString("es-AR", { day: "2-digit", month: "short" }),
+        `${r.predicted_score1} - ${r.predicted_score2}`,
+        r.real_score1 !== null ? `${r.real_score1} - ${r.real_score2}` : "—",
+        RESULT_LABELS[r.result] ?? r.result,
+        r.points_earned,
+      ]),
+      headStyles: { fillColor: [5, 74, 157], textColor: 255, fontSize: 7, fontStyle: "bold" },
+      styles: { fontSize: 7, cellPadding: 2 },
+      alternateRowStyles: { fillColor: [245, 248, 255] },
+      columnStyles: {
+        0: { cellWidth: 40 },
+        1: { cellWidth: 20 },
+        2: { cellWidth: 40 },
+        3: { cellWidth: 25 },
+        4: { cellWidth: 20 },
+        5: { cellWidth: 22, halign: "center" },
+        6: { cellWidth: 22, halign: "center" },
+        7: { cellWidth: 25 },
+        8: { cellWidth: 14, halign: "center" },
+      },
+      didParseCell: (data) => {
+        if (data.section === "body" && data.column.index === 7) {
+          const v = data.cell.raw as string
+          if (v === "Exacto")          data.cell.styles.textColor = [34, 197, 94]
+          else if (v === "Ganador")    data.cell.styles.textColor = [99, 179, 237]
+          else if (v === "Dif. correcta") data.cell.styles.textColor = [167, 243, 208]
+          else if (v === "Incorrecto") data.cell.styles.textColor = [239, 68, 68]
+        }
+      },
+    })
+
+    // Paginación
+    const pageCount = (doc as unknown as { internal: { getNumberOfPages: () => number } }).internal.getNumberOfPages()
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i)
+      doc.setFontSize(7); doc.setTextColor(180, 180, 180)
+      doc.text(`Página ${i} de ${pageCount} — Prode Grupo Paris 2026`, 14, 205)
+    }
+
+    doc.save(`pronosticos-participantes-${new Date().toISOString().slice(0, 10)}.pdf`)
+  }
+
   return (
     <div className="space-y-8">
 
@@ -272,6 +363,14 @@ export function ReportGenerator({ participants, ranking, prizes, predictions, sn
           >
             <FileText className="w-4 h-4" />
             Exportar PDF
+          </button>
+          <button
+            onClick={handleExportPredictions}
+            disabled={loadingPred}
+            className="flex items-center gap-2 px-5 h-11 bg-[#7ab0e8]/10 hover:bg-[#7ab0e8]/20 border border-[#7ab0e8]/20 text-[#7ab0e8] font-black text-sm rounded-xl transition-all disabled:opacity-50"
+          >
+            <Target className="w-4 h-4" />
+            {loadingPred ? "Generando..." : "Descargar pronósticos participantes"}
           </button>
         </div>
       </div>
