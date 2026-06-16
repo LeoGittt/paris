@@ -35,19 +35,19 @@ type SaveStatus = "idle" | "dirty" | "saving" | "saved" | "error"
 /* ─── Score stepper ──────────────────────────────────────── */
 function ScoreStepper({ value, onChange }: { value: number; onChange: (v: number) => void }) {
   return (
-    <div className="flex-1 flex items-center justify-center gap-3">
+    <div className="flex items-center justify-center gap-3">
       <button
         onClick={() => onChange(Math.max(0, value - 1))}
-        className="w-11 h-11 rounded-xl bg-white/6 hover:bg-white/12 active:scale-90 border border-white/8 hover:border-white/16 text-white font-black text-xl transition-all duration-100 flex items-center justify-center select-none"
+        className="w-11 h-11 shrink-0 rounded-xl bg-white/6 hover:bg-white/12 active:scale-90 border border-white/8 hover:border-white/16 text-white font-black text-xl transition-all duration-100 flex items-center justify-center select-none"
       >
         –
       </button>
-      <span className="text-white font-black text-4xl tabular-nums w-10 text-center select-none leading-none">
+      <span className="text-white font-black text-4xl tabular-nums w-10 text-center select-none leading-none shrink-0">
         {value}
       </span>
       <button
         onClick={() => onChange(value + 1)}
-        className="w-11 h-11 rounded-xl bg-white/6 hover:bg-white/12 active:scale-90 border border-white/8 hover:border-white/16 text-white font-black text-xl transition-all duration-100 flex items-center justify-center select-none"
+        className="w-11 h-11 shrink-0 rounded-xl bg-white/6 hover:bg-white/12 active:scale-90 border border-white/8 hover:border-white/16 text-white font-black text-xl transition-all duration-100 flex items-center justify-center select-none"
       >
         +
       </button>
@@ -196,7 +196,7 @@ function PredictionCard({
             <p className="text-white/30 text-[10px] font-black uppercase tracking-[0.25em] text-center">
               Tu pronóstico
             </p>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center justify-center gap-2">
               <ScoreStepper value={s1} onChange={changeS1} />
               <span className="text-white/20 font-black text-2xl shrink-0 px-1">–</span>
               <ScoreStepper value={s2} onChange={changeS2} />
