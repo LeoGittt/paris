@@ -57,30 +57,30 @@ function ResultModal({ match, onClose }: { match: MatchAdminRow; onClose: () => 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-[#0b2440] border border-white/10 rounded-2xl p-7 w-full max-w-sm shadow-2xl">
+      <div className="relative bg-[#0b2440] border border-white/10 rounded-2xl p-4 sm:p-7 w-full max-w-sm shadow-2xl">
         <h3 className="text-white font-black uppercase text-lg mb-1">Cargar resultado</h3>
         <p className="text-white/40 text-sm mb-6 flex items-center gap-1.5">
           <Flag emoji={match.team1_flag} size={16} /> {match.team1} vs <Flag emoji={match.team2_flag} size={16} /> {match.team2}
         </p>
 
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex items-center gap-2 mb-6 overflow-hidden">
           <div className="flex-1 text-center">
             <div className="flex justify-center mb-1"><Flag emoji={match.team1_flag} size={36} /></div>
             <p className="text-white/40 text-[11px] font-bold uppercase tracking-wide mb-2">{match.team1}</p>
             <div className="flex items-center justify-center gap-2">
-              <button onClick={() => setS1(v => Math.max(0, v-1))} className="w-9 h-9 rounded-xl bg-white/6 hover:bg-white/12 text-white font-black text-lg transition-colors">–</button>
-              <span className="text-white font-black text-4xl tabular-nums w-10 text-center">{s1}</span>
-              <button onClick={() => setS1(v => v+1)} className="w-9 h-9 rounded-xl bg-white/6 hover:bg-white/12 text-white font-black text-lg transition-colors">＋</button>
+              <button onClick={() => setS1(v => Math.max(0, v-1))} className="w-9 h-9 shrink-0 rounded-xl bg-white/6 hover:bg-white/12 text-white font-black text-lg transition-colors">–</button>
+              <span className="text-white font-black text-4xl tabular-nums w-10 text-center shrink-0">{s1}</span>
+              <button onClick={() => setS1(v => v+1)} className="w-9 h-9 shrink-0 rounded-xl bg-white/6 hover:bg-white/12 text-white font-black text-lg transition-colors">＋</button>
             </div>
           </div>
-          <span className="text-white/20 font-black text-2xl">–</span>
+          <span className="text-white/20 font-black text-2xl shrink-0">–</span>
           <div className="flex-1 text-center">
             <div className="flex justify-center mb-1"><Flag emoji={match.team2_flag} size={36} /></div>
             <p className="text-white/40 text-[11px] font-bold uppercase tracking-wide mb-2">{match.team2}</p>
             <div className="flex items-center justify-center gap-2">
-              <button onClick={() => setS2(v => Math.max(0, v-1))} className="w-9 h-9 rounded-xl bg-white/6 hover:bg-white/12 text-white font-black text-lg transition-colors">–</button>
-              <span className="text-white font-black text-4xl tabular-nums w-10 text-center">{s2}</span>
-              <button onClick={() => setS2(v => v+1)} className="w-9 h-9 rounded-xl bg-white/6 hover:bg-white/12 text-white font-black text-lg transition-colors">＋</button>
+              <button onClick={() => setS2(v => Math.max(0, v-1))} className="w-9 h-9 shrink-0 rounded-xl bg-white/6 hover:bg-white/12 text-white font-black text-lg transition-colors">–</button>
+              <span className="text-white font-black text-4xl tabular-nums w-10 text-center shrink-0">{s2}</span>
+              <button onClick={() => setS2(v => v+1)} className="w-9 h-9 shrink-0 rounded-xl bg-white/6 hover:bg-white/12 text-white font-black text-lg transition-colors">＋</button>
             </div>
           </div>
         </div>
