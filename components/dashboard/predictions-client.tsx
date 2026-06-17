@@ -1,7 +1,7 @@
 "use client"
 
 // Poner en false para cerrar todos los pronósticos manualmente
-const PREDICTIONS_OPEN = false
+const PREDICTIONS_OPEN = true
 
 import { useState, useTransition, useRef, useCallback, useEffect } from "react"
 import { CheckCircle2, Clock, Lock, XCircle, ChevronDown, AlertCircle } from "lucide-react"
