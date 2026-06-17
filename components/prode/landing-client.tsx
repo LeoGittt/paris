@@ -549,6 +549,7 @@ export function LandingClient({ rankingRows, prizes, upcomingMatches }: Props) {
               <span className="text-emerald-400 text-[11px] font-black uppercase tracking-widest">En curso — resultado parcial</span>
             </div>
             <p className="text-white/50 text-base md:text-lg max-w-md mx-auto font-medium">Los mejores pronosticadores compiten por el gran premio.</p>
+            <p className="text-white/25 text-sm max-w-sm mx-auto mt-2">La competencia sigue en curso — estas posiciones pueden cambiar partido a partido.</p>
           </div>
           <div className="max-w-3xl mx-auto">
             <RankingTable rows={rankingRows} />
