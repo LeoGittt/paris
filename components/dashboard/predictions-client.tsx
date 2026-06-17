@@ -1,5 +1,8 @@
 "use client"
 
+// Poner en false para cerrar todos los pronósticos manualmente
+const PREDICTIONS_OPEN = false
+
 import { useState, useTransition, useRef, useCallback, useEffect } from "react"
 import { CheckCircle2, Clock, Lock, XCircle, ChevronDown, AlertCircle } from "lucide-react"
 import { savePrediction } from "@/lib/actions/predictions"
@@ -105,7 +108,7 @@ function PredictionCard({
   const debounceRef  = useRef<ReturnType<typeof setTimeout> | null>(null)
   const savedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const isLocked  = match.predictions_locked || match.is_finished || new Date(match.match_date) <= new Date()
+  const isLocked  = !PREDICTIONS_OPEN || match.predictions_locked || match.is_finished || new Date(match.match_date) <= new Date()
   const hasPred   = !!prediction
   const resultCfg = prediction ? (RESULT_CONFIG[prediction.result] ?? RESULT_CONFIG.pending) : null
 
