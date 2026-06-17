@@ -50,7 +50,7 @@ export default async function ProdePage() {
       .from("ranking_view")
       .select("participant_id, first_name, last_name, total_points, correct_exact, ranking_position")
       .order("ranking_position", { ascending: true })
-      .limit(8) as unknown as Promise<{ data: RankingRow[] | null }>,
+      .limit(5) as unknown as Promise<{ data: RankingRow[] | null }>,
 
     supabase
       .from("prizes")
