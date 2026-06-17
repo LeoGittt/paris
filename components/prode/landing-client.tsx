@@ -544,6 +544,10 @@ export function LandingClient({ rankingRows, prizes, upcomingMatches }: Props) {
           <div className="text-center mb-14">
             <SectionLabel>Tabla de posiciones</SectionLabel>
             <h2 className="font-black text-white uppercase leading-none text-5xl md:text-7xl mb-4">RANKING</h2>
+            <div className="inline-flex items-center gap-2 bg-[#054a9d]/15 border border-[#054a9d]/30 rounded-full px-4 py-1.5 mb-4">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+              <span className="text-emerald-400 text-[11px] font-black uppercase tracking-widest">En curso — resultado parcial</span>
+            </div>
             <p className="text-white/50 text-base md:text-lg max-w-md mx-auto font-medium">Los mejores pronosticadores compiten por el gran premio.</p>
           </div>
           <div className="max-w-3xl mx-auto">
