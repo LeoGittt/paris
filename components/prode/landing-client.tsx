@@ -538,7 +538,6 @@ export function LandingClient({ rankingRows, prizes, upcomingMatches }: Props) {
       </section>
 
       {/* RANKING */}
-      {/*
       <section id="ranking" className="py-24 md:py-32 bg-[#06192c]">
         <div className="absolute inset-x-0 h-px bg-linear-to-r from-transparent via-[#c3871e]/40 to-transparent" />
         <div className="max-w-7xl mx-auto px-5 md:px-10">
@@ -565,7 +564,6 @@ export function LandingClient({ rankingRows, prizes, upcomingMatches }: Props) {
           </div>
         </div>
       </section>
-      */}
 
       {/* CTA FINAL */}
       <section className="relative py-36 md:py-48 overflow-hidden">
