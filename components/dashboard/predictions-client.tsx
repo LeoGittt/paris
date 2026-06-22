@@ -3,6 +3,15 @@
 // Poner en false para cerrar todos los pronósticos manualmente
 const PREDICTIONS_OPEN = true
 
+// Equipos bloqueados manualmente (independiente del cron y de la DB)
+const LOCKED_TEAM_PAIRS: [string, string][] = [
+  ["Argentina", "Austria"],
+]
+
+function isManuallyLocked(team1: string, team2: string) {
+  return LOCKED_TEAM_PAIRS.some(([t1, t2]) => t1 === team1 && t2 === team2)
+}
+
 import { useState, useTransition, useRef, useCallback, useEffect } from "react"
 import { CheckCircle2, Clock, Lock, XCircle, ChevronDown, AlertCircle } from "lucide-react"
 import { savePrediction } from "@/lib/actions/predictions"
@@ -108,7 +117,7 @@ function PredictionCard({
   const debounceRef  = useRef<ReturnType<typeof setTimeout> | null>(null)
   const savedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const isLocked  = !PREDICTIONS_OPEN || match.predictions_locked || match.is_finished || new Date(match.match_date) <= new Date()
+  const isLocked  = !PREDICTIONS_OPEN || match.predictions_locked || match.is_finished || new Date(match.match_date) <= new Date() || isManuallyLocked(match.team1, match.team2)
   const hasPred   = !!prediction
   const resultCfg = prediction ? (RESULT_CONFIG[prediction.result] ?? RESULT_CONFIG.pending) : null
 
