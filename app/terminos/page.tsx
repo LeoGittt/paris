@@ -75,7 +75,7 @@ export default function TerminosPage() {
             <ul className="list-disc pl-5 mt-2 space-y-1">
               <li><strong className="text-white/70">Resultado exacto</strong> (marcador correcto): 10 puntos.</li>
               <li><strong className="text-white/70">Ganador o empate correcto</strong>: 5 puntos.</li>
-              <li><strong className="text-white/70">Diferencia de goles correcta</strong>: 2 puntos.</li>
+              <li><strong className="text-white/70">Ganador correcto y diferencia de goles exacta</strong>: 7 puntos.</li>
             </ul>
             <p className="mt-2">El Organizador podrá modificar el sistema de puntos con previo aviso a los participantes.</p>
           </Section>

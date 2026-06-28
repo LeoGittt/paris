@@ -90,7 +90,7 @@ export default function BasesPage() {
               {[
                 ["Resultado exacto (marcador correcto)", "10 pts"],
                 ["Ganador o empate correcto", "5 pts"],
-                ["Diferencia de goles correcta", "2 pts"],
+                ["Ganador correcto + diferencia de goles exacta", "7 pts"],
                 ["Resultado incorrecto", "0 pts"],
               ].map(([tipo, pts]) => (
                 <div key={tipo} className="grid grid-cols-2 divide-x divide-white/6 border-t border-white/6">

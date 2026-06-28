@@ -454,7 +454,7 @@ export function LandingClient({ rankingRows, prizes, upcomingMatches }: Props) {
                   color: "#7ab0e8", badge: null,
                 },
                 {
-                  pts: "2", label: "Diferencia de goles",
+                  pts: "7", label: "Diferencia de goles",
                   sub: "Acertás la diferencia entre los equipos",
                   color: "#4ade80", badge: null,
                 },

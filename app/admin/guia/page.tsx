@@ -527,7 +527,7 @@ export default function GuiaPage() {
               headers={["Tipo de acierto", "Puntos", "Descripción"]}
               rows={[
                 [<Badge color="#4ade80">Resultado exacto</Badge>, "10 pts", "Marcador correcto (ej: predijo 2-1, fue 2-1)"],
-                [<Badge color="#c3871e">Diferencia de goles</Badge>, "2 pts", "Mismo ganador, misma diferencia (ej: 3-1 → predijo 2-0)"],
+                [<Badge color="#c3871e">Diferencia de goles</Badge>, "7 pts", "Mismo ganador, misma diferencia (ej: 3-1 → predijo 2-0)"],
                 [<Badge color="#7ab0e8">Ganador / empate</Badge>, "5 pts", "Acertó quién ganó o que empataron, diferencia incorrecta"],
                 [<Badge color="#f87171">Error</Badge>, "0 pts", "Ganador equivocado o empató cuando predijo victoria"],
               ]}
@@ -537,7 +537,7 @@ export default function GuiaPage() {
             <div className="space-y-3">
               {[
                 { real: "2-1", pred: "2-1", result: "Exacto",    pts: 10, color: "#4ade80" },
-                { real: "3-1", pred: "2-0", result: "Diferencia", pts: 2,  color: "#c3871e" },
+                { real: "3-1", pred: "2-0", result: "Diferencia", pts: 7,  color: "#c3871e" },
                 { real: "3-0", pred: "1-0", result: "Ganador",   pts: 5,  color: "#7ab0e8" },
                 { real: "2-0", pred: "0-1", result: "Error",     pts: 0,  color: "#f87171" },
               ].map(ex => (
