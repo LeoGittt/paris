@@ -81,10 +81,10 @@ export default async function PublicRankingPage() {
             {/* Header tabla */}
             <div className="grid grid-cols-12 px-5 py-3 bg-[#06192c]/50 border-b border-white/6">
               {[
-                { l: "#",       c: "col-span-1 text-center" },
-                { l: "Jugador", c: "col-span-7" },
-                { l: "Pts",     c: "col-span-2 text-center" },
-                { l: "Exactos", c: "col-span-2 text-center" },
+                // { l: "#",       c: "col-span-1 text-center" },
+                { l: "Jugador", c: "col-span-10" },
+                { l: "Pts",     c: "col-span-1 text-center" },
+                { l: "Exactos", c: "col-span-1 text-center" },
               ].map(h => (
                 <div key={h.l} className={`${h.c} text-white/20 text-[9px] font-black uppercase tracking-[0.25em]`}>{h.l}</div>
               ))}
@@ -100,14 +100,14 @@ export default async function PublicRankingPage() {
 
                 return (
                   <div key={p.participant_id} className="grid grid-cols-12 items-center px-5 py-3.5 hover:bg-white/3 transition-colors">
-                    <div className="col-span-1 text-center">
+                    {/* <div className="col-span-1 text-center">
                       {medalColor ? (
                         <span className="font-black text-sm" style={{ color: medalColor }}>{pos}</span>
                       ) : (
                         <span className="text-white/25 text-sm font-black">{pos}</span>
                       )}
-                    </div>
-                    <div className="col-span-7 flex items-center gap-2.5">
+                    </div> */}
+                    <div className="col-span-10 flex items-center gap-2.5 overflow-hidden">
                       <div
                         className="w-8 h-8 rounded-lg shrink-0 flex items-center justify-center text-[10px] font-black"
                         style={{
@@ -118,19 +118,19 @@ export default async function PublicRankingPage() {
                       >
                         {p.first_name[0]}{p.last_name[0]}
                       </div>
-                      <span className="text-white/70 text-sm font-bold truncate">
+                      <span className="text-white/70 text-sm font-bold flex-1 min-w-0 truncate">
                         {p.first_name} {p.last_name}
                       </span>
                       {p.is_pain_mania_fan && (
                         <span title="Seguidor de Tim Payne desde antes que fuera famoso" className="text-sm select-none shrink-0">🇳🇿</span>
                       )}
                     </div>
-                    <div className="col-span-2 text-center">
+                    <div className="col-span-1 text-center">
                       <span className="font-black text-base tabular-nums" style={{ color: medalColor ?? "rgba(255,255,255,0.7)" }}>
                         {p.total_points}
                       </span>
                     </div>
-                    <div className="col-span-2 text-center">
+                    <div className="col-span-1 text-center">
                       <span className="text-emerald-400/70 font-black text-sm tabular-nums">{p.correct_exact}</span>
                     </div>
                   </div>

@@ -6,6 +6,7 @@ const PREDICTIONS_OPEN = true
 // Equipos bloqueados manualmente (independiente del cron y de la DB)
 const LOCKED_TEAM_PAIRS: [string, string][] = [
   ["Argentina", "Austria"],
+  ["Jordania", "Argentina"],
 ]
 
 function isManuallyLocked(team1: string, team2: string) {
