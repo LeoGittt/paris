@@ -144,12 +144,21 @@ function LandingMatchCard({ match }: { match: LandingMatch }) {
   const dateStr = match.formatted_date
   const timeStr = match.formatted_time
 
+  const stageLabel = match.group_name ?? {
+    round_of_32: "Dieciseisavos de Final",
+    round_of_16: "Octavos de Final",
+    quarterfinal: "Cuartos de Final",
+    semifinal: "Semifinal",
+    third_place: "Tercer Puesto",
+    final: "Final",
+  }[match.stage as string] ?? match.stage
+
   return (
     <div className="group relative rounded-2xl bg-[#0b2440] border border-white/8 group-hover:border-white/16 overflow-hidden transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-black/30">
       <div className="flex justify-center pt-3.5 pb-0 px-4">
         <span className="text-[#7ab0e8] text-[10px] font-black uppercase tracking-[0.25em]"
           style={{ fontFamily: "'ChevySans', sans-serif" }}>
-          {match.group_name ?? match.stage}
+          {stageLabel}
         </span>
       </div>
       <div className="flex items-center justify-center gap-3 px-4 py-2">
