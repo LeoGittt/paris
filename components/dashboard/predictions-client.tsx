@@ -7,6 +7,7 @@ const PREDICTIONS_OPEN = true
 const LOCKED_TEAM_PAIRS: [string, string][] = [
   ["Argentina", "Austria"],
   ["Jordania", "Argentina"],
+  ["Argentina", "Cabo Verde"],
 ]
 
 function isManuallyLocked(team1: string, team2: string) {
