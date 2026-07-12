@@ -9,10 +9,13 @@ const LOCKED_TEAM_PAIRS: [string, string][] = [
   ["Jordania", "Argentina"],
   ["Argentina", "Cabo Verde"],
   ["Argentina", "Egipto"],
+  ["Argentina", "Suiza"],
 ]
 
 function isManuallyLocked(team1: string, team2: string) {
-  return LOCKED_TEAM_PAIRS.some(([t1, t2]) => t1 === team1 && t2 === team2)
+  return LOCKED_TEAM_PAIRS.some(
+    ([t1, t2]) => (t1 === team1 && t2 === team2) || (t1 === team2 && t2 === team1)
+  )
 }
 
 import { useState, useTransition, useRef, useCallback, useEffect } from "react"
