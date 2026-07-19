@@ -11,7 +11,6 @@ const LOCKED_TEAM_PAIRS: [string, string][] = [
   ["Argentina", "Inglaterra"],
   ["Argentina", "Egipto"],
   ["Argentina", "Suiza"],
-  ["Argentina", "España"],
 ]
 
 function isManuallyLocked(team1: string, team2: string) {
